@@ -1,2 +1,3 @@
 argcomplete
 GitPython
+lxml
