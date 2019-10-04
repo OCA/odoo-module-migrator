@@ -41,11 +41,11 @@ def _migrate_module(args, module_path, git_repository=False):
         # Execute migration that have to be done for all version after
         # a given revision
         # Exemple remove python3 header if version >= to 11.0
-        # script_module = importlib.import_module(
-        #     'odoo_migrate.migrate_%s__all' % (
-        #         migration[0].replace('.', '_')))
-        # _migrate_module_script(
-        #     args, module_path, script_module, git_repository)
+        script_module = importlib.import_module(
+            'odoo_migrate.migrate_%s__all' % (
+                migration[0].replace('.', '_')))
+        _migrate_module_script(
+            args, module_path, script_module, git_repository)
 
     # Finally, execute a script that will be allways executed
     script_module = importlib.import_module('odoo_migrate.migrate_allways')
