@@ -14,47 +14,57 @@ from pathlib import Path
 
 _logger = logging.getLogger(__name__)
 
+_ALLOWED_EXTENSIONS = ['.py', '.xml', '.js']
 
 _MIGRATION_LIST = [
     ('8.0', '9.0'),
     ('9.0', '10.0'),
     ('10.0', '11.0'),
     ('11.0', '12.0'),
-    ('12.0', '13.0'),
 ]
 
 
-def _migrate(args, repo):
+def _migrate_module(args, module_path, git_repository=False):
     migration_list = _migration_list(args.init_version, args.target_version)
 
     for migration in migration_list:
+        # Execute specific migration for a version to another
+        # Exemple 8.0 -> 9.0
         script_module = importlib.import_module(
             'odoo_migrate.migrate_%s__%s' % (
                 migration[0].replace('.', '_'),
                 (migration[1].replace('.', '_'))))
-        _run_migrate(script_module, args, repo)
+        _migrate_module_script(
+            args, module_path, script_module, git_repository)
+
+        # Execute migration that have to be done for all version after
+        # a given revision
+        # Exemple remove python3 header if version >= to 11.0
+        # script_module = importlib.import_module(
+        #     'odoo_migrate.migrate_%s__all' % (
+        #         migration[0].replace('.', '_')))
+        # _migrate_module_script(
+        #     args, module_path, script_module, git_repository)
+
+    # Finally, execute a script that will be allways executed
     script_module = importlib.import_module('odoo_migrate.migrate_allways')
-    _run_migrate(script_module, args, repo)
+    _migrate_module_script(args, module_path, script_module, git_repository)
 
 
-def _find_git_folder(args):
-    try:
-        return Repo(args.directory)
-    except:
-        return False
-
-
-def _run_migrate(script_module, args, repo):
-    _logger.debug("Begin migration script '%s'" % script_module)
+def _migrate_module_script(
+        args, module_path, script_module, git_repository=False):
+    _logger.debug(
+        "Begin migration script '%s' in folder %s " % (
+            script_module.__name__, module_path))
 
     file_renames = getattr(script_module, '_FILE_RENAMES', {})
 
     text_replaces = getattr(script_module, '_TEXT_REPLACES', {})
 
-    for root, directories, filenames in os.walk(args.full_path):
+    for root, directories, filenames in os.walk(module_path._str):
         for filename in filenames:
             extension = os.path.splitext(filename)[1]
-            if extension not in ['.py', '.xml', '.js']:
+            if extension not in _ALLOWED_EXTENSIONS:
                 continue
 
             filenameWithPath = os.path.join(root, filename)
@@ -68,8 +78,6 @@ def _run_migrate(script_module, args, repo):
                 replaces = text_replaces.get('*', {})
                 replaces.update(text_replaces.get(extension, {}))
 
-                if replaces:
-                    print(replaces)
                 for old_term, new_term in replaces.items():
                     newText = re.sub(old_term, new_term, newText)
 
@@ -85,7 +93,6 @@ def _run_migrate(script_module, args, repo):
                 _logger.info(
                     "renaming file: %s. New name: %s " % (filename, new_name))
 
-                import pdb; pdb.set_trace()
                 os.rename(filenameWithPath, os.path.join(root, new_name))
 
 
@@ -208,24 +215,18 @@ def main():
         _logger.debug("The lib will process the following modules %s" % (
             ', '.join([x.name for x in modules_path])))
 
-        # full_path = os.path.join(args.directory, args.module_name)
+        # Get Git repository
+        try:
+            git_repository = Repo(args.directory)
+        except:
+            git_repository = False
+            _logger.warning(
+                "%s doesn't appear to be a valid repository."
+                " Git command will be ignored.")
 
-        # # Get Repo
-        # repo = _find_git_folder(args)
+        for module_path in modules_path:
+            _migrate_module(args, module_path, git_repository)
 
-        # if not os.path.exists(full_path):
-        #     # If the folder of the module doesn't exist, we suppose we have
-        #     # to cherry pick the module from the old version
-        #     # TODO Cherry Pick
-        #     pass
-
-        #     # Create new branch, if required
-        #     branch_name = "ù"
-        #     branch = repo.create_head(branch_name)
-        #     repo.head.set_reference(branch)
-        # setattr(args, 'full_path', full_path)
-
-        # _migrate(args, repo)
     except KeyboardInterrupt:
         pass
 
