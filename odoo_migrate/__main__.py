@@ -66,13 +66,13 @@ def _migrate_module_script(
     )
 
     file_renames = getattr(script_module, "_FILE_RENAMES", {})
-
-    text_replaces = getattr(script_module, "_TEXT_REPLACES", {})
+    # text_replaces = getattr(script_module, "_TEXT_REPLACES", {})
+    text_warnings = getattr(script_module, "_TEXT_WARNING", {})
 
     for root, directories, filenames in os.walk(module_path._str):
         for filename in filenames:
             # Skip useless file
-            # TODO, skip files present in some folder. (for exemple 'lib')
+            # TODO, skip files present in some folders. (for exemple 'lib')
             extension = os.path.splitext(filename)[1]
             if extension not in _ALLOWED_EXTENSIONS:
                 continue
@@ -80,10 +80,18 @@ def _migrate_module_script(
             filenameWithPath = os.path.join(root, filename)
             _logger.debug("Migrate '%s' file" % filenameWithPath)
 
-            # with open(filenameWithPath, "U") as f:
+            # Rename file, if required
+            new_name = file_renames.get(filename)
+            if new_name:
+                migrate_tools._rename_file(
+                    _logger, module_path, filenameWithPath,
+                    os.path.join(root, new_name))
+                filenameWithPath = os.path.join(root, new_name)
 
-            #     currentText = f.read()
-            #     newText = currentText
+            # Operate changes in the file (replacement, changes)
+            with open(filenameWithPath, "U") as f:
+                currentText = f.read()
+                newText = currentText
 
             #     replaces = text_replaces.get("*", {})
             #     replaces.update(text_replaces.get(extension, {}))
@@ -97,12 +105,12 @@ def _migrate_module_script(
             #         with open(filenameWithPath, "w") as f:
             #             f.write(newText)
 
-            # At the end, rename file, if required
-            new_name = file_renames.get(filename)
-            if new_name:
-                migrate_tools._rename_file(
-                    _logger, module_path, filenameWithPath,
-                    os.path.join(root, new_name))
+                # Display warnings if the file content some obsolete code
+                warnings = text_warnings.get("*", {})
+                warnings.update(text_warnings.get(extension, {}))
+                for pattern, warning_message in warnings.items():
+                    if re.findall(pattern, newText):
+                        _logger.warning(warning_message)
 
 
 def _get_init_versions():
