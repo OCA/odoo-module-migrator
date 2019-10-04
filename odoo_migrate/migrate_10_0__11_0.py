@@ -1,6 +1,1 @@
-_TEXT_REPLACES = {
-    '.py': {
-        '# coding: utf-8\n': '',
-        '# -*- coding: utf-8 -*-\n': '',
-    }
-}
+_TEXT_WARNING = {"ir.values": "ir.values table has been deleted"}

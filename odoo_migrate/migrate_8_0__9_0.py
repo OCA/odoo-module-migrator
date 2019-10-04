@@ -1,5 +1,1 @@
-_TEXT_REPLACES = {
-    '.py': {
-        'select=True': 'index=True',
-    },
-}
+_TEXT_REPLACES = {".py": {"select=True": "index=True"}}
