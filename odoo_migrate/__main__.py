@@ -8,8 +8,8 @@ import logging
 import importlib
 import os
 import re
-from git import Repo
 from pathlib import Path
+from . import migrate_tools
 
 
 _logger = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ _MIGRATION_LIST = [
 ]
 
 
-def _migrate_module(args, module_path, git_repository=False):
+def _migrate_module(args, module_path):
     migration_list = _get_migration_list(
         args.init_version, args.target_version
     )
@@ -40,7 +40,7 @@ def _migrate_module(args, module_path, git_repository=False):
             )
         )
         _migrate_module_script(
-            args, module_path, script_module, git_repository
+            args, module_path, script_module
         )
 
         # Execute migration that have to be done for all version after
@@ -50,17 +50,16 @@ def _migrate_module(args, module_path, git_repository=False):
             "odoo_migrate.migrate_%s__all" % (migration[0].replace(".", "_"))
         )
         _migrate_module_script(
-            args, module_path, script_module, git_repository
+            args, module_path, script_module
         )
 
     # Finally, execute a script that will be allways executed
     script_module = importlib.import_module("odoo_migrate.migrate_allways")
-    _migrate_module_script(args, module_path, script_module, git_repository)
+    _migrate_module_script(args, module_path, script_module)
 
 
 def _migrate_module_script(
-    args, module_path, script_module, git_repository=False
-):
+        args, module_path, script_module):
     _logger.debug(
         "Begin migration script '%s' in folder %s "
         % (script_module.__name__, module_path)
@@ -72,6 +71,8 @@ def _migrate_module_script(
 
     for root, directories, filenames in os.walk(module_path._str):
         for filename in filenames:
+            # Skip useless file
+            # TODO, skip files present in some folder. (for exemple 'lib')
             extension = os.path.splitext(filename)[1]
             if extension not in _ALLOWED_EXTENSIONS:
                 continue
@@ -79,31 +80,29 @@ def _migrate_module_script(
             filenameWithPath = os.path.join(root, filename)
             _logger.debug("Migrate '%s' file" % filenameWithPath)
 
-            with open(filenameWithPath, "U") as f:
+            # with open(filenameWithPath, "U") as f:
 
-                currentText = f.read()
-                newText = currentText
+            #     currentText = f.read()
+            #     newText = currentText
 
-                replaces = text_replaces.get("*", {})
-                replaces.update(text_replaces.get(extension, {}))
+            #     replaces = text_replaces.get("*", {})
+            #     replaces.update(text_replaces.get(extension, {}))
 
-                for old_term, new_term in replaces.items():
-                    newText = re.sub(old_term, new_term, newText)
+            #     for old_term, new_term in replaces.items():
+            #         newText = re.sub(old_term, new_term, newText)
 
-                # Write file if changed
-                if newText != currentText:
-                    _logger.info("Changing content of file: %s" % filename)
-                    with open(filenameWithPath, "w") as f:
-                        f.write(newText)
+            #     # Write file if changed
+            #     if newText != currentText:
+            #         _logger.info("Changing content of file: %s" % filename)
+            #         with open(filenameWithPath, "w") as f:
+            #             f.write(newText)
 
             # At the end, rename file, if required
             new_name = file_renames.get(filename)
             if new_name:
-                _logger.info(
-                    "renaming file: %s. New name: %s " % (filename, new_name)
-                )
-
-                os.rename(filenameWithPath, os.path.join(root, new_name))
+                migrate_tools._rename_file(
+                    _logger, module_path, filenameWithPath,
+                    os.path.join(root, new_name))
 
 
 def _get_init_versions():
@@ -239,18 +238,8 @@ def main():
             % (", ".join([x.name for x in modules_path]))
         )
 
-        # Get Git repository
-        try:
-            git_repository = Repo(args.directory)
-        except:
-            git_repository = False
-            _logger.warning(
-                "%s doesn't appear to be a valid repository."
-                " Git command will be ignored."
-            )
-
         for module_path in modules_path:
-            _migrate_module(args, module_path, git_repository)
+            _migrate_module(args, module_path)
 
     except KeyboardInterrupt:
         pass
