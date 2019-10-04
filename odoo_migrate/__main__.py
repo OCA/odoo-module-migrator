@@ -14,53 +14,61 @@ from pathlib import Path
 
 _logger = logging.getLogger(__name__)
 
-_ALLOWED_EXTENSIONS = ['.py', '.xml', '.js']
+_ALLOWED_EXTENSIONS = [".py", ".xml", ".js"]
 
 _MIGRATION_LIST = [
-    ('8.0', '9.0'),
-    ('9.0', '10.0'),
-    ('10.0', '11.0'),
-    ('11.0', '12.0'),
+    ("8.0", "9.0"),
+    ("9.0", "10.0"),
+    ("10.0", "11.0"),
+    ("11.0", "12.0"),
 ]
 
 
 def _migrate_module(args, module_path, git_repository=False):
     migration_list = _get_migration_list(
-        args.init_version, args.target_version)
+        args.init_version, args.target_version
+    )
 
     for migration in migration_list:
         # Execute specific migration for a version to another
         # Exemple 8.0 -> 9.0
         script_module = importlib.import_module(
-            'odoo_migrate.migrate_%s__%s' % (
-                migration[0].replace('.', '_'),
-                (migration[1].replace('.', '_'))))
+            "odoo_migrate.migrate_%s__%s"
+            % (
+                migration[0].replace(".", "_"),
+                (migration[1].replace(".", "_")),
+            )
+        )
         _migrate_module_script(
-            args, module_path, script_module, git_repository)
+            args, module_path, script_module, git_repository
+        )
 
         # Execute migration that have to be done for all version after
         # a given revision
         # Exemple remove python3 header if version >= to 11.0
         script_module = importlib.import_module(
-            'odoo_migrate.migrate_%s__all' % (
-                migration[0].replace('.', '_')))
+            "odoo_migrate.migrate_%s__all" % (migration[0].replace(".", "_"))
+        )
         _migrate_module_script(
-            args, module_path, script_module, git_repository)
+            args, module_path, script_module, git_repository
+        )
 
     # Finally, execute a script that will be allways executed
-    script_module = importlib.import_module('odoo_migrate.migrate_allways')
+    script_module = importlib.import_module("odoo_migrate.migrate_allways")
     _migrate_module_script(args, module_path, script_module, git_repository)
 
 
 def _migrate_module_script(
-        args, module_path, script_module, git_repository=False):
+    args, module_path, script_module, git_repository=False
+):
     _logger.debug(
-        "Begin migration script '%s' in folder %s " % (
-            script_module.__name__, module_path))
+        "Begin migration script '%s' in folder %s "
+        % (script_module.__name__, module_path)
+    )
 
-    file_renames = getattr(script_module, '_FILE_RENAMES', {})
+    file_renames = getattr(script_module, "_FILE_RENAMES", {})
 
-    text_replaces = getattr(script_module, '_TEXT_REPLACES', {})
+    text_replaces = getattr(script_module, "_TEXT_REPLACES", {})
 
     for root, directories, filenames in os.walk(module_path._str):
         for filename in filenames:
@@ -71,12 +79,12 @@ def _migrate_module_script(
             filenameWithPath = os.path.join(root, filename)
             _logger.debug("Migrate '%s' file" % filenameWithPath)
 
-            with open(filenameWithPath, 'U') as f:
+            with open(filenameWithPath, "U") as f:
 
                 currentText = f.read()
                 newText = currentText
 
-                replaces = text_replaces.get('*', {})
+                replaces = text_replaces.get("*", {})
                 replaces.update(text_replaces.get(extension, {}))
 
                 for old_term, new_term in replaces.items():
@@ -92,7 +100,8 @@ def _migrate_module_script(
             new_name = file_renames.get(filename)
             if new_name:
                 _logger.info(
-                    "renaming file: %s. New name: %s " % (filename, new_name))
+                    "renaming file: %s. New name: %s " % (filename, new_name)
+                )
 
                 os.rename(filenameWithPath, os.path.join(root, new_name))
 
@@ -126,47 +135,58 @@ def get_parser():
     """Return :py:class:`argparse.ArgumentParser` instance for CLI."""
 
     main_parser = argparse.ArgumentParser(
-        formatter_class=argparse.RawTextHelpFormatter)
+        formatter_class=argparse.RawTextHelpFormatter
+    )
 
     main_parser.add_argument(
-        '-d', '--directory',
-        dest='directory',
-        required=True, type=str,
+        "-d",
+        "--directory",
+        dest="directory",
+        required=True,
+        type=str,
         help="Target Modules directory. Set here a folder path"
         " that contains Odoo modules you want to migrate from a version"
-        " to another.")
+        " to another.",
+    )
 
     main_parser.add_argument(
-        '-m', '--module_list',
-        dest='module_list',
+        "-m",
+        "--module_list",
+        dest="module_list",
         type=str,
         help="Targer Modules to migrate."
         " If not set, all the modules present in the directory will be"
-        " migrated.")
+        " migrated.",
+    )
 
     main_parser.add_argument(
-        '-i', '--init-version',
+        "-i",
+        "--init-version",
         choices=_get_init_versions(),
-        dest='init_version',
+        dest="init_version",
         required=True,
-        type=str)
+        type=str,
+    )
 
     main_parser.add_argument(
-        '-l', '--log-level',
-        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
-        dest='log_level',
-        default='INFO',
-        type=str)
+        "-l",
+        "--log-level",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        dest="log_level",
+        default="INFO",
+        type=str,
+    )
 
     main_parser.add_argument(
-        '-t', '--target-version',
-        dest='target_version',
+        "-t",
+        "--target-version",
+        dest="target_version",
         type=str,
         choices=_get_target_versions(),
         default=_get_latest_version(),
         help="Target version of the Odoo module you want to migrate."
         " If 'latest' is set, the tool will try to migrate to the latest"
-        " Odoo version."
+        " Odoo version.",
     )
 
     return main_parser
@@ -180,8 +200,7 @@ def main():
 
     # Set log level
     handler = logging.StreamHandler()
-    formatter = logging.Formatter(
-        "%(asctime)s %(levelname)-10s %(message)s")
+    formatter = logging.Formatter("%(asctime)s %(levelname)-10s %(message)s")
     handler.setFormatter(formatter)
     _logger.addHandler(handler)
     _logger.setLevel(getattr(logging, str(args.log_level)))
@@ -191,8 +210,7 @@ def main():
         # Get Main path and test if exists
         root_path = Path(args.directory)
         if not root_path.exists():
-            raise ValueError("'%s' is not a valid path." % (
-                args.directory))
+            raise ValueError("'%s' is not a valid path." % (args.directory))
 
         # Recover modules list
         modules_path = []
@@ -201,20 +219,25 @@ def main():
             all_subfolders = [x for x in root_path.iterdir() if x.is_dir()]
         else:
             all_subfolders = [
-                root_path / x for x in args.module_list.split(',')]
+                root_path / x for x in args.module_list.split(",")
+            ]
 
         # check if each folder is a valid module or not
         for subfolder in all_subfolders:
-            if (subfolder / '__openerp__.py').exists()\
-                    or (subfolder / '__manifest__.py').exists():
+            if (subfolder / "__openerp__.py").exists() or (
+                subfolder / "__manifest__.py"
+            ).exists():
                 modules_path.append(subfolder)
             else:
                 if args.module_list:
                     _logger.warning(
-                        "The module %s was not found in the directory %s" % (
-                            subfolder.name, args.directory))
-        _logger.debug("The lib will process the following modules %s" % (
-            ', '.join([x.name for x in modules_path])))
+                        "The module %s was not found in the directory %s"
+                        % (subfolder.name, args.directory)
+                    )
+        _logger.debug(
+            "The lib will process the following modules %s"
+            % (", ".join([x.name for x in modules_path]))
+        )
 
         # Get Git repository
         try:
@@ -223,7 +246,8 @@ def main():
             git_repository = False
             _logger.warning(
                 "%s doesn't appear to be a valid repository."
-                " Git command will be ignored.")
+                " Git command will be ignored."
+            )
 
         for module_path in modules_path:
             _migrate_module(args, module_path, git_repository)
@@ -231,5 +255,6 @@ def main():
     except KeyboardInterrupt:
         pass
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
