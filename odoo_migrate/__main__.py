@@ -66,7 +66,7 @@ def _migrate_module_script(
     )
 
     file_renames = getattr(script_module, "_FILE_RENAMES", {})
-    # text_replaces = getattr(script_module, "_TEXT_REPLACES", {})
+    text_replaces = getattr(script_module, "_TEXT_REPLACES", {})
     text_warnings = getattr(script_module, "_TEXT_WARNING", {})
 
     for root, directories, filenames in os.walk(module_path._str):
@@ -88,22 +88,22 @@ def _migrate_module_script(
                     os.path.join(root, new_name))
                 filenameWithPath = os.path.join(root, new_name)
 
-            # Operate changes in the file (replacement, changes)
             with open(filenameWithPath, "U") as f:
+                # Operate changes in the file (replacements, removals)
                 currentText = f.read()
                 newText = currentText
 
-            #     replaces = text_replaces.get("*", {})
-            #     replaces.update(text_replaces.get(extension, {}))
+                replaces = text_replaces.get("*", {})
+                replaces.update(text_replaces.get(extension, {}))
 
-            #     for old_term, new_term in replaces.items():
-            #         newText = re.sub(old_term, new_term, newText)
+                for old_term, new_term in replaces.items():
+                    newText = re.sub(old_term, new_term, newText)
 
-            #     # Write file if changed
-            #     if newText != currentText:
-            #         _logger.info("Changing content of file: %s" % filename)
-            #         with open(filenameWithPath, "w") as f:
-            #             f.write(newText)
+                # Write file if changed
+                if newText != currentText:
+                    _logger.info("Changing content of file: %s" % filename)
+                    with open(filenameWithPath, "w") as f:
+                        f.write(newText)
 
                 # Display warnings if the file content some obsolete code
                 warnings = text_warnings.get("*", {})
