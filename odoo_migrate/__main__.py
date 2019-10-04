@@ -25,7 +25,8 @@ _MIGRATION_LIST = [
 
 
 def _migrate_module(args, module_path, git_repository=False):
-    migration_list = _migration_list(args.init_version, args.target_version)
+    migration_list = _get_migration_list(
+        args.init_version, args.target_version)
 
     for migration in migration_list:
         # Execute specific migration for a version to another
@@ -108,7 +109,7 @@ def _get_latest_version():
     return _MIGRATION_LIST[-1][1]
 
 
-def _migration_list(init_version, target_version):
+def _get_migration_list(init_version, target_version):
     found = False
     res = []
     for item in _MIGRATION_LIST:
