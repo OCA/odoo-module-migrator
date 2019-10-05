@@ -84,9 +84,17 @@ def get_parser():
     main_parser.add_argument(
         "-fp",
         "--format-patch",
-        dest="format_patch",
-        default=False,
-        type=bool,
+        action='store_true',
+        help="Enable this option, if you want to get the code from the"
+        " previous branch."
+    )
+
+    main_parser.add_argument(
+        "-b",
+        "--enable-black",
+        action='store_true',
+        default=True,
+        help="Enable this option, if you want to use 'black' to clean the code"
     )
 
     main_parser.add_argument(
@@ -189,8 +197,14 @@ def main():
         )
 
         for module_path in modules_path:
+            # Use black to clean the code
+            if args.enable_black:
+                import pdb; pdb.set_trace()
+                pass
+
+            # migrate modules
             migrate_tools._migrate_module(
-                root_path, module_path, migration_list)
+                _logger, root_path, module_path, migration_list)
 
     except KeyboardInterrupt:
         pass

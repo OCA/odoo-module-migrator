@@ -33,6 +33,13 @@ def _migrate_module(logger, root_path, module_path, migration_list):
     script_module = importlib.import_module("odoo_migrate.migrate_allways")
     _migrate_module_script(logger, root_path, module_path, script_module)
 
+    # At the end of the migration, we commit the changes
+    logger.info("Commiting migration changes, if any.")
+    migration_commit_name = "[MIG] %s: Migration to %s (from %s)" % (
+        module_path, migration_list[0], migration_list[-1])
+    _execute_shell(logger, "git add --all")
+    _execute_shell("git commit -m '%s'" % (migration_commit_name))
+
 
 def _migrate_module_script(logger, root_path, module_path, script_module):
     logger.debug("Executing script '%s'" % (script_module.__name__))
@@ -93,10 +100,11 @@ def _rename_file(logger, module_path, old_file_path, new_file_path):
     )
 
     # try:
-    subprocess.check_output(
+    _execute_shell(
+        logger,
         "cd %s && git mv %s %s" % (
             module_path._str, old_file_path, new_file_path
-        ), shell=True)
+        ))
     # except:
     # os.rename(old_file_path, new_file_path)
 
@@ -105,11 +113,15 @@ def _get_code_from_previous_branch(
         logger, root_path, module_name, init_version, target_version,
         remote_name):
 
-    logger.info("Try to format-patch code from the initial branch %s" % (
-        module_name))
-    _execute_shell(logger, "cd %s git fetch %s" % (root_path, remote_name))
+    logger.info("Fetch the repository %s" % (remote_name))
+    _execute_shell(logger, "cd %s && git fetch %s" % (root_path, remote_name))
 
-    subprocess.check_output(
+    branch_name = "%s-mig-%s" % (target_version, module_name)
+    logger.info("Create new branch '%s'" % (branch_name))
+    _execute_shell(logger, "git checkout -b %s" % (branch_name))
+
+    _execute_shell(
+        logger,
         "cd %s && git format-patch --keep-subject --stdout"
         " %s/%s..%s/%s"
         " -- %s | git am -3 --keep" % (
@@ -119,5 +131,5 @@ def _get_code_from_previous_branch(
 
 
 def _execute_shell(logger, shell):
-    logger.debug("Execute: '%s" % (shell))
-    return subprocess.check_output(shell)
+    logger.debug("Execute: '%s'" % (shell))
+    return subprocess.check_output(shell, shell=True)
