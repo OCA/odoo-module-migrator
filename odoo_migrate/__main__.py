@@ -143,7 +143,9 @@ def main():
 
         # Recover modules list
         modules_path = []
-        modules_list = args.modules and args.modules.split(",") or []
+        modules_list = args.modules\
+            and [x for x in args.modules.split(",") if x] or []
+
         if not args.modules:
             # Recover all submodules, if no modules list is provided
             subfolders = [x for x in root_path.iterdir() if x.is_dir()]
@@ -172,17 +174,19 @@ def main():
                         "The module %s was not found in the directory %s"
                         % (subfolder.name, args.directory)
                     )
-        _logger.debug(
-            "The lib will process the following modules '%s'"
-            % (", ".join([x.name for x in modules_path]))
-        )
+
+        if modules_path:
+            _logger.debug(
+                "The lib will process the following modules '%s'"
+                % (", ".join([x.name for x in modules_path]))
+            )
+        else:
+            _logger.error("No module found.")
 
         # Compute migration list
         migration_list = _get_migration_list(
             args.init_version, args.target_version
         )
-        for migration in migration_list:
-            _logger.debug("Migration will be done for")
 
         for module_path in modules_path:
             migrate_tools._migrate_module(
