@@ -28,7 +28,7 @@ Usage
 Migrate Tools
 -------------
 
-this library allow to realize automatically recurring changes when migrating
+This library allow to realize automatically recurring changes when migrating
 Odoo modules from a version to another.
 
 For that purpose, once installed
@@ -40,25 +40,50 @@ For that purpose, once installed
 Settings
 ========
 
-* The list of the operations are written in a file for each migration for exemple
-  ``migrate_10_0__11_0.py`` file contains all the operations to do for a migration
-  from 10.0 to 11.0.
+The list of the operations are written:
+
+* in a file for each migration for exemple ``migrate_10_0__11_0.py`` file
+  contains all the operations to do for a migration from 10.0 to 11.0.
+
+* in a file for operations that should be execute since some revision, named
+  for exemple ``migrate_10_0__all.py``
 
 * a file ``migrate_allways.py`` contains all the operations that will be
-  executed, whatever the init and and the target versions.
+  executed, whatever the init and the target versions.
 
 List of the operations
 ----------------------
 
-* Rename files
+* Rename files. For exemple, for migration from version 8.0 to more recent
+  version
 
 .. code-block:: python
 
     _FILE_RENAMES = {
-        '__openerp__.py': '__manifest__.py',
+        "__openerp__.py": "__manifest__.py",
     }
 
+* Replace pattern text by another. for exemple, for migration from version 8.0
+  to version 9.0:
 
+.. code-block:: python
+
+   _TEXT_REPLACES = {
+        ".py": {
+            "select=True": "index=True",
+        }
+    }
+
+* Display warnings if files contains a given partern. For exemple, for
+  migration from version 10.0 to version 11.0:
+
+.. code-block:: python
+
+    _TEXT_WARNING = {
+        "*": {
+            "ir.values": "ir.values table does not exist anymore"
+        }
+    }
 
 Developement
 ============
@@ -106,8 +131,6 @@ Roadmap / Know issues
 
 * option ``init_version`` : add 'auto' as a possible option, to let library
   guess the current version of the module.
-
-* _FILE_RENAMES should try to make a git mv, instead of making a system rename.
 
 Credits
 =======
