@@ -1,1 +1,1 @@
-_TEXT_REPLACES = {".py": {"#.+coding:\Wutf-8.+\n": ""}}
+_TEXT_REPLACES = {".py": {r"#.+coding:\Wutf-8.+\n": ""}}

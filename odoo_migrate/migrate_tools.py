@@ -92,13 +92,13 @@ def _rename_file(logger, module_path, old_file_path, new_file_path):
         "renaming file: %s. New name: %s " % (old_file_path, new_file_path)
     )
 
-    try:
-        subprocess.check_output(
-            "cd %s && git mv %s %s" % (
-                module_path._str, old_file_path, new_file_path
-            ), shell=True)
-    except:
-        os.rename(old_file_path, new_file_path)
+    # try:
+    subprocess.check_output(
+        "cd %s && git mv %s %s" % (
+            module_path._str, old_file_path, new_file_path
+        ), shell=True)
+    # except:
+    # os.rename(old_file_path, new_file_path)
 
 
 def _get_code_from_previous_branch(

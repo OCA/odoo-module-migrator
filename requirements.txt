@@ -1,2 +1,7 @@
 argcomplete
 lxml
+
+# Test libraries
+tox
+pytest-flake8
+pytest-cov

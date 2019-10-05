@@ -144,7 +144,6 @@ def main():
         # Recover modules list
         modules_path = []
         modules_list = args.modules and args.modules.split(",") or []
-        import pdb; pdb.set_trace()
         if not args.modules:
             # Recover all submodules, if no modules list is provided
             subfolders = [x for x in root_path.iterdir() if x.is_dir()]
