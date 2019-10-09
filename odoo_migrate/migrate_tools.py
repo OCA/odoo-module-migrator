@@ -3,8 +3,6 @@ import subprocess
 import importlib
 import re
 
-_ALLOWED_EXTENSIONS = [".py", ".xml", ".js"]
-
 
 def _migrate_module(logger, root_path, module_path, migration_list):
     logger.info("Migration of module '%s'" % (module_path))

@@ -1,13 +1,4 @@
-# List of migrations handled by this library
-# _MIGRATION_LIST = [
-#     ("8.0", "9.0"),
-#     ("9.0", "10.0"),
-#     ("10.0", "11.0"),
-#     ("11.0", "12.0"),
-#     ("12.0", "13.0"),
-# ]
-
-
+# List of migrations steps handled by this library
 _AVAILABLE_MIGRATION_STEPS = [
     {
         "init_version_name": "8.0",
@@ -34,13 +25,8 @@ _AVAILABLE_MIGRATION_STEPS = [
         "target_version_name": "13.0",
         "init_version_code": "120",
         "target_version_code": "130",
+        "use_black": True,
     },
-
-    # ("8.0", "9.0"),
-    # ("9.0", "10.0"),
-    # ("10.0", "11.0"),
-    # ("11.0", "12.0"),
-    # ("12.0", "13.0"),
 ]
 
 _ALLOWED_EXTENSIONS = [".py", ".xml", ".js"]

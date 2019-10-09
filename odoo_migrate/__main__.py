@@ -4,13 +4,11 @@
 
 import argparse
 import argcomplete
-import logging
 # from pathlib import Path
 # from . import migrate_tools
 from . import tools
+from .log import setup_logger
 from .migration import Migration
-
-_logger = logging.getLogger(__name__)
 
 
 def get_parser():
@@ -72,7 +70,7 @@ def get_parser():
 
     main_parser.add_argument(
         "-b",
-        "--enable-black",
+        "--force-black",
         action='store_true',
         default=True,
         help="Enable this option, if you want to use 'black' to clean the code"
@@ -105,18 +103,15 @@ def main():
     args = parser.parse_args()
 
     # Set log level
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter("%(asctime)s %(levelname)-10s %(message)s")
-    handler.setFormatter(formatter)
-    _logger.addHandler(handler)
-    _logger.setLevel(getattr(logging, str(args.log_level)))
+    setup_logger(args.log_level)
 
     try:
 
         pass
         # Create a new Migration Object
         migration = Migration(
-            args.init_version_name, args.target_version_name, args.directory)
+            args.init_version_name, args.target_version_name, args.directory,
+            args.force_black)
         migration.run()
 
         # # Get Main path and test if exists
