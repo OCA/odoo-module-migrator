@@ -1,26 +1,13 @@
-from . import config
+from .config import _AVAILABLE_MIGRATION_STEPS
 
 
-def _get_init_versions():
-    return [x[0] for x in config._MIGRATION_LIST]
+def _get_available_init_version_names():
+    return [x["init_version_name"] for x in _AVAILABLE_MIGRATION_STEPS]
 
 
-def _get_target_versions():
-    return [x[1] for x in config._MIGRATION_LIST]
+def _get_available_target_version_names():
+    return [x["target_version_name"] for x in _AVAILABLE_MIGRATION_STEPS]
 
 
-def _get_latest_version():
-    return config._MIGRATION_LIST[-1][1]
-
-
-def _get_migration_list(init_version, target_version):
-    found = False
-    res = []
-    for item in config._MIGRATION_LIST:
-        if not found and item[0] != init_version:
-            continue
-        else:
-            found = True
-        res.append(item)
-        if item[1] == target_version:
-            return res
+def _get_latest_version_name():
+    return _AVAILABLE_MIGRATION_STEPS[-1]["target_version_name"]

@@ -5,9 +5,10 @@
 import argparse
 import argcomplete
 import logging
-from pathlib import Path
-from . import migrate_tools
+# from pathlib import Path
+# from . import migrate_tools
 from . import tools
+from .migration import Migration
 
 _logger = logging.getLogger(__name__)
 
@@ -42,11 +43,23 @@ def get_parser():
 
     main_parser.add_argument(
         "-i",
-        "--init-version",
-        choices=tools._get_init_versions(),
-        dest="init_version",
+        "--init-version-name",
+        choices=tools._get_available_init_version_names(),
+        dest="init_version_name",
         required=True,
         type=str,
+    )
+
+    main_parser.add_argument(
+        "-t",
+        "--target-version-name",
+        dest="target_version_name",
+        type=str,
+        choices=tools._get_available_target_version_names(),
+        default=tools._get_latest_version_name(),
+        help="Target version of the Odoo module you want to migrate."
+        " If 'latest' is set, the tool will try to migrate to the latest"
+        " Odoo version.",
     )
 
     main_parser.add_argument(
@@ -82,18 +95,6 @@ def get_parser():
         type=str,
     )
 
-    main_parser.add_argument(
-        "-t",
-        "--target-version",
-        dest="target_version",
-        type=str,
-        choices=tools._get_target_versions(),
-        default=tools._get_latest_version(),
-        help="Target version of the Odoo module you want to migrate."
-        " If 'latest' is set, the tool will try to migrate to the latest"
-        " Odoo version.",
-    )
-
     return main_parser
 
 
@@ -113,6 +114,10 @@ def main():
     try:
 
         pass
+        # Create a new Migration Object
+        migration = Migration(args.init_version_name, args.target_version_name)
+        migration.run()
+
         # # Get Main path and test if exists
         # root_path = Path(args.directory)
         # if not root_path.exists():
