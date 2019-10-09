@@ -1,5 +1,6 @@
 import pathlib
 import os
+import importlib
 from .config import _AVAILABLE_MIGRATION_STEPS
 from .exception import ConfigException
 from .log import logger
@@ -12,7 +13,7 @@ class Migration():
     _migration_steps = []
     _directory_path = False
     _use_black = False
-
+    _migration_scripts = []
     _module_migrations = []
 
     def __init__(
@@ -83,6 +84,9 @@ class Migration():
         for module_name in module_names:
             self._module_migrations.append(ModuleMigration(self, module_name))
 
+        # get migration scripts, depending to the migration list
+        self._get_migration_scripts()
+
     def _is_module_path(self, module_path):
         return (module_path / "__openerp__.py").exists() or\
             (module_path / "__manifest__.py").exists()
@@ -116,6 +120,24 @@ class Migration():
                 'module': module_name,
             }
         )
+
+    def _get_migration_scripts(self):
+
+        for step in self._migration_steps:
+            # Execute specific migration for a version to another
+            # Exemple 8.0 -> 9.0
+            self.migration_scripts.append(importlib.import_module(
+                "odoo_migrate.migration_scripts.migrate_%s__%s" % (
+                    step["init_version_code"],
+                    step["target_version_code"],
+                )
+            ))
+            # TODO, add also 10.0 -> 12.0
+            # or 10.0 to allways script
+
+        # Finally, execute a script that will be allways executed
+        self.migration_scripts.append(importlib.import_module(
+            "odoo_migrate.migration_scripts.migrate_allways"))
 
     def run(self):
         logger.info(
