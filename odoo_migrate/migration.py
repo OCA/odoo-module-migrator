@@ -3,6 +3,7 @@ import os
 from .config import _AVAILABLE_MIGRATION_STEPS
 from .exception import ConfigException
 from .log import logger
+from .tools import _execute_shell
 
 
 class Migration():
@@ -14,8 +15,9 @@ class Migration():
     _module_names = []
 
     def __init__(
-        self, init_version_name, target_version_name, relative_directory_path,
-        module_names, format_patch, force_black,
+        self, relative_directory_path, init_version_name, target_version_name,
+        module_names=[], format_patch=False, remote_name='origin',
+        force_black=False
     ):
         pass
         # Get migration steps that will be runned
@@ -39,8 +41,6 @@ class Migration():
         logger.debug("Module list: %s" % module_names)
         logger.debug("format patch option : %s" % format_patch)
 
-        # TODO FORMAT PATCH, if required
-
         # convert relative or absolute directory into Path Object
         if not os.path.exists(relative_directory_path):
             raise ConfigException(
@@ -49,6 +49,11 @@ class Migration():
         root_path = pathlib.Path(relative_directory_path)
         self._directory_path = pathlib.Path(root_path.resolve(strict=True))
 
+        # format-patch, if required
+        if format_patch:
+            self._get_code_from_previous_branch(module_names[0], remote_name)
+
+        # Guess modules if not provided, and check validity
         if not module_names:
             module_names = []
             # Recover all submodules, if no modules list is provided
@@ -73,6 +78,45 @@ class Migration():
     def _is_module_path(self, module_path):
         return (module_path / "__openerp__.py").exists() or\
             (module_path / "__manifest__.py").exists()
+
+    def _get_code_from_previous_branch(self, module_name, remote_name):
+        init_version = self._migration_steps[0]["init_version_name"]
+        target_version = self._migration_steps[-1]["target_version_name"]
+        branch_name = "%(version)s-mig-%(module_name)s" % {
+            'version': target_version,
+            'module_name': module_name}
+
+        logger.info("Creating new branch '%s' ..." % (branch_name))
+        _execute_shell(
+            "cd %(path)s && "
+            "git checkout -b %(branch)s %(remote)s/%(version)s" % {
+                'path': self._directory_path.resolve(),
+                'branch': branch_name,
+                'remote': remote_name,
+                'version': target_version,
+            })
+
+        _execute_shell(
+            "cd %(path)s && "
+            "git format-patch --keep-subject "
+            "--stdout %(remote)s/%(target)s..%(remote)s/%(init)s "
+            "-- %(module)s | git am -3 --keep" % {
+                'path': self._directory_path.resolve(),
+                'remote': remote_name,
+                'init': init_version,
+                'target': target_version,
+                'module': module_name,
+            }
+        )
+
+        # _execute_shell(
+        #     logger,
+        #     "cd %s && git format-patch --keep-subject --stdout"
+        #     " %s/%s..%s/%s"
+        #     " -- %s | git am -3 --keep" % (
+        #         root_path,
+        #         remote_name, target_version, remote_name, init_version,
+        #         module_name))
 
     def run(self):
         print(self._migration_steps)

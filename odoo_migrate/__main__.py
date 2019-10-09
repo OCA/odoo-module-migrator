@@ -111,8 +111,9 @@ def main():
             and [x.strip() for x in args.modules.split(",") if x.strip()] or []
 
         migration = Migration(
-            args.init_version_name, args.target_version_name, args.directory,
-            module_names, args.format_patch, args.force_black)
+            args.directory, args.init_version_name, args.target_version_name,
+            module_names, args.format_patch, args.remote_name, args.force_black
+        )
 
         # run Migration
         migration.run()

@@ -1,4 +1,10 @@
 # List of migrations steps handled by this library
+# * init and target name are friendly name used by the user, when calling
+#   the lib.
+# * init and target code are technical code used to name the migration script
+#   files.
+# * Optional : "use_black" (default=false) the migration will begin with
+#   a call of the library black.
 _AVAILABLE_MIGRATION_STEPS = [
     {
         "init_version_name": "8.0",
