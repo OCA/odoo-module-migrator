@@ -126,7 +126,7 @@ class Migration():
         for step in self._migration_steps:
             # Execute specific migration for a version to another
             # Exemple 8.0 -> 9.0
-            self.migration_scripts.append(importlib.import_module(
+            self._migration_scripts.append(importlib.import_module(
                 "odoo_migrate.migration_scripts.migrate_%s__%s" % (
                     step["init_version_code"],
                     step["target_version_code"],
@@ -136,8 +136,12 @@ class Migration():
             # or 10.0 to allways script
 
         # Finally, execute a script that will be allways executed
-        self.migration_scripts.append(importlib.import_module(
+        self._migration_scripts.append(importlib.import_module(
             "odoo_migrate.migration_scripts.migrate_allways"))
+        logger.debug(
+            "The following migration script will be"
+            " executed:\n- %s" % '\n- '.join(
+                [x.__file__.split('/')[-1] for x in self._migration_scripts]))
 
     def run(self):
         logger.info(
