@@ -8,12 +8,14 @@ from .log import logger
 class Migration():
 
     _migration_steps = []
-    _absolute_directory_path = False
+    _directory_path = False
     _use_black = False
+
+    _module_names = []
 
     def __init__(
         self, init_version_name, target_version_name, relative_directory_path,
-        force_black,
+        module_names, format_patch, force_black,
     ):
         pass
         # Get migration steps that will be runned
@@ -30,18 +32,55 @@ class Migration():
                 # This is the last step, exiting
                 break
 
-        # Get absolute directory path of the repository
+        # Check consistency between format patch and module_names args
+        if format_patch and len(module_names) != 1:
+            raise ConfigException(
+                "Format patch option can only be used for a single module")
+        logger.debug("Module list: %s" % module_names)
+        logger.debug("format patch option : %s" % format_patch)
+
+        # TODO FORMAT PATCH, if required
+
+        # convert relative or absolute directory into Path Object
         if not os.path.exists(relative_directory_path):
             raise ConfigException(
                 "Unable to find directory: %s" % relative_directory_path)
 
-        self._absolute_directory_path =\
-            pathlib.Path(relative_directory_path).resolve(strict=True)
+        root_path = pathlib.Path(relative_directory_path)
+        self._directory_path = pathlib.Path(root_path.resolve(strict=True))
+
+        if not module_names:
+            module_names = []
+            # Recover all submodules, if no modules list is provided
+            child_paths = [x for x in root_path.iterdir() if x.is_dir()]
+            for child_path in child_paths:
+                if self._is_module_path(child_path):
+                    module_names.append(child_path.name)
+        else:
+            child_paths = [root_path / x for x in module_names]
+            for child_path in child_paths:
+                if not self._is_module_path(child_path):
+                    module_names.remove(child_path.name)
+                    logger.warning(
+                        "No valid module found for '%s' in the directory '%s'"
+                        % (child_path.name, root_path.resolve()))
+
+        if not module_names:
+            raise ConfigException("No modules found to migrate. Exiting.")
+
+        self._module_names = module_names
+
+    def _is_module_path(self, module_path):
+        return (module_path / "__openerp__.py").exists() or\
+            (module_path / "__manifest__.py").exists()
 
     def run(self):
-        logger.info(">>> Absolute Directory Path ")
-        # logger.debug(self._absolute_directory_path)
-        # logger.debug(">>> The following Migration Steps will be executed")
-        # logger.debug(self._migration_steps)
-        # logger.debug(">>> Use black")
-        # logger.debug(self._use_black)
+        print(self._migration_steps)
+        logger.info(
+            "Running migration from %s to %s:\n"
+            "- Directory: %s\n"
+            "- Modules: %s" % (
+                self._migration_steps[0]["init_version_name"],
+                self._migration_steps[-1]["target_version_name"],
+                self._directory_path.resolve(),
+                self._module_names))

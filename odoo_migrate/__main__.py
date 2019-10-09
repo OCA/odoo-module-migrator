@@ -89,7 +89,7 @@ def get_parser():
         "--log-level",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         dest="log_level",
-        default="INFO",
+        default="DEBUG",
         type=str,
     )
 
@@ -106,12 +106,15 @@ def main():
     setup_logger(args.log_level)
 
     try:
-
-        pass
         # Create a new Migration Object
+        module_names = args.modules\
+            and [x.strip() for x in args.modules.split(",") if x.strip()] or []
+
         migration = Migration(
             args.init_version_name, args.target_version_name, args.directory,
-            args.force_black)
+            module_names, args.format_patch, args.force_black)
+
+        # run Migration
         migration.run()
 
         # # Get Main path and test if exists
