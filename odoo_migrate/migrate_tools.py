@@ -25,12 +25,14 @@ def _migrate_module(logger, root_path, module_path, migration_list):
         # a given revision
         # Exemple remove python3 header if version >= to 11.0
         script_module = importlib.import_module(
-            "odoo_migrate.migration_scripts.migrate_%s__all" % (migration[0].replace(".", "_"))
+            "odoo_migrate.migration_scripts.migrate_%s__all" % (
+                migration[0].replace(".", "_"))
         )
         _migrate_module_script(logger, root_path, module_path, script_module)
 
     # Finally, execute a script that will be allways executed
-    script_module = importlib.import_module("odoo_migrate.migration_scripts.migrate_allways")
+    script_module = importlib.import_module(
+        "odoo_migrate.migration_scripts.migrate_allways")
     _migrate_module_script(logger, root_path, module_path, script_module)
 
     # At the end of the migration, we commit the changes
