@@ -199,7 +199,6 @@ def main():
         for module_path in modules_path:
             # Use black to clean the code
             if args.enable_black:
-                import pdb; pdb.set_trace()
                 pass
 
             # migrate modules
