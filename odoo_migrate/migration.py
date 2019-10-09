@@ -51,7 +51,13 @@ class Migration():
 
         # format-patch, if required
         if format_patch:
-            self._get_code_from_previous_branch(module_names[0], remote_name)
+            if not (root_path / module_names[0]).is_dir():
+                self._get_code_from_previous_branch(
+                    module_names[0], remote_name)
+            else:
+                logger.warning(
+                    "Ignoring format-patch argument, as the module %s"
+                    " is still present in the repository" % (module_names[0]))
 
         # Guess modules if not provided, and check validity
         if not module_names:
@@ -109,17 +115,7 @@ class Migration():
             }
         )
 
-        # _execute_shell(
-        #     logger,
-        #     "cd %s && git format-patch --keep-subject --stdout"
-        #     " %s/%s..%s/%s"
-        #     " -- %s | git am -3 --keep" % (
-        #         root_path,
-        #         remote_name, target_version, remote_name, init_version,
-        #         module_name))
-
     def run(self):
-        print(self._migration_steps)
         logger.info(
             "Running migration from %s to %s:\n"
             "- Directory: %s\n"
