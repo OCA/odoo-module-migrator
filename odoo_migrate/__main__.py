@@ -115,7 +115,8 @@ def main():
 
         pass
         # Create a new Migration Object
-        migration = Migration(args.init_version_name, args.target_version_name)
+        migration = Migration(
+            args.init_version_name, args.target_version_name, args.directory)
         migration.run()
 
         # # Get Main path and test if exists
