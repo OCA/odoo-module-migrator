@@ -40,7 +40,8 @@ class OdooMigrateFormatter(logging.Formatter):
         )
 
         prefix = self.default_prefix_template(record) % record.__dict__
-        return (prefix + " " + record.message).replace("\n", "\n    ")
+        return (prefix + " " + record.message).replace(
+            "\n", "\n" + "".ljust(23, " "))
 
     def default_prefix_template(self, record):
         """Return the prefix for the log message. Template for Formatter.

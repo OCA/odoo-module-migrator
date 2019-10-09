@@ -4,6 +4,7 @@ from .config import _AVAILABLE_MIGRATION_STEPS
 from .exception import ConfigException
 from .log import logger
 from .tools import _execute_shell
+from .module_migration import ModuleMigration
 
 
 class Migration():
@@ -12,7 +13,7 @@ class Migration():
     _directory_path = False
     _use_black = False
 
-    _module_names = []
+    _module_migrations = []
 
     def __init__(
         self, relative_directory_path, init_version_name, target_version_name,
@@ -79,7 +80,8 @@ class Migration():
         if not module_names:
             raise ConfigException("No modules found to migrate. Exiting.")
 
-        self._module_names = module_names
+        for module_name in module_names:
+            self._module_migrations.append(ModuleMigration(self, module_name))
 
     def _is_module_path(self, module_path):
         return (module_path / "__openerp__.py").exists() or\
@@ -117,10 +119,9 @@ class Migration():
 
     def run(self):
         logger.info(
-            "Running migration from %s to %s:\n"
-            "- Directory: %s\n"
-            "- Modules: %s" % (
+            "Running migration from: %s to: %s in '%s'" % (
                 self._migration_steps[0]["init_version_name"],
                 self._migration_steps[-1]["target_version_name"],
-                self._directory_path.resolve(),
-                self._module_names))
+                self._directory_path.resolve()))
+        for module_migration in self._module_migrations:
+            module_migration.run()
