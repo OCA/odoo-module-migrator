@@ -23,13 +23,20 @@ class ModuleMigration():
 
     def run(self):
         logger.info("Running migration of module %s" % self._module_name)
+        self._run_black()
         for migration_script in self._migration._migration_scripts:
             self._run_migration_scripts(migration_script)
+
+    def _run_black(self):
+        # TODO
+        pass
 
     def _run_migration_scripts(self, migration_script):
         file_renames = getattr(migration_script, "_FILE_RENAMES", {})
         text_replaces = getattr(migration_script, "_TEXT_REPLACES", {})
         text_warnings = getattr(migration_script, "_TEXT_WARNING", {})
+
+        has_change = False
 
         for root, directories, filenames in os.walk(
                 self._module_path.resolve()):
@@ -46,8 +53,11 @@ class ModuleMigration():
                 # Rename file, if required
                 new_name = file_renames.get(filename)
                 if new_name:
+                    has_change = True
                     self._rename_file(
-                        absolute_file_path, os.path.join(root, new_name))
+                        self._migration._directory_path,
+                        absolute_file_path,
+                        os.path.join(root, new_name))
                     absolute_file_path = os.path.join(root, new_name)
 
                 with open(absolute_file_path, "U") as f:
@@ -63,28 +73,46 @@ class ModuleMigration():
 
                     # Write file if changed
                     if new_text != current_text:
+                        has_change = True
                         logger.info("Changing content of file: %s" % filename)
                         with open(absolute_file_path, "w") as f:
                             f.write(new_text)
 
-                    # Display warnings if the file content some obsolete code
+                    # Display warnings if the file contents some obsolete code
                     warnings = text_warnings.get("*", {})
                     warnings.update(text_warnings.get(extension, {}))
                     for pattern, warning_message in warnings.items():
                         if re.findall(pattern, new_text):
                             logger.warning(warning_message)
 
+        # Commit changes
+        if has_change:
+            commit_name = "[MIG] %s: Migration to %s" % (
+                self._module_name,
+                self._migration._migration_steps[-1]["target_version_name"])
+
+            logger.info(
+                "Commit changes for %s. commit name '%s'" % (
+                    self._module_name, commit_name
+                ))
+
+            _execute_shell(
+                "cd %s && git add . --all && git commit -m '%s'" % (
+                    str(self._migration._directory_path.resolve()), commit_name
+                ))
+
     def _rename_file(self, module_path, old_file_path, new_file_path):
         """
         Rename a file. try to execute 'git mv', to avoid huge diff.
         if 'git mv' fails, make a classical rename
         """
-        logger.debug(
-            "Renaming file: %s. New name: %s " % (old_file_path, new_file_path)
+        logger.info(
+            "Renaming file: '%s' by '%s' " % (
+                old_file_path.replace(str(module_path.resolve()), ""),
+                new_file_path.replace(str(module_path.resolve()), ""))
         )
 
         _execute_shell(
-            logger,
             "cd %s && git mv %s %s" % (
-                module_path._str, old_file_path, new_file_path
+                str(module_path.resolve()), old_file_path, new_file_path
             ))

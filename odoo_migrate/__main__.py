@@ -88,7 +88,7 @@ def get_parser():
         "--log-level",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         dest="log_level",
-        default="DEBUG",
+        default="INFO",
         type=str,
     )
 

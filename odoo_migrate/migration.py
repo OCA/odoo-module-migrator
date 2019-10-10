@@ -10,7 +10,7 @@ import pkgutil
 from .config import _AVAILABLE_MIGRATION_STEPS
 from .exception import ConfigException
 from .log import logger
-from .tools import _execute_shell
+from .tools import _execute_shell, _get_latest_version_code
 from .module_migration import ModuleMigration
 
 
@@ -132,30 +132,38 @@ class Migration():
         all_packages = importlib.import_module(
             "odoo_migrate.migration_scripts")
 
-        results = {}
+        migration_start = float(self._migration_steps[0]["init_version_code"])
+        migration_end = float(self._migration_steps[-1]["target_version_code"])
+
         for loader, name, is_pkg in pkgutil.walk_packages(
                 all_packages.__path__):
+            # Ignore script that will be allways executed.
+            # this script will be added at the end.
+            if name == 'migrate_allways':
+                continue
+
+            # Filter migration scripts, depending of the configuration
             full_name = all_packages.__name__ + '.' + name
-            results[full_name] = importlib.import_module(full_name)
+            if 'allways' in name:
+                # replace allways by the most recent version
+                real_name = name.replace("allways", _get_latest_version_code())
+            else:
+                real_name = name
+            splitted_name = real_name.split("_")
 
-        print(results)
+            script_start = float(splitted_name[1])
+            script_end = float(splitted_name[2])
 
-        exit()
-        for step in self._migration_steps:
-            # Execute specific migration for a version to another
-            # Exemple 8.0 -> 9.0
-            self._migration_scripts.append(importlib.import_module(
-                "odoo_migrate.migration_scripts.migrate_%s__%s" % (
-                    step["init_version_code"],
-                    step["target_version_code"],
-                )
-            ))
-            # TODO, add also 10.0 -> 12.0
-            # or 10.0 to allways script
+            # Exclude scripts
+            if script_start >= migration_end or script_end <= migration_start:
+                continue
 
-        # Finally, execute a script that will be allways executed
+            self._migration_scripts.append(importlib.import_module(full_name))
+
+        # Finally, add the script that will be allways executed
         self._migration_scripts.append(importlib.import_module(
             "odoo_migrate.migration_scripts.migrate_allways"))
+
         logger.debug(
             "The following migration script will be"
             " executed:\n- %s" % '\n- '.join(
