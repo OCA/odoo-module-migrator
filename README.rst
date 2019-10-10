@@ -78,11 +78,11 @@ This tools will operate the changes for each module.
 Available arguments
 -------------------
 
-+--------------------------+----------+-------------------------------------------------------------------------+
-|name                      | shortcut | options         | description                                           |
++--------------------------+----------+-----------------+-------------------------------------------------------+
+|name                      | shortcut | Options         | description                                           |
 +==========================+==========+=================+=======================================================+
 |``--directory``           |``-d``    | Default:        | Local folder that belongs the module(s) to migrate.   |
-|                          |          |  ``./``         |                                                       |
+|                          |          | ``./``          |                                                       |
 +--------------------------+----------+-----------------+-------------------------------------------------------+
 |``--init-version-name``   | ``-i``   | Required        | Initial version of your module(s) you want to migrate.|
 |                          |          |                 |                                                       |
