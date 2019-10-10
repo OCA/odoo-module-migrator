@@ -12,7 +12,6 @@ from .migration import Migration
 
 
 def get_parser():
-    """Return :py:class:`argparse.ArgumentParser` instance for CLI."""
 
     main_parser = argparse.ArgumentParser(
         formatter_class=argparse.RawTextHelpFormatter
@@ -22,7 +21,7 @@ def get_parser():
         "-d",
         "--directory",
         dest="directory",
-        required=True,
+        default="./",
         type=str,
         help="Target Modules directory. Set here a folder path"
         " that contains Odoo modules you want to migrate from a version"
@@ -69,7 +68,7 @@ def get_parser():
     )
 
     main_parser.add_argument(
-        "-b",
+        "-fb",
         "--force-black",
         action='store_true',
         default=True,
@@ -85,7 +84,7 @@ def get_parser():
     )
 
     main_parser.add_argument(
-        "-l",
+        "-ll",
         "--log-level",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         dest="log_level",

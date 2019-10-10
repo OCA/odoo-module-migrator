@@ -1,6 +1,12 @@
-import pathlib
-import os
+# Copyright (C) 2019 - Today: GRAP (http://www.grap.coop)
+# @author: Sylvain LE GAL (https://twitter.com/legalsylvain)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+
 import importlib
+import os
+import pathlib
+import pkgutil
+
 from .config import _AVAILABLE_MIGRATION_STEPS
 from .exception import ConfigException
 from .log import logger
@@ -123,6 +129,18 @@ class Migration():
 
     def _get_migration_scripts(self):
 
+        all_packages = importlib.import_module(
+            "odoo_migrate.migration_scripts")
+
+        results = {}
+        for loader, name, is_pkg in pkgutil.walk_packages(
+                all_packages.__path__):
+            full_name = all_packages.__name__ + '.' + name
+            results[full_name] = importlib.import_module(full_name)
+
+        print(results)
+
+        exit()
         for step in self._migration_steps:
             # Execute specific migration for a version to another
             # Exemple 8.0 -> 9.0

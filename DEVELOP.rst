@@ -17,6 +17,15 @@ Installation
     # Run the script
     python -m odoo_migrate COMMAND OPTIONS
 
+You can also install from test source via pip:
+
+.. code-block:: shell
+
+    pip3 install odoo-migrate\
+        --upgrade\
+        --index-url https://test.pypi.org/simple\
+        --extra-index-url https://pypi.org/simple
+
 Run tests
 =========
 
@@ -95,7 +104,17 @@ The list of the operations are written in the subfolder
         }
     }
 
+How to improve the library
+==========================
 
+* Read (or complete !) the migration advices of the OCA.
+  https://github.com/OCA/maintainer-tools/wiki#migration
+
+* Create or complete the according migration file.
+
+* Add tests.
+
+* Make a Pull request.
 
 Package deployment
 ==================
