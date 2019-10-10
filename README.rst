@@ -75,37 +75,27 @@ This tools will operate the changes for each module.
 
 **Options**
 
-    * ``--directory`` (-d):
-        local folder that belongs the module(s) to migrate.
-        Default: ``./``
 
-    * ``--init-version-name`` (-i): REQUIRED
-        Initial version of your module(s) you want to migrate.
+Available arguments
+-------------------
+name | options | description
+--- | --- | ---
 
-    * ``--target-version-name`` (-i):
-        Final Version you want to migrate.
-        Default: the last odoo version available.
+``--directory`` / ``-d`` | Default: ``./`` | Local folder that belongs the module(s) to migrate.
 
-    * ``--modules`` (-m):
-        module(s) to migrate.
-        Default: All modules present in the directory.
-        Note if format-patch option is enabled, you have to provide only
-        one module.
+``--init-version-name`` / ``-i`` | Required | Initial version of your module(s) you want to migrate.
 
-    * ``--format-patch`` (-fp):
-        Recover code, using git format-patch command.
+``--target-version-name`` / ``-t`` | Default: the last odoo version available. | Final Version you want to migrate.
 
-    * ``--remote-name`` -(-rn):
-        Name of the main remote, used by format-patch command.
-        Default: ``origin``
+``--modules`` / ``-m`` | Default: All modules present in the directory | Module(s) to migrate. Note if format-patch option is enabled, you have to provide only one module.
 
-    * ``--force-black`` (-fb) :
-        Force to use black library. Note that this option is enabled by
-        default, if migrating to 13.0 or further version.
+``--format-patch`` / ``-fp`` | disabled by default | Recover code, using git format-patch command.
 
-    * ``--log-level`` (-ll):
-        Possible value: ``DEBUG``, ``INFO``, ``WARNING``, etc.
-        Default: ``INFO``
+``--remote-name``  / ``-rn`` | Default: ``origin`` |  Name of the main remote, used by format-patch command.
+        
+``--force-black``  / ``-fb`` | depend on the configuration | Force to use black library.
+
+``--log-level``  / ``-ll`` | Default: ``INFO`` | Possible value: ``DEBUG``, ``INFO``, ``WARNING``, etc.
 
 
 Roadmap / Know issues
@@ -114,8 +104,6 @@ Roadmap / Know issues
 * Complete migration scripts.
 
 * Add tests.
-
-* finish to implement black.
 
 Credits
 =======

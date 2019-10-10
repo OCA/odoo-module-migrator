@@ -2,11 +2,3 @@ argcomplete
 colorama
 black
 lxml
-
-
-# Test libraries
-# TODO, move into another part
-tox
-unittest
-pytest-flake8
-pytest-cov
