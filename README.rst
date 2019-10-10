@@ -78,23 +78,16 @@ This tools will operate the changes for each module.
 
 Available arguments
 -------------------
+
 name | options | description
 --- | --- | ---
-
 ``--directory`` / ``-d`` | Default: ``./`` | Local folder that belongs the module(s) to migrate.
-
 ``--init-version-name`` / ``-i`` | Required | Initial version of your module(s) you want to migrate.
-
 ``--target-version-name`` / ``-t`` | Default: the last odoo version available. | Final Version you want to migrate.
-
 ``--modules`` / ``-m`` | Default: All modules present in the directory | Module(s) to migrate. Note if format-patch option is enabled, you have to provide only one module.
-
 ``--format-patch`` / ``-fp`` | disabled by default | Recover code, using git format-patch command.
-
 ``--remote-name``  / ``-rn`` | Default: ``origin`` |  Name of the main remote, used by format-patch command.
-        
 ``--force-black``  / ``-fb`` | depend on the configuration | Force to use black library.
-
 ``--log-level``  / ``-ll`` | Default: ``INFO`` | Possible value: ``DEBUG``, ``INFO``, ``WARNING``, etc.
 
 
