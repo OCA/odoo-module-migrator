@@ -6,11 +6,12 @@ import setuptools
 
 setuptools.setup(
     name="odoo-migrate",
-    version="0.0.4",
+    version="0.0.5",
     author="GRAP, Groupement Régional Alimentaire de Proximité",
     author_email="informatique@grap.coop",
     description="Small tools too migrate Odoo modules",
     long_description=open('README.rst').read(),
+    long_description_content_type='text/x-rst',
     url="https://www.grap.coop",
     packages=['odoo_migrate'],
     classifiers=[

@@ -68,6 +68,7 @@ class ModuleMigration():
         file_renames = getattr(migration_script, "_FILE_RENAMES", {})
         text_replaces = getattr(migration_script, "_TEXT_REPLACES", {})
         text_warnings = getattr(migration_script, "_TEXT_WARNING", {})
+        global_functions = getattr(migration_script, "_GLOBAL_FUNCTIONS", {})
 
         has_change = False
 
@@ -117,6 +118,14 @@ class ModuleMigration():
                     for pattern, warning_message in warnings.items():
                         if re.findall(pattern, new_text):
                             logger.warning(warning_message)
+
+        if global_functions:
+            for function in global_functions:
+                function(
+                    logger=logger,
+                    module_path=self._module_path,
+                    module_name=self._module_name,
+                )
 
         # Commit changes
         if has_change:
