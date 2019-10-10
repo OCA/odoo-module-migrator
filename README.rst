@@ -80,7 +80,10 @@ Available arguments
 -------------------
 
 name | options | description
---- | --- | ---
+---- | ------- | -----------
+qdsf | from    | dfqsfklmsfklj
+
+
 ``--directory`` / ``-d`` | Default: ``./`` | Local folder that belongs the module(s) to migrate.
 ``--init-version-name`` / ``-i`` | Required | Initial version of your module(s) you want to migrate.
 ``--target-version-name`` / ``-t`` | Default: the last odoo version available. | Final Version you want to migrate.
