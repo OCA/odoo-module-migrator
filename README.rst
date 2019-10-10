@@ -79,10 +79,11 @@ This tools will operate the changes for each module.
 Available arguments
 -------------------
 
-name | options | description
----- | ------- | -----------
-qdsf | from    | dfqsfklmsfklj
-
++------------+------------+-----------+ 
+|name | options | description |
++============+============+===========+ 
+| qdsf | from    | dfqsfklmsfklj |
++------------+------------+-----------+
 
 ``--directory`` / ``-d`` | Default: ``./`` | Local folder that belongs the module(s) to migrate.
 ``--init-version-name`` / ``-i`` | Required | Initial version of your module(s) you want to migrate.
