@@ -10,15 +10,27 @@ odoo-migrate
 
 ``odoo-migrate`` is a python3 library that allows you to realize automatically
 recurring changes when migrating Odoo modules from a version to another.
-for exemple, renaming ``__openerp__.py`` file into ``__manifest__.py``.
+for exemple: 
+
+* renaming ``__openerp__.py`` file into ``__manifest__.py``.
+* removing ``# -*- encoding: utf-8 -*-`` since V11.0
+* replacing ``openerp`` import by ``odoo`` import.
+* ...
 
 This library will so:
 
-* (optionnaly) get commit from the old branch (if format-patch is enabled)
+* (optionnaly) get commits from the old branch (if format-patch is enabled)
 * apply automatically changes. (renaming, replacing, etc.)
 * (depending of the config and the version) black your code.
 * commit your changes.
-* Display warnings if your code belong obsolete code patterns.
+* Display warnings if your code belong obsolete code patterns. For exemple,
+  for a migration to V11+
+
+
+.. code-block:: shell
+
+    15:59:04   WARNING     'ir.values' found. This model has been removed in V11.
+
 
 Development and improvment
 ==========================
