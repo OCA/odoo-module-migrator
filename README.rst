@@ -12,9 +12,10 @@ odoo-migrate
 recurring changes when migrating Odoo modules from a version to another.
 for exemple: 
 
-* renaming ``__openerp__.py`` file into ``__manifest__.py``.
+* renaming ``__openerp__.py`` file into ``__manifest__.py``
 * removing ``# -*- encoding: utf-8 -*-`` since V11.0
-* replacing ``openerp`` import by ``odoo`` import.
+* replacing ``openerp`` import by ``odoo`` import
+* removing ``migrations`` folders
 * ...
 
 This library will so:
@@ -43,7 +44,6 @@ Installation
 
 .. code-block:: shell
 
-    # Install Stable Source
     pip3 install odoo-migrate
 
 
