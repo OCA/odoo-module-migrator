@@ -4,134 +4,14 @@
 
 import argparse
 import argcomplete
-import logging
-import importlib
-import os
-import re
-from pathlib import Path
-from . import migrate_tools
-
-
-_logger = logging.getLogger(__name__)
-
-_ALLOWED_EXTENSIONS = [".py", ".xml", ".js"]
-
-_MIGRATION_LIST = [
-    ("8.0", "9.0"),
-    ("9.0", "10.0"),
-    ("10.0", "11.0"),
-    ("11.0", "12.0"),
-]
-
-
-def _migrate_module(args, module_path):
-    migration_list = _get_migration_list(
-        args.init_version, args.target_version
-    )
-
-    for migration in migration_list:
-        # Execute specific migration for a version to another
-        # Exemple 8.0 -> 9.0
-        script_module = importlib.import_module(
-            "odoo_migrate.migrate_%s__%s"
-            % (
-                migration[0].replace(".", "_"),
-                (migration[1].replace(".", "_")),
-            )
-        )
-        _migrate_module_script(
-            args, module_path, script_module
-        )
-
-        # Execute migration that have to be done for all version after
-        # a given revision
-        # Exemple remove python3 header if version >= to 11.0
-        script_module = importlib.import_module(
-            "odoo_migrate.migrate_%s__all" % (migration[0].replace(".", "_"))
-        )
-        _migrate_module_script(
-            args, module_path, script_module
-        )
-
-    # Finally, execute a script that will be allways executed
-    script_module = importlib.import_module("odoo_migrate.migrate_allways")
-    _migrate_module_script(args, module_path, script_module)
-
-
-def _migrate_module_script(
-        args, module_path, script_module):
-    _logger.debug(
-        "Begin migration script '%s' in folder %s "
-        % (script_module.__name__, module_path)
-    )
-
-    file_renames = getattr(script_module, "_FILE_RENAMES", {})
-
-    text_replaces = getattr(script_module, "_TEXT_REPLACES", {})
-
-    for root, directories, filenames in os.walk(module_path._str):
-        for filename in filenames:
-            # Skip useless file
-            # TODO, skip files present in some folder. (for exemple 'lib')
-            extension = os.path.splitext(filename)[1]
-            if extension not in _ALLOWED_EXTENSIONS:
-                continue
-
-            filenameWithPath = os.path.join(root, filename)
-            _logger.debug("Migrate '%s' file" % filenameWithPath)
-
-            # with open(filenameWithPath, "U") as f:
-
-            #     currentText = f.read()
-            #     newText = currentText
-
-            #     replaces = text_replaces.get("*", {})
-            #     replaces.update(text_replaces.get(extension, {}))
-
-            #     for old_term, new_term in replaces.items():
-            #         newText = re.sub(old_term, new_term, newText)
-
-            #     # Write file if changed
-            #     if newText != currentText:
-            #         _logger.info("Changing content of file: %s" % filename)
-            #         with open(filenameWithPath, "w") as f:
-            #             f.write(newText)
-
-            # At the end, rename file, if required
-            new_name = file_renames.get(filename)
-            if new_name:
-                migrate_tools._rename_file(
-                    _logger, module_path, filenameWithPath,
-                    os.path.join(root, new_name))
-
-
-def _get_init_versions():
-    return [x[0] for x in _MIGRATION_LIST]
-
-
-def _get_target_versions():
-    return [x[1] for x in _MIGRATION_LIST]
-
-
-def _get_latest_version():
-    return _MIGRATION_LIST[-1][1]
-
-
-def _get_migration_list(init_version, target_version):
-    found = False
-    res = []
-    for item in _MIGRATION_LIST:
-        if not found and item[0] != init_version:
-            continue
-        else:
-            found = True
-        res.append(item)
-        if item[1] == target_version:
-            return res
+# from pathlib import Path
+# from . import migrate_tools
+from . import tools
+from .log import setup_logger
+from .migration import Migration
 
 
 def get_parser():
-    """Return :py:class:`argparse.ArgumentParser` instance for CLI."""
 
     main_parser = argparse.ArgumentParser(
         formatter_class=argparse.RawTextHelpFormatter
@@ -141,7 +21,7 @@ def get_parser():
         "-d",
         "--directory",
         dest="directory",
-        required=True,
+        default="./",
         type=str,
         help="Target Modules directory. Set here a folder path"
         " that contains Odoo modules you want to migrate from a version"
@@ -150,8 +30,8 @@ def get_parser():
 
     main_parser.add_argument(
         "-m",
-        "--module_list",
-        dest="module_list",
+        "--modules",
+        dest="modules",
         type=str,
         help="Targer Modules to migrate."
         " If not set, all the modules present in the directory will be"
@@ -160,32 +40,56 @@ def get_parser():
 
     main_parser.add_argument(
         "-i",
-        "--init-version",
-        choices=_get_init_versions(),
-        dest="init_version",
+        "--init-version-name",
+        choices=tools._get_available_init_version_names(),
+        dest="init_version_name",
         required=True,
         type=str,
     )
 
     main_parser.add_argument(
-        "-l",
+        "-t",
+        "--target-version-name",
+        dest="target_version_name",
+        type=str,
+        choices=tools._get_available_target_version_names(),
+        default=tools._get_latest_version_name(),
+        help="Target version of the Odoo module you want to migrate."
+        " If 'latest' is set, the tool will try to migrate to the latest"
+        " Odoo version.",
+    )
+
+    main_parser.add_argument(
+        "-fp",
+        "--format-patch",
+        action='store_true',
+        help="Enable this option, if you want to get the code from the"
+        " previous branch."
+    )
+
+    main_parser.add_argument(
+        "-fb",
+        "--force-black",
+        action='store_true',
+        default=True,
+        help="Enable this option, if you want to use 'black' to clean the code"
+    )
+
+    main_parser.add_argument(
+        "-rn",
+        "--remote-name",
+        dest="remote_name",
+        default='origin',
+        type=str,
+    )
+
+    main_parser.add_argument(
+        "-ll",
         "--log-level",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         dest="log_level",
         default="INFO",
         type=str,
-    )
-
-    main_parser.add_argument(
-        "-t",
-        "--target-version",
-        dest="target_version",
-        type=str,
-        choices=_get_target_versions(),
-        default=_get_latest_version(),
-        help="Target version of the Odoo module you want to migrate."
-        " If 'latest' is set, the tool will try to migrate to the latest"
-        " Odoo version.",
     )
 
     return main_parser
@@ -198,48 +102,81 @@ def main():
     args = parser.parse_args()
 
     # Set log level
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter("%(asctime)s %(levelname)-10s %(message)s")
-    handler.setFormatter(formatter)
-    _logger.addHandler(handler)
-    _logger.setLevel(getattr(logging, str(args.log_level)))
+    setup_logger(args.log_level)
 
     try:
+        # Create a new Migration Object
+        module_names = args.modules\
+            and [x.strip() for x in args.modules.split(",") if x.strip()] or []
 
-        # Get Main path and test if exists
-        root_path = Path(args.directory)
-        if not root_path.exists():
-            raise ValueError("'%s' is not a valid path." % (args.directory))
-
-        # Recover modules list
-        modules_path = []
-        if not args.module_list:
-            # Recover all submodules, if no module_list is provided
-            all_subfolders = [x for x in root_path.iterdir() if x.is_dir()]
-        else:
-            all_subfolders = [
-                root_path / x for x in args.module_list.split(",")
-            ]
-
-        # check if each folder is a valid module or not
-        for subfolder in all_subfolders:
-            if (subfolder / "__openerp__.py").exists() or (
-                subfolder / "__manifest__.py"
-            ).exists():
-                modules_path.append(subfolder)
-            else:
-                if args.module_list:
-                    _logger.warning(
-                        "The module %s was not found in the directory %s"
-                        % (subfolder.name, args.directory)
-                    )
-        _logger.debug(
-            "The lib will process the following modules %s"
-            % (", ".join([x.name for x in modules_path]))
+        migration = Migration(
+            args.directory, args.init_version_name, args.target_version_name,
+            module_names, args.format_patch, args.remote_name, args.force_black
         )
 
-        for module_path in modules_path:
-            _migrate_module(args, module_path)
+        # run Migration
+        migration.run()
+
+        # # Get Main path and test if exists
+        # root_path = Path(args.directory)
+        # if not root_path.exists():
+        #     raise ValueError("'%s' is not a valid path." % (args.directory))
+
+        # # Recover modules list
+        # modules_path = []
+        # modules_list = args.modules\
+        #     and [x for x in args.modules.split(",") if x] or []
+
+        # if not args.modules:
+        #     # Recover all submodules, if no modules list is provided
+        #     subfolders = [x for x in root_path.iterdir() if x.is_dir()]
+        # else:
+        #     subfolders = [root_path / x for x in modules_list]
+
+        # # Recover code for former version, if asked
+        # if args.format_patch:
+        #     if len(modules_list) != 1:
+        #         raise ValueError(
+        #             "If 'format-patch' option is enabled, you should provide"
+        #             " a unique module name in the 'modules' argument.")
+        #     migrate_tools._get_code_from_previous_branch(
+        #         _logger, root_path, modules_list[0], args.init_version,
+        #         args.target_version, args.remote_name)
+
+        # # check if each folder is a valid module or not
+        # for subfolder in subfolders:
+        #     if (subfolder / "__openerp__.py").exists() or (
+        #         subfolder / "__manifest__.py"
+        #     ).exists():
+        #         modules_path.append(subfolder)
+        #     else:
+        #         if modules_list:
+        #             _logger.warning(
+        #                 "The module %s was not found in the directory %s"
+        #                 % (subfolder.name, args.directory)
+        #             )
+
+        # if modules_path:
+        #     _logger.debug(
+        #         "The lib will process the following modules '%s'"
+        #         % (", ".join([x.name for x in modules_path]))
+        #     )
+        # else:
+        #     _logger.error("No module found.")
+
+        # # Compute migration list
+        # migration_list = tools._get_migration_list(
+        #     args.init_version, args.target_version
+        # )
+
+        # for module_path in modules_path:
+        #     # Use black to clean the code
+        #     if args.enable_black:
+        #         pass
+
+        #     # migrate modules
+        #     migrate_tools._migrate_module(
+        #         _logger, root_path, module_path, migration_list)
 
     except KeyboardInterrupt:
         pass
