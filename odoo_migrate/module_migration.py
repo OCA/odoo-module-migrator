@@ -2,11 +2,13 @@
 # @author: Sylvain LE GAL (https://twitter.com/legalsylvain)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+import black
 import os
+import pathlib
 import re
 from .log import logger
 
-from .config import _ALLOWED_EXTENSIONS
+from .config import _ALLOWED_EXTENSIONS, _BLACK_LINE_LENGTH
 from .tools import _execute_shell
 
 
@@ -28,8 +30,39 @@ class ModuleMigration():
             self._run_migration_scripts(migration_script)
 
     def _run_black(self):
-        # TODO
-        pass
+        has_change = False
+        if not self._migration._use_black:
+            return
+
+        file_mode = black.FileMode()
+        file_mode.line_length = _BLACK_LINE_LENGTH
+
+        for root, directories, filenames in os.walk(
+                self._module_path.resolve()):
+            for filename in filenames:
+                # Skip useless file
+                if os.path.splitext(filename)[1] != ".py":
+                    continue
+
+                absolute_file_path = os.path.join(root, filename)
+
+                has_change = has_change or black.format_file_in_place(
+                    pathlib.Path(absolute_file_path), False, file_mode,
+                    black.WriteBack.YES)
+
+        # Commit changes
+        if has_change:
+            commit_name = "[REF] %s: Black python code" % (self._module_name)
+
+            logger.info(
+                "Commit changes for %s. commit name '%s'" % (
+                    self._module_name, commit_name
+                ))
+
+            _execute_shell(
+                "cd %s && git add . --all && git commit -m '%s'" % (
+                    str(self._migration._directory_path.resolve()), commit_name
+                ))
 
     def _run_migration_scripts(self, migration_script):
         file_renames = getattr(migration_script, "_FILE_RENAMES", {})

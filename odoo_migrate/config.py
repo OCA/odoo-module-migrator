@@ -40,3 +40,5 @@ _AVAILABLE_MIGRATION_STEPS = [
 ]
 
 _ALLOWED_EXTENSIONS = [".py", ".xml", ".js"]
+
+_BLACK_LINE_LENGTH = 79
