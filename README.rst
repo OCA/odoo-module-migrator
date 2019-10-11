@@ -120,8 +120,8 @@ Available arguments
 |``--log-level``           | ``-ll``  | Default:        | Possible value: ``DEBUG``, ``INFO``, ``WARNING``, etc.|
 |                          |          | ``INFO``        |                                                       |
 +--------------------------+----------+-----------------+-------------------------------------------------------+
-|``--no-commit``           | ``-nc``  | Default:        | If set the library will not add and commit changes.   |
-|                          |          | commit          |                                                       |
+|``--no-commit``           | ``-nc``  | Default:        | If set the library will not git add and git commit    |
+|                          |          | commit          | changes.                                              |
 +--------------------------+----------+-----------------+-------------------------------------------------------+
 
 
