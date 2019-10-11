@@ -7,7 +7,7 @@ import os
 import pathlib
 import pkgutil
 
-from .config import _AVAILABLE_MIGRATION_STEPS
+from .config import _AVAILABLE_MIGRATION_STEPS, _MANIFEST_NAMES
 from .exception import ConfigException
 from .log import logger
 from .tools import _execute_shell, _get_latest_version_code
@@ -21,16 +21,18 @@ class Migration():
     _use_black = False
     _migration_scripts = []
     _module_migrations = []
+    _commit_enabled = True
 
     def __init__(
         self, relative_directory_path, init_version_name, target_version_name,
         module_names=[], format_patch=False, remote_name='origin',
-        force_black=False
+        force_black=False, commit_enabled=True,
     ):
-        pass
+        self._use_black = force_black
+        self._commit_enabled = commit_enabled
+
         # Get migration steps that will be runned
         found = False
-        self._use_black = force_black
         for item in _AVAILABLE_MIGRATION_STEPS:
             if not found and item["init_version_name"] != init_version_name:
                 continue
@@ -94,8 +96,7 @@ class Migration():
         self._get_migration_scripts()
 
     def _is_module_path(self, module_path):
-        return (module_path / "__openerp__.py").exists() or\
-            (module_path / "__manifest__.py").exists()
+        return any([(module_path / x).exists() for x in _MANIFEST_NAMES])
 
     def _get_code_from_previous_branch(self, module_name, remote_name):
         init_version = self._migration_steps[0]["init_version_name"]
@@ -170,7 +171,7 @@ class Migration():
                 [x.__file__.split('/')[-1] for x in self._migration_scripts]))
 
     def run(self):
-        logger.info(
+        logger.debug(
             "Running migration from: %s to: %s in '%s'" % (
                 self._migration_steps[0]["init_version_name"],
                 self._migration_steps[-1]["target_version_name"],

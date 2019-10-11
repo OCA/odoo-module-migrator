@@ -3,6 +3,10 @@
     :alt: License: AGPL-3
 .. image:: https://img.shields.io/badge/python-3.6-blue.svg
     :alt: Python support: 3.6
+.. image:: https://travis-ci.org/grap/odoo-migrate.svg?branch=master
+    :target: https://travis-ci.org/grap/odoo-migrate
+.. image:: https://coveralls.io/repos/grap/odoo-migrate/badge.png?branch=master
+    :target: https://coveralls.io/r/grap/odoo-migrate?branch=master
 
 ============
 odoo-migrate
@@ -120,6 +124,9 @@ Available arguments
 |``--log-level``           | ``-ll``  | Default:        | Possible value: ``DEBUG``, ``INFO``, ``WARNING``, etc.|
 |                          |          | ``INFO``        |                                                       |
 +--------------------------+----------+-----------------+-------------------------------------------------------+
+|``--no-commit``           | ``-nc``  | Default:        | If set the library will not git add and git commit    |
+|                          |          | commit          | changes.                                              |
++--------------------------+----------+-----------------+-------------------------------------------------------+
 
 
 Roadmap / Know issues
@@ -128,6 +135,14 @@ Roadmap / Know issues
 * Complete migration scripts.
 
 * Add tests.
+
+Changes
+=======
+
+0.1.2 (October 10, 2019)
+------------------------
+
+* First release
 
 Credits
 =======
@@ -141,3 +156,4 @@ Contributors
 ------------
 
 * Sylvain LE GAL (https://www.twitter.com/legalsylvain)
+
