@@ -25,16 +25,15 @@ class ModuleMigration():
 
     def run(self):
         logger.info("Running migration of module %s" % self._module_name)
-        if self._run_black():
-            self._commit("[REF] %s: Black python code" % (self._module_name))
+        self._run_black()
+        self._commit("[REF] %s: Black python code" % (self._module_name))
 
-        has_change = False
         for migration_script in self._migration._migration_scripts:
-            has_change =\
-                has_change or self._run_migration_scripts(migration_script)
+            self._run_migration_scripts(migration_script)
 
-        if has_change:
-            self._commit()
+        self._commit("[MIG] %s: Migration to %s" % (
+            self._module_name,
+            self._migration._migration_steps[-1]["target_version_name"]))
 
     def _run_black(self):
         has_change = False
@@ -65,8 +64,6 @@ class ModuleMigration():
         text_warnings = getattr(migration_script, "_TEXT_WARNING", {})
         global_functions = getattr(migration_script, "_GLOBAL_FUNCTIONS", {})
 
-        has_change = False
-
         for root, directories, filenames in os.walk(
                 self._module_path.resolve()):
             for filename in filenames:
@@ -82,7 +79,6 @@ class ModuleMigration():
                 # Rename file, if required
                 new_name = file_renames.get(filename)
                 if new_name:
-                    has_change = True
                     self._rename_file(
                         self._migration._directory_path,
                         absolute_file_path,
@@ -102,7 +98,6 @@ class ModuleMigration():
 
                     # Write file if changed
                     if new_text != current_text:
-                        has_change = True
                         logger.info("Changing content of file: %s" % filename)
                         with open(absolute_file_path, "w") as f:
                             f.write(new_text)
@@ -125,6 +120,7 @@ class ModuleMigration():
     def _rename_file(self, module_path, old_file_path, new_file_path):
         """
         Rename a file. try to execute 'git mv', to avoid huge diff.
+
         if 'git mv' fails, make a classical rename
         """
         logger.info(
