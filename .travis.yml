@@ -20,7 +20,7 @@ install:
 script:
   - git --version
   - flake8 . --exclude=__init__.py
-  - coverage run --source git_aggregator setup.py test
+  - coverage run --source odoo_migrate setup.py test
 
 after_success:
   - coveralls

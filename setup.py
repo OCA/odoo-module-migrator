@@ -6,7 +6,7 @@ import setuptools
 
 setuptools.setup(
     name="odoo-migrate",
-    version="0.1.3",
+    version="0.1.4",
     author="GRAP, Groupement Régional Alimentaire de Proximité",
     author_email="informatique@grap.coop",
     description="Small tools to migrate Odoo modules from a version"
@@ -20,6 +20,11 @@ setuptools.setup(
         "License :: OSI Approved :: GNU Affero General Public License v3",
     ],
     install_requires=open('requirements.txt').read().splitlines(),
+    test_requires=open('test_requirements.txt').read().splitlines(),
     entry_points=dict(
         console_scripts=['odoo-migrate=odoo_migrate.__main__:main']),
+    keywords=[
+        "Odoo Community Association (OCA)",
+        "Odoo", "Migration", "Upgrade", "Module",
+    ],
 )

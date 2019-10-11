@@ -18,16 +18,11 @@ class ModuleMigration():
     _migration = False
     _module_name = False
     _module_path = False
-    _manifest_path = False
 
     def __init__(self, migration, module_name):
         self._migration = migration
         self._module_name = module_name
         self._module_path = self._migration._directory_path / module_name
-        for manifest_name in _MANIFEST_NAMES:
-            manifest_path = self._module_path / manifest_name
-            if manifest_path.exists():
-                self._manifest_path = manifest_path
 
     def run(self):
         logger.info("[%s] Running migration from %s to %s" % (
@@ -101,7 +96,7 @@ class ModuleMigration():
                 replaces.update(text_replaces.get(extension, {}))
 
                 new_text = tools._replace_in_file(
-                    absolute_file_path, replaces, "froma")
+                    absolute_file_path, replaces, "File changed.")
 
                 # Display warnings if the new content contains some obsolete
                 # pattern
@@ -117,10 +112,16 @@ class ModuleMigration():
                     logger=logger,
                     module_path=self._module_path,
                     module_name=self._module_name,
-                    manifest_path=self._manifest_path,
+                    manifest_path=self._get_manifest_path(),
                     migration_steps=self._migration._migration_steps,
                     tools=tools,
                 )
+
+    def _get_manifest_path(self):
+        for manifest_name in _MANIFEST_NAMES:
+            manifest_path = self._module_path / manifest_name
+            if manifest_path.exists():
+                return manifest_path
 
     def _rename_file(self, module_path, old_file_path, new_file_path):
         """
@@ -133,11 +134,16 @@ class ModuleMigration():
                 old_file_path.replace(str(module_path.resolve()), ""),
                 new_file_path.replace(str(module_path.resolve()), ""))
         )
-
-        _execute_shell(
-            "cd %s && git mv %s %s" % (
-                str(module_path.resolve()), old_file_path, new_file_path
-            ))
+        if self._migration._commit_enabled:
+            _execute_shell(
+                "cd %s && git mv %s %s" % (
+                    str(module_path.resolve()), old_file_path, new_file_path
+                ))
+        else:
+            _execute_shell(
+                "cd %s && mv %s %s" % (
+                    str(module_path.resolve()), old_file_path, new_file_path
+                ))
 
     def _commit_changes(self, commit_name):
         if not self._migration._commit_enabled:
