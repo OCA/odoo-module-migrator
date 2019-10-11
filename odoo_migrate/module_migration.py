@@ -24,7 +24,11 @@ class ModuleMigration():
         self._module_path = self._migration._directory_path / module_name
 
     def run(self):
-        logger.info("Running migration of module %s" % self._module_name)
+        logger.info("[%s] Running migration from %s to %s" % (
+            self._module_name,
+            self._migration._migration_steps[0]["init_version_name"],
+            self._migration._migration_steps[-1]["target_version_name"],
+        ))
 
         # Run Black, if required
         self._run_black()
@@ -136,13 +140,17 @@ class ModuleMigration():
             ))
 
     def _commit_changes(self, commit_name):
-        import pdb; pdb.set_trace()
-        logger.info(
-            "Commit changes for %s. commit name '%s'" % (
-                self._module_name, commit_name
-            ))
+        if not self._migration._commit_enabled:
+            return
 
-        _execute_shell(
-            "cd %s && git add . --all && git commit -m '%s'" % (
-                str(self._migration._directory_path.resolve()), commit_name
-            ))
+        if _execute_shell("cd %s && git diff" % (
+                str(self._migration._directory_path.resolve()))):
+            logger.info(
+                "Commit changes for %s. commit name '%s'" % (
+                    self._module_name, commit_name
+                ))
+
+            _execute_shell(
+                "cd %s && git add . --all && git commit -m '%s'" % (
+                    str(self._migration._directory_path.resolve()), commit_name
+                ))

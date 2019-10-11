@@ -92,6 +92,15 @@ def get_parser():
         type=str,
     )
 
+    main_parser.add_argument(
+        "-nc",
+        "--no-commit",
+        action='store_true',
+        default=False,
+        help="Enable this option, if you don't want that the library commits"
+        " the changes. (using git add and git commit command)"
+    )
+
     return main_parser
 
 
@@ -111,72 +120,12 @@ def main():
 
         migration = Migration(
             args.directory, args.init_version_name, args.target_version_name,
-            module_names, args.format_patch, args.remote_name, args.force_black
+            module_names, args.format_patch, args.remote_name,
+            args.force_black, not args.no_commit,
         )
 
         # run Migration
         migration.run()
-
-        # # Get Main path and test if exists
-        # root_path = Path(args.directory)
-        # if not root_path.exists():
-        #     raise ValueError("'%s' is not a valid path." % (args.directory))
-
-        # # Recover modules list
-        # modules_path = []
-        # modules_list = args.modules\
-        #     and [x for x in args.modules.split(",") if x] or []
-
-        # if not args.modules:
-        #     # Recover all submodules, if no modules list is provided
-        #     subfolders = [x for x in root_path.iterdir() if x.is_dir()]
-        # else:
-        #     subfolders = [root_path / x for x in modules_list]
-
-        # # Recover code for former version, if asked
-        # if args.format_patch:
-        #     if len(modules_list) != 1:
-        #         raise ValueError(
-        #             "If 'format-patch' option is enabled, you should provide"
-        #             " a unique module name in the 'modules' argument.")
-        #     migrate_tools._get_code_from_previous_branch(
-        #         _logger, root_path, modules_list[0], args.init_version,
-        #         args.target_version, args.remote_name)
-
-        # # check if each folder is a valid module or not
-        # for subfolder in subfolders:
-        #     if (subfolder / "__openerp__.py").exists() or (
-        #         subfolder / "__manifest__.py"
-        #     ).exists():
-        #         modules_path.append(subfolder)
-        #     else:
-        #         if modules_list:
-        #             _logger.warning(
-        #                 "The module %s was not found in the directory %s"
-        #                 % (subfolder.name, args.directory)
-        #             )
-
-        # if modules_path:
-        #     _logger.debug(
-        #         "The lib will process the following modules '%s'"
-        #         % (", ".join([x.name for x in modules_path]))
-        #     )
-        # else:
-        #     _logger.error("No module found.")
-
-        # # Compute migration list
-        # migration_list = tools._get_migration_list(
-        #     args.init_version, args.target_version
-        # )
-
-        # for module_path in modules_path:
-        #     # Use black to clean the code
-        #     if args.enable_black:
-        #         pass
-
-        #     # migrate modules
-        #     migrate_tools._migrate_module(
-        #         _logger, root_path, module_path, migration_list)
 
     except KeyboardInterrupt:
         pass
