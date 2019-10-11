@@ -7,7 +7,7 @@ import os
 import pathlib
 import pkgutil
 
-from .config import _AVAILABLE_MIGRATION_STEPS
+from .config import _AVAILABLE_MIGRATION_STEPS, _MANIFEST_NAMES
 from .exception import ConfigException
 from .log import logger
 from .tools import _execute_shell, _get_latest_version_code
@@ -96,8 +96,7 @@ class Migration():
         self._get_migration_scripts()
 
     def _is_module_path(self, module_path):
-        return (module_path / "__openerp__.py").exists() or\
-            (module_path / "__manifest__.py").exists()
+        return any([(module_path / x).exists() for x in _MANIFEST_NAMES])
 
     def _get_code_from_previous_branch(self, module_name, remote_name):
         init_version = self._migration_steps[0]["init_version_name"]

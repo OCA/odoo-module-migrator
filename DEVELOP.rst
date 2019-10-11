@@ -110,6 +110,13 @@ How to improve the library
 * Read (or complete !) the migration advices of the OCA.
   https://github.com/OCA/maintainer-tools/wiki#migration
 
+* Read the complementary pages
+  https://odoo-development.readthedocs.io/en/latest/migration/
+
+* Discover what changed between two revisions, reading OpenUpgrade
+  documentation, specially the modules changes, for exemple:
+  https://github.com/OCA/OpenUpgrade/blob/12.0/odoo/openupgrade/doc/source/modules110-120.rst
+
 * Create or complete the according migration file.
 
 * Add tests.

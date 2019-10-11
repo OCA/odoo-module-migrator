@@ -8,8 +8,9 @@ import pathlib
 import re
 from .log import logger
 
-from .config import _ALLOWED_EXTENSIONS, _BLACK_LINE_LENGTH
+from .config import _ALLOWED_EXTENSIONS, _BLACK_LINE_LENGTH, _MANIFEST_NAMES
 from .tools import _execute_shell
+from . import tools
 
 
 class ModuleMigration():
@@ -17,11 +18,16 @@ class ModuleMigration():
     _migration = False
     _module_name = False
     _module_path = False
+    _manifest_path = False
 
     def __init__(self, migration, module_name):
         self._migration = migration
         self._module_name = module_name
         self._module_path = self._migration._directory_path / module_name
+        for manifest_name in _MANIFEST_NAMES:
+            manifest_path = self._module_path / manifest_name
+            if manifest_path.exists():
+                self._manifest_path = manifest_path
 
     def run(self):
         logger.info("[%s] Running migration from %s to %s" % (
@@ -90,29 +96,20 @@ class ModuleMigration():
                         os.path.join(root, new_name))
                     absolute_file_path = os.path.join(root, new_name)
 
-                with open(absolute_file_path, "U") as f:
-                    # Operate changes in the file (replacements, removals)
-                    current_text = f.read()
-                    new_text = current_text
+                # Operate changes in the file (replacements, removals)
+                replaces = text_replaces.get("*", {})
+                replaces.update(text_replaces.get(extension, {}))
 
-                    replaces = text_replaces.get("*", {})
-                    replaces.update(text_replaces.get(extension, {}))
+                new_text = tools._replace_in_file(
+                    absolute_file_path, replaces, "froma")
 
-                    for old_term, new_term in replaces.items():
-                        new_text = re.sub(old_term, new_term, new_text)
-
-                    # Write file if changed
-                    if new_text != current_text:
-                        logger.info("Changing content of file: %s" % filename)
-                        with open(absolute_file_path, "w") as f:
-                            f.write(new_text)
-
-                    # Display warnings if the file contents some obsolete code
-                    warnings = text_warnings.get("*", {})
-                    warnings.update(text_warnings.get(extension, {}))
-                    for pattern, warning_message in warnings.items():
-                        if re.findall(pattern, new_text):
-                            logger.warning(warning_message)
+                # Display warnings if the new content contains some obsolete
+                # pattern
+                warnings = text_warnings.get("*", {})
+                warnings.update(text_warnings.get(extension, {}))
+                for pattern, warning_message in warnings.items():
+                    if re.findall(pattern, new_text):
+                        logger.warning(warning_message)
 
         if global_functions:
             for function in global_functions:
@@ -120,6 +117,9 @@ class ModuleMigration():
                     logger=logger,
                     module_path=self._module_path,
                     module_name=self._module_name,
+                    manifest_path=self._manifest_path,
+                    migration_steps=self._migration._migration_steps,
+                    tools=tools,
                 )
 
     def _rename_file(self, module_path, old_file_path, new_file_path):
