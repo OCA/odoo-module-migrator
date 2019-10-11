@@ -25,18 +25,21 @@ class ModuleMigration():
 
     def run(self):
         logger.info("Running migration of module %s" % self._module_name)
-        self._run_black()
-        self._commit("[REF] %s: Black python code" % (self._module_name))
 
+        # Run Black, if required
+        self._run_black()
+        self._commit_changes(
+            "[REF] %s: Black python code" % (self._module_name))
+
+        # Apply migration script
         for migration_script in self._migration._migration_scripts:
             self._run_migration_scripts(migration_script)
 
-        self._commit("[MIG] %s: Migration to %s" % (
+        self._commit_changes("[MIG] %s: Migration to %s" % (
             self._module_name,
             self._migration._migration_steps[-1]["target_version_name"]))
 
     def _run_black(self):
-        has_change = False
         if not self._migration._use_black:
             return
 
@@ -52,11 +55,9 @@ class ModuleMigration():
 
                 absolute_file_path = os.path.join(root, filename)
 
-                has_change = has_change or black.format_file_in_place(
+                black.format_file_in_place(
                     pathlib.Path(absolute_file_path), False, file_mode,
                     black.WriteBack.YES)
-
-        return has_change
 
     def _run_migration_scripts(self, migration_script):
         file_renames = getattr(migration_script, "_FILE_RENAMES", {})
@@ -134,7 +135,8 @@ class ModuleMigration():
                 str(module_path.resolve()), old_file_path, new_file_path
             ))
 
-    def _commit_change(self, commit_name):
+    def _commit_changes(self, commit_name):
+        import pdb; pdb.set_trace()
         logger.info(
             "Commit changes for %s. commit name '%s'" % (
                 self._module_name, commit_name

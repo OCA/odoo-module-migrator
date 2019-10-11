@@ -1,2 +1,3 @@
-_TEXT_WARNING = {"*": {"ir.values": "'ir.values' found."
-                                    " This model has been removed in V11."}}
+_TEXT_WARNING = {"*": {
+    "ir.values": "[V11] Reference to 'ir.values'."
+    " This model has been removed."}}
