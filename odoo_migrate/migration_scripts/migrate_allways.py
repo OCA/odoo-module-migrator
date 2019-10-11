@@ -39,5 +39,6 @@ def remove_migration_folder(**kwargs):
             module_name))
         subprocess.check_output("rm -r %s" % migration_path_folder, shell=True)
 
+
 _GLOBAL_FUNCTIONS = [
     remove_migration_folder, set_module_installable, bump_revision]
