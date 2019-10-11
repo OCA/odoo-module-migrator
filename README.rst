@@ -129,6 +129,14 @@ Roadmap / Know issues
 
 * Add tests.
 
+Changes
+=======
+
+0.1.2 (October 10, 2019)
+------------------------
+
+* First release
+
 Credits
 =======
 
@@ -141,3 +149,4 @@ Contributors
 ------------
 
 * Sylvain LE GAL (https://www.twitter.com/legalsylvain)
+

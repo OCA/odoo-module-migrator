@@ -25,9 +25,16 @@ class ModuleMigration():
 
     def run(self):
         logger.info("Running migration of module %s" % self._module_name)
-        self._run_black()
+        if self._run_black():
+            self._commit("[REF] %s: Black python code" % (self._module_name))
+
+        has_change = False
         for migration_script in self._migration._migration_scripts:
-            self._run_migration_scripts(migration_script)
+            has_change =\
+                has_change or self._run_migration_scripts(migration_script)
+
+        if has_change:
+            self._commit()
 
     def _run_black(self):
         has_change = False
@@ -50,19 +57,7 @@ class ModuleMigration():
                     pathlib.Path(absolute_file_path), False, file_mode,
                     black.WriteBack.YES)
 
-        # Commit changes
-        if has_change:
-            commit_name = "[REF] %s: Black python code" % (self._module_name)
-
-            logger.info(
-                "Commit changes for %s. commit name '%s'" % (
-                    self._module_name, commit_name
-                ))
-
-            _execute_shell(
-                "cd %s && git add . --all && git commit -m '%s'" % (
-                    str(self._migration._directory_path.resolve()), commit_name
-                ))
+        return has_change
 
     def _run_migration_scripts(self, migration_script):
         file_renames = getattr(migration_script, "_FILE_RENAMES", {})
@@ -127,22 +122,6 @@ class ModuleMigration():
                     module_name=self._module_name,
                 )
 
-        # Commit changes
-        if has_change:
-            commit_name = "[MIG] %s: Migration to %s" % (
-                self._module_name,
-                self._migration._migration_steps[-1]["target_version_name"])
-
-            logger.info(
-                "Commit changes for %s. commit name '%s'" % (
-                    self._module_name, commit_name
-                ))
-
-            _execute_shell(
-                "cd %s && git add . --all && git commit -m '%s'" % (
-                    str(self._migration._directory_path.resolve()), commit_name
-                ))
-
     def _rename_file(self, module_path, old_file_path, new_file_path):
         """
         Rename a file. try to execute 'git mv', to avoid huge diff.
@@ -157,4 +136,15 @@ class ModuleMigration():
         _execute_shell(
             "cd %s && git mv %s %s" % (
                 str(module_path.resolve()), old_file_path, new_file_path
+            ))
+
+    def _commit_change(self, commit_name):
+        logger.info(
+            "Commit changes for %s. commit name '%s'" % (
+                self._module_name, commit_name
+            ))
+
+        _execute_shell(
+            "cd %s && git add . --all && git commit -m '%s'" % (
+                str(self._migration._directory_path.resolve()), commit_name
             ))
