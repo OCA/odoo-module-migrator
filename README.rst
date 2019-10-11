@@ -139,6 +139,28 @@ Roadmap / Know issues
 Changes
 =======
 
+0.1.3 (October 11, 2019)
+------------------------
+
+* framework
+
+[ADD] --no-commit option that disable git add and git commit calls
+[FIX] do not commit many times if migration has many steps.
+[REF] remove useless commented code
+[REF] create _commit_changes() and _replace_in_file() functions
+
+* Meta
+
+[FIX] github url of the project in setup.py
+[ADD] Travis file + links to coveralls
+[ADD] test_requirements.txt
+
+* migration script
+
+[ADD] 12.0 to 13.0 and add a warning if reference to web_settings_dashboard are found. cortesy @yelizariev
+[ADD] bump version in manifest file
+[ADD] set installable to True
+
 0.1.2 (October 10, 2019)
 ------------------------
 
