@@ -3,6 +3,10 @@
     :alt: License: AGPL-3
 .. image:: https://img.shields.io/badge/python-3.6-blue.svg
     :alt: Python support: 3.6
+.. image:: https://travis-ci.org/grap/odoo-migrate.svg?branch=master
+    :target: https://travis-ci.org/grap/odoo-migrate
+.. image:: https://coveralls.io/repos/grap/odoo-migrate/badge.png?branch=master
+    :target: https://coveralls.io/r/grap/odoo-migrate?branch=master
 
 ============
 odoo-migrate
