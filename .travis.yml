@@ -1,0 +1,26 @@
+sudo: false
+cache: pip
+
+language: python
+
+python:
+  - "3.7"
+
+before_install:
+  # For tests running git command
+  - git config --global user.name "test"
+  - git config --global user.email "test.test@test.com"
+
+# command to install dependencies
+install:
+  - pip install -r requirements.txt
+  - pip install -r test_requirements.txt
+
+# command to run tests
+script:
+  - git --version
+  - flake8 . --exclude=__init__.py
+  - coverage run --source git_aggregator setup.py test
+
+after_success:
+  - coveralls
