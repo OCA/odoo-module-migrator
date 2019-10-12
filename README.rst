@@ -42,7 +42,12 @@ a more recent version:
 **WARNING log**
 
 It mentions that you should check something. There is *maybe* something to do
-to make the module working.
+to make the module working. For exemple:
+
+.. code-block:: shell
+
+    19:37:55 WARNING Replaced dependency of 'account_analytic_analysis' by 'contract' (Moved to OCA/contract)
+
 
 **ERROR log**
 
@@ -54,7 +59,7 @@ For example, if you have a 8.0 module that depends on 'account_chart', that
 disappeared in more recent version, the following log will be displayed
 
 .. code-block:: shell
-    12:38:54 ERROR DeprecatedModuleError 'account_chart'
+    12:38:54 ERROR Depends on removed module 'account_anglo_saxon'
 
 Development and improvment
 ==========================
@@ -151,9 +156,9 @@ Available arguments
 Roadmap / Know issues
 =====================
 
-* Complete migration scripts.
-
-* Add tests.
+* replacement of tag <openerp><data> by <odoo> will fail in the case
+  where there are many <data> occurency.
+  We could fix that, using lxml lib instead of regular expression.
 
 Changes
 =======
