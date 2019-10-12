@@ -22,15 +22,19 @@ LEVEL_COLORS = {
 }
 
 
-def setup_logger(level):
-    handler = logging.StreamHandler()
-    handler.setFormatter(OdooMigrateFormatter())
+def setup_logger(level, file_path=False):
+    if not file_path:
+        handler = logging.StreamHandler()
+        handler.setFormatter(OdooMigrateFormatter())
+    else:
+        handler = logging.FileHandler(file_path)
+        handler.setFormatter(logging.Formatter(
+            "%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s"))
     logger.addHandler(handler)
     logger.setLevel(getattr(logging, str(level)))
 
 
 class OdooMigrateFormatter(logging.Formatter):
-    """custom Log Formatter"""
 
     def format(self, record):
         """Overwrite format() function to use custom formatter"""
@@ -50,7 +54,6 @@ class OdooMigrateFormatter(logging.Formatter):
         from inside the :py:meth:`logging.Formatter.format` record.
 
         """
-
         reset = [Style.RESET_ALL]
         levelname = [
             LEVEL_COLORS.get(record.levelname), Style.BRIGHT,

@@ -93,6 +93,14 @@ def get_parser():
     )
 
     main_parser.add_argument(
+        "-lp",
+        "--log-path",
+        dest="log_path",
+        default=False,
+        type=str,
+    )
+
+    main_parser.add_argument(
         "-nc",
         "--no-commit",
         action='store_true',
@@ -111,7 +119,7 @@ def main(args):
     args = parser.parse_args(args)
 
     # Set log level
-    setup_logger(args.log_level)
+    setup_logger(args.log_level, args.log_path)
 
     try:
         # Create a new Migration Object

@@ -20,7 +20,6 @@ setuptools.setup(
         "License :: OSI Approved :: GNU Affero General Public License v3",
     ],
     install_requires=open('requirements.txt').read().splitlines(),
-    test_require=open('test_requirements.txt').read().splitlines(),
     entry_points=dict(
         console_scripts=['odoo-migrate=odoo_migrate.__main__:main']),
     keywords=[

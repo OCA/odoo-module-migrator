@@ -4,6 +4,7 @@
 
 from filecmp import dircmp
 import os
+import pathlib
 import shutil
 import unittest
 
@@ -12,9 +13,9 @@ from odoo_migrate.__main__ import main
 
 class TestMigration(unittest.TestCase):
 
-    _template_path = "./tests/data_template"
-    _working_path = "./tests/data_tmp"
-    _expected_path = "./tests/data_result"
+    _template_path = pathlib.Path("./tests/data_template").resolve()
+    _working_path = pathlib.Path("./tests/data_tmp").resolve()
+    _expected_path = pathlib.Path("./tests/data_result").resolve()
 
     def _migrate_module_diff_result(
         self, module_name, result_name, init_version_name, target_version_name
@@ -23,13 +24,14 @@ class TestMigration(unittest.TestCase):
         shutil.copytree(self._template_path, self._working_path)
 
         main([
-            "-d", self._working_path, "-i", init_version_name, "-t",
-            target_version_name, "-m", module_name, "--no-commit"])
+            "--directory", str(self._working_path),
+            "--init-version-name", init_version_name,
+            "--target-version-name", target_version_name,
+            "--modules", module_name,
+            "--log-path", str(self._working_path / "test_log.log"),
+            "--no-commit",
+        ])
 
-        # migration = Migration(
-        #     self._working_path, init_version_name, target_version_name,
-        #     [module_name], commit_enabled=False)
-        # migration.run()
         return dircmp(
             os.path.join(self._expected_path, result_name),
             os.path.join(self._working_path, module_name)).diff_files
