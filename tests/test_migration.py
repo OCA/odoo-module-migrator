@@ -18,5 +18,5 @@ class TestConfig(unittest.TestCase):
         shutil.rmtree(working_path, ignore_errors=False, onerror=None)
         shutil.copytree(template_path, working_path)
         migration = Migration(
-            working_path, "8.0", "12.0", commit_enabled=False)
+            working_path, "8.0", "13.0", commit_enabled=False)
         migration.run()
