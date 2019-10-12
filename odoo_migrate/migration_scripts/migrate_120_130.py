@@ -15,6 +15,8 @@ _TEXT_ERRORS = {
         "[13] Use of deprecated decorator '@api.cr'",
         r".*@api.model_cr.*\n":
         "[13] Use of deprecated decorator '@api.model_cr'",
+        r".sudo\(":
+        "[13] Use of deprated function sudo(). Use with_user instead."
     },
 }
 
