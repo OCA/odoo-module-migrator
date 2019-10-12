@@ -31,7 +31,7 @@ def _execute_shell(shell_command):
 
 
 def _replace_in_file(file_path, replaces, log_message=False):
-    with open(file_path, "U") as f:
+    with open(file_path, "r") as f:
         current_text = f.read()
         new_text = current_text
 
