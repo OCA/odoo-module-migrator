@@ -64,7 +64,7 @@ class TestMigration(unittest.TestCase):
             ("WARNING", "Replaced.*account_analytic_analysis.*contract'"),
             ("ERROR", "deprecated decorator.*@api.cr"),
             ("ERROR", "ir.values.*removed"),
-            ("ERROR", "removed module.*account_anglo_saxon")
+            ("ERROR", "removed module.*account_anglo_saxon"),
         ]
 
         for required_log in required_logs:

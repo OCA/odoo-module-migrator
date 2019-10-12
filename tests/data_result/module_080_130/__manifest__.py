@@ -10,6 +10,7 @@
         "account_anglo_saxon",
         "contract",
         "account",
+        "account_check_printing",
         "web_kanban_sparkline",
         "web",
     ],

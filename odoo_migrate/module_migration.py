@@ -130,6 +130,13 @@ class ModuleMigration():
                 logger.error(
                     "Depends on removed module '%s'" % (old_module))
 
+            elif action == 'renamed':
+                new_manifest_text = re.sub(
+                    old_module_pattern, replace_pattern, new_manifest_text)
+                logger.info(
+                    "Replaced dependency of '%s' by '%s'." % (
+                        old_module, new_module))
+
             elif action == 'oca_moved':
                 new_manifest_text = re.sub(
                     old_module_pattern, replace_pattern, new_manifest_text)

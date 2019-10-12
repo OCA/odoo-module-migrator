@@ -11,6 +11,7 @@
         'account_anglo_saxon',
         'account_analytic_analysis',
         'account_chart',
+        'account_check_writing',
         'web_kanban_sparkline',
         'web',
     ],
