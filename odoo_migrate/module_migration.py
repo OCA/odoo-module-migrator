@@ -71,6 +71,8 @@ class ModuleMigration():
         text_replaces = getattr(migration_script, "_TEXT_REPLACES", {})
         text_warnings = getattr(migration_script, "_TEXT_WARNING", {})
         global_functions = getattr(migration_script, "_GLOBAL_FUNCTIONS", {})
+        deprecated_modules = getattr(
+            migration_script, "_DEPRECATED_MODULES", {})
 
         for root, directories, filenames in os.walk(
                 self._module_path.resolve()):
@@ -108,6 +110,51 @@ class ModuleMigration():
                 for pattern, warning_message in warnings.items():
                     if re.findall(pattern, new_text):
                         logger.warning(warning_message)
+
+        # Handle deprecated modules
+        current_manifest_text = tools._read_content(self._get_manifest_path())
+        new_manifest_text = current_manifest_text
+        for items in deprecated_modules:
+            old_module, action = items[0:2]
+            new_module = len(items) > 2 and items[2]
+            old_module_pattern = r"('|\"){0}('|\")".format(old_module)
+            if new_module:
+                new_module_pattern = r"('|\"){0}('|\")".format(new_module)
+                replace_pattern = r"\1{0}\2".format(new_module)
+
+            if not re.findall(old_module_pattern, new_manifest_text):
+                continue
+
+            if action == 'removed':
+                # The module has been removed, just log an error.
+                logger.error(
+                    "Depends on removed module '%s'" % (old_module))
+            elif action == 'oca_moved':
+                new_manifest_text = re.sub(
+                    old_module_pattern, replace_pattern, new_manifest_text)
+                logger.info(
+                    "Replaced dependency of '%s' by '%s' (%s)" % (
+                        old_module, new_module, items[3]))
+            elif action == "merged":
+                if not re.findall(new_module_pattern, new_manifest_text):
+                    # adding dependency of the merged module
+                    new_manifest_text = re.sub(
+                        old_module_pattern, replace_pattern, new_manifest_text)
+                    logger.info(
+                        "'%s' merged in '%s'. Replacing dependency." % (
+                            old_module, new_module))
+                else:
+                    # TODO, improve me. we should remove the dependency
+                    # but it could generate coma trouble.
+                    # maybe handling this treatment by ast lib could fix
+                    # the problem.
+                    logger.error(
+                        "'%s' merged in '%s'. You should remove the"
+                        " dependency to '%s' manually." % (
+                            old_module, new_module, old_module))
+
+        if current_manifest_text != new_manifest_text:
+            tools._write_content(self._get_manifest_path(), new_manifest_text)
 
         if global_functions:
             for function in global_functions:

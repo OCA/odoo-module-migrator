@@ -8,6 +8,10 @@
     'license': 'AGPL-3',
     'depends': [
         'sale',
-        'crm',
+        'account_anglo_saxon',
+        'account_analytic_analysis',
+        'account_chart',
+        'web_kanban_sparkline',
+        'web',
     ],
 }

@@ -5,5 +5,12 @@
     "version": "13.0.1.0.0",
     "installable": True,
     "license": "AGPL-3",
-    "depends": ["sale", "crm"],
+    "depends": [
+        "sale",
+        "account_anglo_saxon",
+        "contract",
+        "account",
+        "web_kanban_sparkline",
+        "web",
+    ],
 }
