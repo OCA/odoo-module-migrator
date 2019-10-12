@@ -158,17 +158,30 @@ Roadmap / Know issues
 
 * replacement of tag <openerp><data> by <odoo> will fail in the case
   where there are many <data> occurency.
-  We could fix that, using lxml lib instead of regular expression.
+  We could fix that, using ``lxml`` lib instead of regular expression.
 
 Changes
 =======
+
+0.1.4 (October 12, 2019)
+------------------------
+* test
+[ADD] test
+
+* framework
+[ADD] ``--file-path`` option.
+[ADD] ``_DEPRECATED_MODULES`` syntax.
+
+* migration script
+[FIX] Incorrect syntax of regular expression, to remove python 2 header
+[IMP] first release of all the steps from 8.0 to 13.0
 
 0.1.3 (October 11, 2019)
 ------------------------
 
 * framework
 
-[ADD] --no-commit option that disable git add and git commit calls
+[ADD] ``--no-commit`` option that disable git add and git commit calls
 [FIX] do not commit many times if migration has many steps.
 [REF] remove useless commented code
 [REF] create _commit_changes() and _replace_in_file() functions
