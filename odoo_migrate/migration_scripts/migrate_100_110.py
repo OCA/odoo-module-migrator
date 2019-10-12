@@ -4,6 +4,19 @@
 
 # TODO: Call 2to3
 
+_TEXT_REPLACES = {
+    "*": {
+        r"ir.actions.report.xml": "ir.actions.report",
+        r"report.external_layout": "web.external_layout",
+        r"report.html_container": "web.html_container",
+        r"report.layout": "web.report_layout",
+        r"report.minimal_layout": "web.minimal_layout",
+    },
+    ".xml": {
+        r"kanban_state_selection": "state_selection",
+    }
+}
+
 _TEXT_ERRORS = {
     "*": {
         "('|\")ir.values('|\")":
@@ -27,6 +40,14 @@ _TEXT_ERRORS = {
         "('|\")workflow.workitem('|\")":
             "[V11] Reference to 'workflow.workitem'."
             " This model has been removed.",
+        "report.external_layout_header":
+            "report.external_layout_header is obsolete.",
+        "report.external_layout_footer":
+            "report.external_layout_footer is obsolete.",
+    },
+    ".xml": {
+        "<tree(\n|.|\t)*color=\"[^>]*":
+        "color attribute is deprecated in tree view. Use decoration- instead.",
     }
 }
 
