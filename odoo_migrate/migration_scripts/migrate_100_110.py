@@ -5,3 +5,34 @@
 _TEXT_ERRORS = {"*": {
     "ir.values": "[V11] Reference to 'ir.values'."
     " This model has been removed."}}
+
+_DEPRECATED_MODULES = [
+    ("account_accountant", "removed"),
+    ("account_tax_cash_basis", "removed"),
+    ("base_action_rule", "renamed", "base_automation"),
+    ("crm_project_issue", "renamed", "crm_project_issue"),
+    ("hr_timesheet_sheet", "oca_moved", "hr_timesheet_sheet",
+        "Moved to OCA/hr-timesheet"),
+    ("marketing_campaign", "removed"),
+    ("marketing_campaign_crm_demo", "removed"),
+    ("portal_gamification", "merged", "gamification"),
+    ("portal_sale", "merged", "sale"),
+    ("portal_stock", "merged", "portal"),
+    ("procurement", "merged", "stock"),
+    ("project_issue", "merged", "project"),
+    ("project_issue_sheet", "merged", "hr_timesheet"),
+    ("rating_project_issue", "removed"),
+    ("report", "merged", "base"),
+    ("stock_calendar", "removed"),
+    ("stock_picking_wave", "renamed", "stock_picking_batch"),
+    ("subscription", "removed"),
+    ("web_calendar", "merged", "web"),
+    ("web_kanban", "merged", "web"),
+    ("website_issue", "renamed", "website_form_project"),
+    ("website_portal", "merged", "website"),
+    ("website_project", "merged", "project"),
+    ("website_project_issue", "merged", "project"),
+    ("website_project_timesheet", "merged", "hr_timesheet"),
+    ("website_rating_project_issue", "renamed", "website_rating_project"),
+
+]
