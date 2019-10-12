@@ -40,6 +40,8 @@ class ModuleMigration():
         for migration_script in self._migration._migration_scripts:
             self._run_migration_scripts(migration_script)
 
+        # Rerun black, to avoid that automated changes broke black rules
+        self._run_black()
         self._commit_changes("[MIG] %s: Migration to %s" % (
             self._module_name,
             self._migration._migration_steps[-1]["target_version_name"]))
