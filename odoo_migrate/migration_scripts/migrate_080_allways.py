@@ -7,7 +7,6 @@ _FILE_RENAMES = {"__openerp__.py": "__manifest__.py"}
 _TEXT_REPLACES = {
     ".py": {"from openerp": "from odoo", "import openerp": "import odoo"},
     ".xml": {
-        r"<data +noupdate=\"0\" *>": "<data>",
         r"( |\t)*<openerp>(\n| |\t)*<data>": "<odoo>",
         r"( |\t)*<\/data>(\n| |\t)*<\/openerp>": "</odoo>",
     }

@@ -5,6 +5,12 @@
 import os
 import subprocess
 
+_TEXT_REPLACES = {
+    ".xml": {
+        r"<data +noupdate=\"0\" *>": "<data>",
+    }
+}
+
 
 def bump_revision(**kwargs):
     tools = kwargs['tools']
