@@ -3,12 +3,14 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 import os
+import re
 from filecmp import dircmp
 import pathlib
 import shutil
 import unittest
 
 from odoo_migrate.__main__ import main
+from odoo_migrate.tools import _read_content
 
 
 class TestMigration(unittest.TestCase):
@@ -54,4 +56,21 @@ class TestMigration(unittest.TestCase):
             "Differences found in the following files\n- %s" % (
                 "\n- ".join(diff_files)))
 
-        # TODO test that log contains correct warning, and error message
+        log_content = _read_content(str(self._working_path / "test_log.log"))
+
+        required_logs = [
+            ("ERROR", "Use of deprated function sudo"),
+            ("ERROR", "web_kanban_sparkline.*should remove the dependency"),
+            ("WARNING", "Replaced.*account_analytic_analysis.*contract'"),
+            ("ERROR", "deprecated decorator.*@api.cr"),
+            ("ERROR", "ir.values.*removed"),
+            ("ERROR", "removed module.*account_anglo_saxon")
+        ]
+
+        for required_log in required_logs:
+            level, message = required_log
+            pattern = "{0}.*{1}".format(level, message)
+            self.assertNotEqual(
+                len(re.findall(pattern, log_content)),
+                0,
+                "%s not found in the log" % pattern)
