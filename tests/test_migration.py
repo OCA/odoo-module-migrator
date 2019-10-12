@@ -15,7 +15,7 @@ class TestConfig(unittest.TestCase):
         template_path = "./tests/data_template"
         working_path = "./tests/data_tmp"
         # expecting_path = "./tests/data_expected"
-        shutil.rmtree(working_path, ignore_errors=False, onerror=None)
+        shutil.rmtree(working_path, ignore_errors=True)
         shutil.copytree(template_path, working_path)
         migration = Migration(
             working_path, "8.0", "13.0", commit_enabled=False)
