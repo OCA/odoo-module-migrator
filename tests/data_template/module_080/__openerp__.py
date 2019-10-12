@@ -8,6 +8,6 @@
     'license': 'AGPL-3',
     'depends': [
         'sale',
-        'marketing_crm',
+        'crm',
     ],
 }
