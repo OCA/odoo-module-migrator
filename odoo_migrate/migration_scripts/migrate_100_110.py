@@ -2,9 +2,33 @@
 # @author: Sylvain LE GAL (https://twitter.com/legalsylvain)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-_TEXT_ERRORS = {"*": {
-    "ir.values": "[V11] Reference to 'ir.values'."
-    " This model has been removed."}}
+# TODO: Call 2to3
+
+_TEXT_ERRORS = {
+    "*": {
+        "('|\")ir.values('|\")":
+            "[V11] Reference to 'ir.values'."
+            " This model has been removed.",
+        "('|\")workflow('|\")":
+            "[V11] Reference to 'workflow'."
+            " This model has been removed.",
+        "('|\")workflow.activity('|\")":
+            "[V11] Reference to 'workflow.activity'."
+            " This model has been removed.",
+        "('|\")workflow.instance('|\")":
+            "[V11] Reference to'workflow.instance'."
+            " This model has been removed.",
+        "('|\")workflow.transition('|\")":
+            "[V11] Reference to 'workflow.transition'."
+            " This model has been removed.",
+        "('|\")workflow.triggers('|\")":
+            "[V11] Reference to 'workflow.triggers'."
+            " This model has been removed.",
+        "('|\")workflow.workitem('|\")":
+            "[V11] Reference to 'workflow.workitem'."
+            " This model has been removed.",
+    }
+}
 
 _DEPRECATED_MODULES = [
     ("account_accountant", "removed"),
