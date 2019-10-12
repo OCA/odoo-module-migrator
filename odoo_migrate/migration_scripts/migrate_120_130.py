@@ -2,6 +2,6 @@
 # @author: Sylvain LE GAL (https://twitter.com/legalsylvain)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-_TEXT_WARNING = {"*": {
+_TEXT_ERRORS = {"*": {
     "web_settings_dashboard": "[V13] Reference to 'web_settings_dashboard'"
     ". This module has been removed."}}
