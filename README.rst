@@ -176,6 +176,7 @@ Changes
 [FIX] Incorrect syntax of regular expression, to remove python 2 header
 [IMP] first release of all the steps from 8.0 to 13.0
 
+
 0.1.3 (October 11, 2019)
 ------------------------
 
@@ -197,6 +198,7 @@ Changes
 [ADD] 12.0 to 13.0 and add a warning if reference to web_settings_dashboard are found. cortesy @yelizariev
 [ADD] bump version in manifest file
 [ADD] set installable to True
+
 
 0.1.2 (October 10, 2019)
 ------------------------
