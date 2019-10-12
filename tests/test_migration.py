@@ -28,7 +28,7 @@ class TestMigration(unittest.TestCase):
             "--init-version-name", init_version_name,
             "--target-version-name", target_version_name,
             "--modules", module_name,
-            # "--log-path", str(self._working_path / "test_log.log"),
+            "--log-path", str(self._working_path / "test_log.log"),
             "--no-commit",
         ])
 
@@ -53,3 +53,5 @@ class TestMigration(unittest.TestCase):
             len(diff_files), 0,
             "Differences found in the following files\n- %s" % (
                 "\n- ".join(diff_files)))
+
+        # TODO test that log contains correct warning, and error message
