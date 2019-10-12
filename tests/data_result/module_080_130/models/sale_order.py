@@ -10,3 +10,8 @@ class SaleOrder(models.Model):
     def write(self, vals):
         # something
         return super(SaleOrder, self).write(vals)
+
+    @api.cr
+    def my_function(self):
+        # something
+        return
