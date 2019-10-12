@@ -96,7 +96,8 @@ class ModuleMigration():
                 replaces.update(text_replaces.get(extension, {}))
 
                 new_text = tools._replace_in_file(
-                    absolute_file_path, replaces, "File changed.")
+                    absolute_file_path, replaces,
+                    "Change file content of %s" % filename)
 
                 # Display warnings if the new content contains some obsolete
                 # pattern

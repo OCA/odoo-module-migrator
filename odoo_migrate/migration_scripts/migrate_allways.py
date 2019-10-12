@@ -35,8 +35,7 @@ def remove_migration_folder(**kwargs):
     module_name = kwargs['module_name']
     migration_path_folder = os.path.join(module_path, 'migrations')
     if os.path.exists(migration_path_folder):
-        logger.info("Removing 'migrations' folder in module %s" % (
-            module_name))
+        logger.info("Removing 'migrations' folder" % (module_name))
         subprocess.check_output("rm -r %s" % migration_path_folder, shell=True)
 
 

@@ -4,8 +4,8 @@
 
 import argparse
 import argcomplete
-# from pathlib import Path
-# from . import migrate_tools
+import sys
+
 from . import tools
 from .log import setup_logger
 from .migration import Migration
@@ -104,11 +104,11 @@ def get_parser():
     return main_parser
 
 
-def main():
+def main(args):
     # Parse Arguments
     parser = get_parser()
     argcomplete.autocomplete(parser, always_complete_options=False)
-    args = parser.parse_args()
+    args = parser.parse_args(args)
 
     # Set log level
     setup_logger(args.log_level)
@@ -132,4 +132,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
