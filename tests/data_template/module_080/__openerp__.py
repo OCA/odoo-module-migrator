@@ -6,4 +6,8 @@
     "version": "8.0.3.0.0",
     "installable": False,
     'license': 'AGPL-3',
+    'depends': [
+        'sale',
+        'marketing_crm',
+    ],
 }

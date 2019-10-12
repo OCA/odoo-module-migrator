@@ -28,14 +28,33 @@ This library will so:
 * apply automatically changes. (renaming, replacing, etc.)
 * (depending of the config and the version) black your code.
 * commit your changes.
-* Display warnings if your code belong obsolete code patterns. For exemple,
-  for a migration to V11+
+* Display warnings or errors in log if your code belong obsolete code patterns.
 
+**INFO log**
+
+It mentions that the lib automatically changed something.
+*A priori* you have nothing to do. For example, for a migration from 8.0 to
+a more recent version:
 
 .. code-block:: shell
+    12:38:54 INFO Renaming file: '/my_module/__openerp__.py' by '/my_module/__manifest__.py' 
 
-    15:59:04   WARNING     'ir.values' found. This model has been removed in V11.
+**WARNING log**
 
+It mentions that you should check something. There is *maybe* something to do
+to make the module working.
+
+**ERROR log**
+
+It mentions that you should change something in your code. It not, the module
+will not work *for sure*. (not installable, or generating error during the
+execution)
+
+For example, if you have a 8.0 module that depends on 'account_chart', that
+disappeared in more recent version, the following log will be displayed
+
+.. code-block:: shell
+    12:38:54 ERROR DeprecatedModuleError 'account_chart'
 
 Development and improvment
 ==========================

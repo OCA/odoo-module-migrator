@@ -39,4 +39,5 @@ class TestMigration(unittest.TestCase):
     def test_migration_080_130(self):
         diff_files = self._migrate_module_diff_result(
             "module_080", "module_080_130", "8.0", "13.0")
+        import pdb; pdb.set_trace()
         self.assertEqual(len(diff_files), 0)
