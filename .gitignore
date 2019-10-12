@@ -1,6 +1,6 @@
 # odoo-module-migrator
 
-tests/data_tmp/
+# tests/data_tmp/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
