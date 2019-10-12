@@ -129,12 +129,15 @@ class ModuleMigration():
                 # The module has been removed, just log an error.
                 logger.error(
                     "Depends on removed module '%s'" % (old_module))
+
             elif action == 'oca_moved':
                 new_manifest_text = re.sub(
                     old_module_pattern, replace_pattern, new_manifest_text)
-                logger.info(
-                    "Replaced dependency of '%s' by '%s' (%s)" % (
-                        old_module, new_module, items[3]))
+                logger.warning(
+                    "Replaced dependency of '%s' by '%s' (%s)\n"
+                    "Check that '%s' is available on your system." % (
+                        old_module, new_module, items[3], new_module))
+
             elif action == "merged":
                 if not re.findall(new_module_pattern, new_manifest_text):
                     # adding dependency of the merged module

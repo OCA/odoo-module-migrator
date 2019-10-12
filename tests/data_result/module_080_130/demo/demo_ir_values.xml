@@ -1,0 +1,5 @@
+<odoo>
+        <record name="demo_values" model="ir.values">
+            <field name="name">My Demo Values</field>
+        </record>
+</odoo>
