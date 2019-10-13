@@ -148,6 +148,9 @@ Available arguments
 |``--log-level``           | ``-ll``  | Default:        | Possible value: ``DEBUG``, ``INFO``, ``WARNING``, etc.|
 |                          |          | ``INFO``        |                                                       |
 +--------------------------+----------+-----------------+-------------------------------------------------------+
+|``--log-path``           | ``-ll``  | Default:         | If set, the logs will not be displayed at screen,     |
+|                          |          | False           | but stored in a file                                  |
++--------------------------+----------+-----------------+-------------------------------------------------------+
 |``--no-commit``           | ``-nc``  | Default:        | If set the library will not git add and git commit    |
 |                          |          | commit          | changes.                                              |
 +--------------------------+----------+-----------------+-------------------------------------------------------+
@@ -163,16 +166,24 @@ Roadmap / Know issues
 Changes
 =======
 
+0.2.0 (October 13, 2019)
+------------------------
+* Second release
+
+
 0.1.4 (October 12, 2019)
 ------------------------
-* test
+* Test
+
 [ADD] test
 
 * framework
+
 [ADD] ``--file-path`` option.
 [ADD] ``_DEPRECATED_MODULES`` syntax.
 
 * migration script
+
 [FIX] Incorrect syntax of regular expression, to remove python 2 header
 [IMP] first release of all the steps from 8.0 to 13.0
 

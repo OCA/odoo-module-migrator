@@ -112,11 +112,14 @@ def get_parser():
     return main_parser
 
 
-def main(args):
+def main(args=False):
     # Parse Arguments
     parser = get_parser()
     argcomplete.autocomplete(parser, always_complete_options=False)
-    args = parser.parse_args(args)
+    if args:
+        args = parser.parse_args(args)
+    else:
+        args = parser.parse_args()
 
     # Set log level
     setup_logger(args.log_level, args.log_path)
