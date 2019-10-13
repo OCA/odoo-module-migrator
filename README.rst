@@ -55,8 +55,8 @@ It mentions that you should change something in your code. It not, the module
 will not work *for sure*. (not installable, or generating error during the
 execution)
 
-For example, if you have a 8.0 module that depends on 'account_chart', that
-disappeared in more recent version, the following log will be displayed
+For example, if you have a 8.0 module that depends on 'account_anglo_saxon',
+that disappeared in more recent version, the following log will be displayed
 
 .. code-block:: shell
     12:38:54 ERROR Depends on removed module 'account_anglo_saxon'
