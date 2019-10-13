@@ -93,16 +93,36 @@ The list of the operations are written in the subfolder
         }
     }
 
-* Display warnings if files contains a given partern. For exemple, for
+* Display errors if files contains a given partern. For exemple, for
   migration from version 10.0 to version 11.0:
 
 .. code-block:: python
 
-    _TEXT_WARNING = {
+    _TEXT_ERRORS = {
         "*": {
             "ir.values": "ir.values table does not exist anymore"
         }
     }
+
+* Dependencies to obsoletes modules. There is four possibility:
+    * the module has been fully removed.
+    * the module has been renamed.
+    * the module features has been merged into another module.
+    * the module has been moved under OCA umbrella. (w/o another name)
+
+.. code-block:: python
+
+    _DEPRECATED_MODULES = [
+
+        ("account_anglo_saxon", "removed"),
+
+        ("account_check_writing", "renamed", "account_check_printing"),
+
+        ("account_chart", "merged", "account"),
+
+        ("account_analytic_analysis", "oca_moved", "contract", "Moved to OCA/contract"),
+
+    ]
 
 How to improve the library
 ==========================

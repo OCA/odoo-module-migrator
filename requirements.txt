@@ -1,4 +1,3 @@
 argcomplete
 colorama
 black
-lxml

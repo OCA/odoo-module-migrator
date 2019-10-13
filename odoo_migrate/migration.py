@@ -130,6 +130,10 @@ class Migration():
 
     def _get_migration_scripts(self):
 
+        # Add the script that will be allways executed
+        self._migration_scripts.append(importlib.import_module(
+            "odoo_migrate.migration_scripts.migrate_allways"))
+
         all_packages = importlib.import_module(
             "odoo_migrate.migration_scripts")
 
@@ -160,10 +164,6 @@ class Migration():
                 continue
 
             self._migration_scripts.append(importlib.import_module(full_name))
-
-        # Finally, add the script that will be allways executed
-        self._migration_scripts.append(importlib.import_module(
-            "odoo_migrate.migration_scripts.migrate_allways"))
 
         logger.debug(
             "The following migration script will be"

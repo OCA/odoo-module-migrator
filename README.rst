@@ -28,14 +28,38 @@ This library will so:
 * apply automatically changes. (renaming, replacing, etc.)
 * (depending of the config and the version) black your code.
 * commit your changes.
-* Display warnings if your code belong obsolete code patterns. For exemple,
-  for a migration to V11+
+* Display warnings or errors in log if your code belong obsolete code patterns.
 
+**INFO log**
+
+It mentions that the lib automatically changed something.
+*A priori* you have nothing to do. For example, for a migration from 8.0 to
+a more recent version:
+
+.. code-block:: shell
+    12:38:54 INFO Renaming file: '/my_module/__openerp__.py' by '/my_module/__manifest__.py' 
+
+**WARNING log**
+
+It mentions that you should check something. There is *maybe* something to do
+to make the module working. For exemple:
 
 .. code-block:: shell
 
-    15:59:04   WARNING     'ir.values' found. This model has been removed in V11.
+    19:37:55 WARNING Replaced dependency of 'account_analytic_analysis' by 'contract' (Moved to OCA/contract)
 
+
+**ERROR log**
+
+It mentions that you should change something in your code. It not, the module
+will not work *for sure*. (not installable, or generating error during the
+execution)
+
+For example, if you have a 8.0 module that depends on 'account_chart', that
+disappeared in more recent version, the following log will be displayed
+
+.. code-block:: shell
+    12:38:54 ERROR Depends on removed module 'account_anglo_saxon'
 
 Development and improvment
 ==========================
@@ -132,12 +156,49 @@ Available arguments
 Roadmap / Know issues
 =====================
 
-* Complete migration scripts.
-
-* Add tests.
+* replacement of tag <openerp><data> by <odoo> will fail in the case
+  where there are many <data> occurency.
+  We could fix that, using ``lxml`` lib instead of regular expression.
 
 Changes
 =======
+
+0.1.4 (October 12, 2019)
+------------------------
+* test
+[ADD] test
+
+* framework
+[ADD] ``--file-path`` option.
+[ADD] ``_DEPRECATED_MODULES`` syntax.
+
+* migration script
+[FIX] Incorrect syntax of regular expression, to remove python 2 header
+[IMP] first release of all the steps from 8.0 to 13.0
+
+
+0.1.3 (October 11, 2019)
+------------------------
+
+* framework
+
+[ADD] ``--no-commit`` option that disable git add and git commit calls
+[FIX] do not commit many times if migration has many steps.
+[REF] remove useless commented code
+[REF] create _commit_changes() and _replace_in_file() functions
+
+* Meta
+
+[FIX] github url of the project in setup.py
+[ADD] Travis file + links to coveralls
+[ADD] test_requirements.txt
+
+* migration script
+
+[ADD] 12.0 to 13.0 and add a warning if reference to web_settings_dashboard are found. cortesy @yelizariev
+[ADD] bump version in manifest file
+[ADD] set installable to True
+
 
 0.1.2 (October 10, 2019)
 ------------------------

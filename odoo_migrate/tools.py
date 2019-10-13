@@ -30,19 +30,30 @@ def _execute_shell(shell_command):
     return subprocess.check_output(shell_command, shell=True)
 
 
+def _read_content(file_path):
+    f = open(file_path, "r")
+    text = f.read()
+    f.close()
+    return text
+
+
+def _write_content(file_path, content):
+    f = open(file_path, "w")
+    f.write(content)
+    f.close()
+
+
 def _replace_in_file(file_path, replaces, log_message=False):
-    with open(file_path, "U") as f:
-        current_text = f.read()
-        new_text = current_text
+    current_text = _read_content(file_path)
+    new_text = current_text
 
-        for old_term, new_term in replaces.items():
-            new_text = re.sub(old_term, new_term, new_text)
+    for old_term, new_term in replaces.items():
+        new_text = re.sub(old_term, new_term, new_text)
 
-        # Write file if changed
-        if new_text != current_text:
-            if not log_message:
-                log_message = "Changing content of file: %s" % file_path.name
-            logger.info(log_message)
-            with open(file_path, "w") as f:
-                f.write(new_text)
-        return new_text
+    # Write file if changed
+    if new_text != current_text:
+        if not log_message:
+            log_message = "Changing content of file: %s" % file_path.name
+        logger.info(log_message)
+        _write_content(file_path, new_text)
+    return new_text

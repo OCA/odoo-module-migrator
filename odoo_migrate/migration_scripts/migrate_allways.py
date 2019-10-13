@@ -5,6 +5,12 @@
 import os
 import subprocess
 
+_TEXT_REPLACES = {
+    ".xml": {
+        r"<data +noupdate=\"0\" *>": "<data>",
+    }
+}
+
 
 def bump_revision(**kwargs):
     tools = kwargs['tools']
@@ -32,11 +38,9 @@ def set_module_installable(**kwargs):
 def remove_migration_folder(**kwargs):
     logger = kwargs['logger']
     module_path = kwargs['module_path']
-    module_name = kwargs['module_name']
     migration_path_folder = os.path.join(module_path, 'migrations')
     if os.path.exists(migration_path_folder):
-        logger.info("Removing 'migrations' folder in module %s" % (
-            module_name))
+        logger.info("Removing 'migrations' folder")
         subprocess.check_output("rm -r %s" % migration_path_folder, shell=True)
 
 
