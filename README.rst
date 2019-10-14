@@ -14,7 +14,7 @@ odoo-migrate
 
 ``odoo-migrate`` is a python3 library that allows you to realize automatically
 recurring changes when migrating Odoo modules from a version to another.
-for exemple: 
+for exemple:
 
 * renaming ``__openerp__.py`` file into ``__manifest__.py``
 * removing ``# -*- encoding: utf-8 -*-`` since V11.0
@@ -230,4 +230,3 @@ Contributors
 ------------
 
 * Sylvain LE GAL (https://www.twitter.com/legalsylvain)
-
