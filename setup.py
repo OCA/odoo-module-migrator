@@ -31,5 +31,4 @@ setuptools.setup(
         "Upgrade",
         "Module",
     ],
-    coucou="coucou",
 )
