@@ -1,3 +1,4 @@
+exclude: "/tests/data_result|tests/data_template"
 default_language_version:
   python: python3
 repos:
