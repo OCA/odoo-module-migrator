@@ -96,7 +96,7 @@ the module ``pos_order_pricelist_change`` in the OCA "pos" repository.
         --directory             ./
         --modules               pos_order_pricelist_change
         --init-version-name     8.0
-        -- target-version-name 12.0
+        --target-version-name  12.0
         --format-patch
 
 Without format Patch command
@@ -113,7 +113,7 @@ you can run the following command
         --directory             /path/to/repository
         --modules               module_1,module_2,module_3
         --init-version-name     10.0
-        -- target-version-name  12.0
+        --target-version-name   12.0
 
 This tools will operate the changes for each module.
 
