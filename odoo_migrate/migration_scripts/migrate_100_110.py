@@ -12,43 +12,31 @@ _TEXT_REPLACES = {
         r"report.layout": "web.report_layout",
         r"report.minimal_layout": "web.minimal_layout",
     },
-    ".xml": {
-        r"kanban_state_selection": "state_selection",
-    }
+    ".xml": {r"kanban_state_selection": "state_selection"},
 }
 
 _TEXT_ERRORS = {
     "*": {
-        "('|\")ir.values('|\")":
-            "[V11] Reference to 'ir.values'."
-            " This model has been removed.",
-        "('|\")workflow('|\")":
-            "[V11] Reference to 'workflow'."
-            " This model has been removed.",
-        "('|\")workflow.activity('|\")":
-            "[V11] Reference to 'workflow.activity'."
-            " This model has been removed.",
-        "('|\")workflow.instance('|\")":
-            "[V11] Reference to'workflow.instance'."
-            " This model has been removed.",
-        "('|\")workflow.transition('|\")":
-            "[V11] Reference to 'workflow.transition'."
-            " This model has been removed.",
-        "('|\")workflow.triggers('|\")":
-            "[V11] Reference to 'workflow.triggers'."
-            " This model has been removed.",
-        "('|\")workflow.workitem('|\")":
-            "[V11] Reference to 'workflow.workitem'."
-            " This model has been removed.",
-        "report.external_layout_header":
-            "report.external_layout_header is obsolete.",
-        "report.external_layout_footer":
-            "report.external_layout_footer is obsolete.",
+        "('|\")ir.values('|\")": "[V11] Reference to 'ir.values'."
+        " This model has been removed.",
+        "('|\")workflow('|\")": "[V11] Reference to 'workflow'."
+        " This model has been removed.",
+        "('|\")workflow.activity('|\")": "[V11] Reference to 'workflow.activity'."
+        " This model has been removed.",
+        "('|\")workflow.instance('|\")": "[V11] Reference to'workflow.instance'."
+        " This model has been removed.",
+        "('|\")workflow.transition('|\")": "[V11] Reference to 'workflow.transition'."
+        " This model has been removed.",
+        "('|\")workflow.triggers('|\")": "[V11] Reference to 'workflow.triggers'."
+        " This model has been removed.",
+        "('|\")workflow.workitem('|\")": "[V11] Reference to 'workflow.workitem'."
+        " This model has been removed.",
+        "report.external_layout_header": "report.external_layout_header is obsolete.",
+        "report.external_layout_footer": "report.external_layout_footer is obsolete.",
     },
     ".xml": {
-        "<tree(\n|.|\t)*color=\"[^>]*":
-        "color attribute is deprecated in tree view. Use decoration- instead.",
-    }
+        '<tree(\n|.|\t)*color="[^>]*': "color attribute is deprecated in tree view. Use decoration- instead."
+    },
 }
 
 _DEPRECATED_MODULES = [
@@ -56,8 +44,12 @@ _DEPRECATED_MODULES = [
     ("account_tax_cash_basis", "removed"),
     ("base_action_rule", "renamed", "base_automation"),
     ("crm_project_issue", "renamed", "crm_project_issue"),
-    ("hr_timesheet_sheet", "oca_moved", "hr_timesheet_sheet",
-        "Moved to OCA/hr-timesheet"),
+    (
+        "hr_timesheet_sheet",
+        "oca_moved",
+        "hr_timesheet_sheet",
+        "Moved to OCA/hr-timesheet",
+    ),
     ("marketing_campaign", "removed"),
     ("marketing_campaign_crm_demo", "removed"),
     ("portal_gamification", "merged", "gamification"),
@@ -79,5 +71,4 @@ _DEPRECATED_MODULES = [
     ("website_project_issue", "merged", "project"),
     ("website_project_timesheet", "merged", "hr_timesheet"),
     ("website_rating_project_issue", "renamed", "website_rating_project"),
-
 ]
