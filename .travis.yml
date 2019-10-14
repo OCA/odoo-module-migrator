@@ -1,5 +1,8 @@
 sudo: false
-cache: pip
+cache:
+  directories:
+  - $HOME/.cache/pip
+  - $HOME/.cache/pre-commit
 
 language: python
 
@@ -11,6 +14,22 @@ before_install:
   - git config --global user.name "test"
   - git config --global user.email "test.test@test.com"
 
+stages:
+  - linting
+  - test
+
+jobs:
+  include:
+    - stage: linting
+      name: "pre-commit"
+      install: pip install pre-commit
+      script: pre-commit run --all --show-diff-on-failure
+      after_success:
+      before_install:
+    - stage: test
+      name: "test"
+
+
 # command to install dependencies
 install:
   - pip install -r requirements.txt
@@ -18,8 +37,6 @@ install:
 
 # command to run tests
 script:
-  - git --version
-  - flake8 . --exclude=__init__.py
   - coverage run --source odoo_migrate setup.py test
 
 after_success:

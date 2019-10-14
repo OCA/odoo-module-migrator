@@ -14,7 +14,7 @@ from .tools import _execute_shell, _get_latest_version_code
 from .module_migration import ModuleMigration
 
 
-class Migration():
+class Migration:
 
     _migration_steps = []
     _directory_path = False
@@ -24,9 +24,15 @@ class Migration():
     _commit_enabled = True
 
     def __init__(
-        self, relative_directory_path, init_version_name, target_version_name,
-        module_names=[], format_patch=False, remote_name='origin',
-        force_black=False, commit_enabled=True,
+        self,
+        relative_directory_path,
+        init_version_name,
+        target_version_name,
+        module_names=[],
+        format_patch=False,
+        remote_name="origin",
+        force_black=False,
+        commit_enabled=True,
     ):
         self._use_black = force_black
         self._commit_enabled = commit_enabled
@@ -47,14 +53,16 @@ class Migration():
         # Check consistency between format patch and module_names args
         if format_patch and len(module_names) != 1:
             raise ConfigException(
-                "Format patch option can only be used for a single module")
+                "Format patch option can only be used for a single module"
+            )
         logger.debug("Module list: %s" % module_names)
         logger.debug("format patch option : %s" % format_patch)
 
         # convert relative or absolute directory into Path Object
         if not os.path.exists(relative_directory_path):
             raise ConfigException(
-                "Unable to find directory: %s" % relative_directory_path)
+                "Unable to find directory: %s" % relative_directory_path
+            )
 
         root_path = pathlib.Path(relative_directory_path)
         self._directory_path = pathlib.Path(root_path.resolve(strict=True))
@@ -62,12 +70,12 @@ class Migration():
         # format-patch, if required
         if format_patch:
             if not (root_path / module_names[0]).is_dir():
-                self._get_code_from_previous_branch(
-                    module_names[0], remote_name)
+                self._get_code_from_previous_branch(module_names[0], remote_name)
             else:
                 logger.warning(
                     "Ignoring format-patch argument, as the module %s"
-                    " is still present in the repository" % (module_names[0]))
+                    " is still present in the repository" % (module_names[0])
+                )
 
         # Guess modules if not provided, and check validity
         if not module_names:
@@ -84,7 +92,8 @@ class Migration():
                     module_names.remove(child_path.name)
                     logger.warning(
                         "No valid module found for '%s' in the directory '%s'"
-                        % (child_path.name, root_path.resolve()))
+                        % (child_path.name, root_path.resolve())
+                    )
 
         if not module_names:
             raise ConfigException("No modules found to migrate. Exiting.")
@@ -102,54 +111,57 @@ class Migration():
         init_version = self._migration_steps[0]["init_version_name"]
         target_version = self._migration_steps[-1]["target_version_name"]
         branch_name = "%(version)s-mig-%(module_name)s" % {
-            'version': target_version,
-            'module_name': module_name}
+            "version": target_version,
+            "module_name": module_name,
+        }
 
         logger.info("Creating new branch '%s' ..." % (branch_name))
         _execute_shell(
             "cd %(path)s && "
-            "git checkout -b %(branch)s %(remote)s/%(version)s" % {
-                'path': self._directory_path.resolve(),
-                'branch': branch_name,
-                'remote': remote_name,
-                'version': target_version,
-            })
+            "git checkout -b %(branch)s %(remote)s/%(version)s"
+            % {
+                "path": self._directory_path.resolve(),
+                "branch": branch_name,
+                "remote": remote_name,
+                "version": target_version,
+            }
+        )
 
         _execute_shell(
             "cd %(path)s && "
             "git format-patch --keep-subject "
             "--stdout %(remote)s/%(target)s..%(remote)s/%(init)s "
-            "-- %(module)s | git am -3 --keep" % {
-                'path': self._directory_path.resolve(),
-                'remote': remote_name,
-                'init': init_version,
-                'target': target_version,
-                'module': module_name,
+            "-- %(module)s | git am -3 --keep"
+            % {
+                "path": self._directory_path.resolve(),
+                "remote": remote_name,
+                "init": init_version,
+                "target": target_version,
+                "module": module_name,
             }
         )
 
     def _get_migration_scripts(self):
 
         # Add the script that will be allways executed
-        self._migration_scripts.append(importlib.import_module(
-            "odoo_migrate.migration_scripts.migrate_allways"))
+        self._migration_scripts.append(
+            importlib.import_module("odoo_migrate.migration_scripts.migrate_allways")
+        )
 
-        all_packages = importlib.import_module(
-            "odoo_migrate.migration_scripts")
+        all_packages = importlib.import_module("odoo_migrate.migration_scripts")
 
         migration_start = float(self._migration_steps[0]["init_version_code"])
         migration_end = float(self._migration_steps[-1]["target_version_code"])
 
-        for loader, name, is_pkg in pkgutil.walk_packages(
-                all_packages.__path__):
+        for loader, name, is_pkg in pkgutil.walk_packages(all_packages.__path__):
             # Ignore script that will be allways executed.
             # this script will be added at the end.
-            if name == 'migrate_allways':
+            if name == "migrate_allways":
                 continue
 
             # Filter migration scripts, depending of the configuration
-            full_name = all_packages.__name__ + '.' + name
-            if 'allways' in name:
+            full_name = all_packages.__name__ + "." + name
+            if "allways" in name:
                 # replace allways by the most recent version
                 real_name = name.replace("allways", _get_latest_version_code())
             else:
@@ -167,14 +179,18 @@ class Migration():
 
         logger.debug(
             "The following migration script will be"
-            " executed:\n- %s" % '\n- '.join(
-                [x.__file__.split('/')[-1] for x in self._migration_scripts]))
+            " executed:\n- %s"
+            % "\n- ".join([x.__file__.split("/")[-1] for x in self._migration_scripts])
+        )
 
     def run(self):
         logger.debug(
-            "Running migration from: %s to: %s in '%s'" % (
+            "Running migration from: %s to: %s in '%s'"
+            % (
                 self._migration_steps[0]["init_version_name"],
                 self._migration_steps[-1]["target_version_name"],
-                self._directory_path.resolve()))
+                self._directory_path.resolve(),
+            )
+        )
         for module_migration in self._module_migrations:
             module_migration.run()

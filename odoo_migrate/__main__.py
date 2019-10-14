@@ -13,9 +13,7 @@ from .migration import Migration
 
 def get_parser():
 
-    main_parser = argparse.ArgumentParser(
-        formatter_class=argparse.RawTextHelpFormatter
-    )
+    main_parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 
     main_parser.add_argument(
         "-d",
@@ -62,25 +60,21 @@ def get_parser():
     main_parser.add_argument(
         "-fp",
         "--format-patch",
-        action='store_true',
+        action="store_true",
         help="Enable this option, if you want to get the code from the"
-        " previous branch."
+        " previous branch.",
     )
 
     main_parser.add_argument(
         "-fb",
         "--force-black",
-        action='store_true',
+        action="store_true",
         default=True,
-        help="Enable this option, if you want to use 'black' to clean the code"
+        help="Enable this option, if you want to use 'black' to clean the code",
     )
 
     main_parser.add_argument(
-        "-rn",
-        "--remote-name",
-        dest="remote_name",
-        default='origin',
-        type=str,
+        "-rn", "--remote-name", dest="remote_name", default="origin", type=str
     )
 
     main_parser.add_argument(
@@ -93,20 +87,16 @@ def get_parser():
     )
 
     main_parser.add_argument(
-        "-lp",
-        "--log-path",
-        dest="log_path",
-        default=False,
-        type=str,
+        "-lp", "--log-path", dest="log_path", default=False, type=str
     )
 
     main_parser.add_argument(
         "-nc",
         "--no-commit",
-        action='store_true',
+        action="store_true",
         default=False,
         help="Enable this option, if you don't want that the library commits"
-        " the changes. (using git add and git commit command)"
+        " the changes. (using git add and git commit command)",
     )
 
     return main_parser
@@ -126,13 +116,21 @@ def main(args=False):
 
     try:
         # Create a new Migration Object
-        module_names = args.modules\
-            and [x.strip() for x in args.modules.split(",") if x.strip()] or []
+        module_names = (
+            args.modules
+            and [x.strip() for x in args.modules.split(",") if x.strip()]
+            or []
+        )
 
         migration = Migration(
-            args.directory, args.init_version_name, args.target_version_name,
-            module_names, args.format_patch, args.remote_name,
-            args.force_black, not args.no_commit,
+            args.directory,
+            args.init_version_name,
+            args.target_version_name,
+            module_names,
+            args.format_patch,
+            args.remote_name,
+            args.force_black,
+            not args.no_commit,
         )
 
         # run Migration
