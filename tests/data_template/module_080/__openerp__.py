@@ -14,5 +14,6 @@
         'account_check_writing',
         'web_kanban_sparkline',
         'web',
+        "base_suspend_security",
     ],
 }

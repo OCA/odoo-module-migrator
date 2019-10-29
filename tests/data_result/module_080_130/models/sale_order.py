@@ -18,4 +18,5 @@ class SaleOrder(models.Model):
         # something
         self.sudo()
         self.with_user(self.env.user)
+        self.sudo().write({"name": "name"})
         return
