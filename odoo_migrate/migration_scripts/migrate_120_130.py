@@ -22,7 +22,7 @@ _TEXT_REPLACES = {
     ".py": {
         r".*@api.multi.*\n": "",
         r".*@api.one.*\n": "",
-        r"\.sudo\((?P<user>.+)\)": r".with_user(\g<user>)",
+        r"\.sudo\((?P<user>[^/)]+?)\)": r".with_user(\g<user>)",
         r"\.suspend_security": ".sudo",
         r"\"base_suspend_security\",\n": "",
     },
