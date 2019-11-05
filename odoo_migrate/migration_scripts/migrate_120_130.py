@@ -15,8 +15,6 @@ _TEXT_ERRORS = {
         "[13] Use of deprecated decorator '@api.cr'",
         r".*@api.model_cr.*\n":
         "[13] Use of deprecated decorator '@api.model_cr'",
-        r".sudo\(":
-        "[13] Use of deprated function sudo(). Use with_user instead."
     },
 }
 
@@ -24,5 +22,8 @@ _TEXT_REPLACES = {
     ".py": {
         r".*@api.multi.*\n": "",
         r".*@api.one.*\n": "",
+        r"\.sudo\((?P<user>.+)\)": r".with_user(\g<user>)",
+        r"\.suspend_security": ".sudo",
+        r"\"base_suspend_security\",\n": "",
     },
 }

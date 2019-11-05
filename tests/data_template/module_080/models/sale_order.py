@@ -19,4 +19,6 @@ class SaleOrder(models.Model):
     def my_function(self):
         # something
         self.sudo()
+        self.sudo(self.env.user)
+        self.suspend_security().write({"name": "name"})
         return

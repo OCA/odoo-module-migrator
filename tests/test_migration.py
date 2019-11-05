@@ -59,7 +59,6 @@ class TestMigration(unittest.TestCase):
         log_content = _read_content(str(self._working_path / "test_log.log"))
 
         required_logs = [
-            ("ERROR", "Use of deprated function sudo"),
             ("ERROR", "web_kanban_sparkline.*should remove the dependency"),
             ("WARNING", "Replaced.*account_analytic_analysis.*contract'"),
             ("ERROR", "deprecated decorator.*@api.cr"),
