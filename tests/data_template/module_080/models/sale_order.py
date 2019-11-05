@@ -17,8 +17,15 @@ class SaleOrder(models.Model):
 
     @api.cr
     def my_function(self):
-        # something
-        self.sudo()
-        self.sudo(self.env.user)
+        # 13.0 preserve sudo
+        sudo_test = self.sudo()
+        self.sudo().test()
+
+        # 13.0 should replace with with_user
+        sudo_test = self.sudo(self.env.user)
+        self.sudo(self.env.user).test()
+
+        # 13.0 should replace with sudo()
+        suspended = self.suspend_security()
         self.suspend_security().write({"name": "name"})
         return
