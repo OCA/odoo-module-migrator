@@ -26,4 +26,7 @@ _TEXT_REPLACES = {
         r"\.suspend_security": ".sudo",
         r"\"base_suspend_security\",\n": "",
     },
+    ".xml": {
+        r"( |\t)*<field name=('|\")view_type('|\")>.*</field>\n": "",
+    }
 }
