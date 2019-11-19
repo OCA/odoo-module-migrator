@@ -18,7 +18,6 @@ class Migration():
 
     _migration_steps = []
     _directory_path = False
-    _use_black = False
     _migration_scripts = []
     _module_migrations = []
     _commit_enabled = True
@@ -26,9 +25,8 @@ class Migration():
     def __init__(
         self, relative_directory_path, init_version_name, target_version_name,
         module_names=[], format_patch=False, remote_name='origin',
-        force_black=False, commit_enabled=True,
+        commit_enabled=True,
     ):
-        self._use_black = force_black
         self._commit_enabled = commit_enabled
 
         # Get migration steps that will be runned
@@ -39,7 +37,6 @@ class Migration():
             else:
                 found = True
             self._migration_steps.append(item)
-            self._use_black = self._use_black or item.get("use_black", False)
             if item["target_version_name"] == target_version_name:
                 # This is the last step, exiting
                 break

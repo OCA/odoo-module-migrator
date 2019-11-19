@@ -26,7 +26,7 @@ This library will so:
 
 * (optionnaly) get commits from the old branch (if format-patch is enabled)
 * apply automatically changes. (renaming, replacing, etc.)
-* (depending of the config and the version) black your code.
+* depending of the config of your repository, run ``pre-commit``.
 * commit your changes.
 * Display warnings or errors in log if your code belong obsolete code patterns.
 
@@ -143,9 +143,6 @@ Available arguments
 +--------------------------+----------+-----------------+-------------------------------------------------------+
 |``--remote-name``         | ``-rn``  | Default:        | Name of the main remote, used by format-patch command.|
 |                          |          | ``origin``      |                                                       |
-+--------------------------+----------+-----------------+-------------------------------------------------------+
-|``--force-black``         | ``-fb``  | depends on the  | Force to use black library.                           |
-|                          |          | configuration   |                                                       |
 +--------------------------+----------+-----------------+-------------------------------------------------------+
 |``--log-level``           | ``-ll``  | Default:        | Possible value: ``DEBUG``, ``INFO``, ``WARNING``, etc.|
 |                          |          | ``INFO``        |                                                       |

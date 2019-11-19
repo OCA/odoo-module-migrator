@@ -2,13 +2,11 @@
 # @author: Sylvain LE GAL (https://twitter.com/legalsylvain)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-import black
 import os
-import pathlib
 import re
 from .log import logger
 
-from .config import _ALLOWED_EXTENSIONS, _BLACK_LINE_LENGTH, _MANIFEST_NAMES
+from .config import _ALLOWED_EXTENSIONS, _MANIFEST_NAMES
 from .tools import _execute_shell
 from . import tools
 
@@ -31,40 +29,25 @@ class ModuleMigration():
             self._migration._migration_steps[-1]["target_version_name"],
         ))
 
-        # Run Black, if required
-        self._run_black()
+        # Run Precommit, if required
+        self._run_precommit()
         self._commit_changes(
-            "[REF] %s: Black python code" % (self._module_name))
+            "[REF] %s: pre-commit code" % (self._module_name))
 
         # Apply migration script
         for migration_script in self._migration._migration_scripts:
             self._run_migration_scripts(migration_script)
 
-        # Rerun black, to avoid that automated changes broke black rules
-        self._run_black()
+        # Rerun precommit, to avoid that automated changes broke
+        # precommit rules
+        self._run_precommit()
         self._commit_changes("[MIG] %s: Migration to %s" % (
             self._module_name,
             self._migration._migration_steps[-1]["target_version_name"]))
 
-    def _run_black(self):
-        if not self._migration._use_black:
-            return
-
-        file_mode = black.FileMode()
-        file_mode.line_length = _BLACK_LINE_LENGTH
-
-        for root, directories, filenames in os.walk(
-                self._module_path.resolve()):
-            for filename in filenames:
-                # Skip useless file
-                if os.path.splitext(filename)[1] != ".py":
-                    continue
-
-                absolute_file_path = os.path.join(root, filename)
-
-                black.format_file_in_place(
-                    pathlib.Path(absolute_file_path), False, file_mode,
-                    black.WriteBack.YES)
+    def _run_precommit(self):
+        # TODO
+        pass
 
     def _run_migration_scripts(self, migration_script):
         file_renames = getattr(migration_script, "_FILE_RENAMES", {})
