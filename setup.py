@@ -5,8 +5,8 @@
 import setuptools
 
 setuptools.setup(
-    name="odoo-module-migrate",
-    version="0.3.0",
+    name="odoo-module-migrator",
+    version="0.3.1",
     author="GRAP, Groupement Régional Alimentaire de Proximité",
     author_email="informatique@grap.coop",
     description="Small tools to migrate Odoo modules from a version"
