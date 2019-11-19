@@ -4,8 +4,8 @@ Installation
 .. code-block:: shell
 
     # Pull Code
-    git clone https://github.com/grap/odoo-migrate
-    cd odoo-migrate
+    git clone https://github.com/grap/odoo-module-migrator
+    cd odoo-module-migrator
 
     # Create virtual env and activate it
     virtualenv env --python=python3
@@ -15,13 +15,13 @@ Installation
     pip3 install -r requirements.txt
 
     # Run the script
-    python -m odoo_migrate COMMAND OPTIONS
+    python -m odoo_module_migrate COMMAND OPTIONS
 
 You can also install from test source via pip:
 
 .. code-block:: shell
 
-    pip3 install odoo-migrate\
+    pip3 install odoo-module-migrator\
         --upgrade\
         --index-url https://test.pypi.org/simple\
         --extra-index-url https://pypi.org/simple
@@ -29,7 +29,13 @@ You can also install from test source via pip:
 Run tests
 =========
 
-TODO
+.. code-block:: shell
+
+    # Activate virtual env
+    . ./env/bin/activate
+
+    # Install extra dependencies required for tests
+    pip3 install -r test_requirements.txt
 
 Structure of the Project
 ========================
@@ -37,7 +43,7 @@ Structure of the Project
 Framework
 ---------
 
-In the ``odoo_migrate`` folder
+In the ``odoo_module_migrate`` folder
 
 * ``__main__.py``: the entry point of this module. It mainly
   handles arguments, and launch the script.
@@ -60,7 +66,7 @@ Migration Scripts
 -----------------
 
 The list of the operations are written in the subfolder
-``odoo_migrate/migration_scripts``:
+``odoo_module_migrate/migration_scripts``:
 
 * in a file for each migration for exemple ``migrate_090__100.py`` file
   contains all the operations to do for a migration from 9.0 to 10.0.

@@ -3,16 +3,16 @@
     :alt: License: AGPL-3
 .. image:: https://img.shields.io/badge/python-3.6-blue.svg
     :alt: Python support: 3.6
-.. image:: https://travis-ci.org/grap/odoo-migrate.svg?branch=master
-    :target: https://travis-ci.org/grap/odoo-migrate
-.. image:: https://coveralls.io/repos/grap/odoo-migrate/badge.png?branch=master
-    :target: https://coveralls.io/r/grap/odoo-migrate?branch=master
+.. image:: https://travis-ci.org/grap/odoo-module-migrator.svg?branch=master
+    :target: https://travis-ci.org/grap/odoo-module-migrator
+.. image:: https://coveralls.io/repos/grap/odoo-module-migrator/badge.png?branch=master
+    :target: https://coveralls.io/r/grap/odoo-module-migrator?branch=master
 
-============
-odoo-migrate
-============
+====================
+odoo-module-migrator
+====================
 
-``odoo-migrate`` is a python3 library that allows you to realize automatically
+``odoo-module-migrator`` is a python3 library that allows you to realize automatically
 recurring changes when migrating Odoo modules from a version to another.
 for exemple: 
 
@@ -74,7 +74,7 @@ Installation
 
 .. code-block:: shell
 
-    pip3 install odoo-migrate
+    pip3 install odoo-module-migrator
 
 
 Usage
@@ -92,7 +92,7 @@ the module ``pos_order_pricelist_change`` in the OCA "pos" repository.
 
     git clone https://github.com/OCA/pos -b 12.0
     cd pos
-    odoo-migrate
+    odoo-module-migrator
         --directory             ./
         --modules               pos_order_pricelist_change
         --init-version-name     8.0
@@ -109,7 +109,7 @@ you can run the following command
 
 .. code-block:: shell
 
-    odoo-migrate
+    odoo-module-migrator
         --directory             /path/to/repository
         --modules               module_1,module_2,module_3
         --init-version-name     10.0

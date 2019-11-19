@@ -9,8 +9,8 @@ import pathlib
 import shutil
 import unittest
 
-from odoo_migrate.__main__ import main
-from odoo_migrate.tools import _read_content
+from odoo_module_migrate.__main__ import main
+from odoo_module_migrate.tools import _read_content
 
 
 class TestMigration(unittest.TestCase):
