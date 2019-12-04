@@ -2,13 +2,11 @@
 # @author: Sylvain LE GAL (https://twitter.com/legalsylvain)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-import black
 import os
-import pathlib
 import re
 from .log import logger
 
-from .config import _ALLOWED_EXTENSIONS, _BLACK_LINE_LENGTH, _MANIFEST_NAMES
+from .config import _ALLOWED_EXTENSIONS, _MANIFEST_NAMES
 from .tools import _execute_shell
 from . import tools
 
@@ -31,40 +29,13 @@ class ModuleMigration():
             self._migration._migration_steps[-1]["target_version_name"],
         ))
 
-        # Run Black, if required
-        self._run_black()
-        self._commit_changes(
-            "[REF] %s: Black python code" % (self._module_name))
-
         # Apply migration script
         for migration_script in self._migration._migration_scripts:
             self._run_migration_scripts(migration_script)
 
-        # Rerun black, to avoid that automated changes broke black rules
-        self._run_black()
         self._commit_changes("[MIG] %s: Migration to %s" % (
             self._module_name,
             self._migration._migration_steps[-1]["target_version_name"]))
-
-    def _run_black(self):
-        if not self._migration._use_black:
-            return
-
-        file_mode = black.FileMode()
-        file_mode.line_length = _BLACK_LINE_LENGTH
-
-        for root, directories, filenames in os.walk(
-                self._module_path.resolve()):
-            for filename in filenames:
-                # Skip useless file
-                if os.path.splitext(filename)[1] != ".py":
-                    continue
-
-                absolute_file_path = os.path.join(root, filename)
-
-                black.format_file_in_place(
-                    pathlib.Path(absolute_file_path), False, file_mode,
-                    black.WriteBack.YES)
 
     def _run_migration_scripts(self, migration_script):
         file_renames = getattr(migration_script, "_FILE_RENAMES", {})
@@ -196,27 +167,24 @@ class ModuleMigration():
         )
         if self._migration._commit_enabled:
             _execute_shell(
-                "cd %s && git mv %s %s" % (
-                    str(module_path.resolve()), old_file_path, new_file_path
-                ))
+                "git mv %s %s" % (old_file_path, new_file_path),
+                path=module_path)
         else:
             _execute_shell(
-                "cd %s && mv %s %s" % (
-                    str(module_path.resolve()), old_file_path, new_file_path
-                ))
+                "mv %s %s" % (old_file_path, new_file_path),
+                path=module_path)
 
     def _commit_changes(self, commit_name):
         if not self._migration._commit_enabled:
             return
 
-        if _execute_shell("cd %s && git diff" % (
-                str(self._migration._directory_path.resolve()))):
+        if _execute_shell("git diff", path=self._migration._directory_path):
             logger.info(
                 "Commit changes for %s. commit name '%s'" % (
                     self._module_name, commit_name
                 ))
 
             _execute_shell(
-                "cd %s && git add . --all && git commit -m '%s'" % (
-                    str(self._migration._directory_path.resolve()), commit_name
-                ))
+                " git add . --all && git commit --no-verify -m '%s'" % (
+                    commit_name
+                ), path=self._migration._directory_path)

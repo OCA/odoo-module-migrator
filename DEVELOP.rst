@@ -37,6 +37,9 @@ Run tests
     # Install extra dependencies required for tests
     pip3 install -r test_requirements.txt
 
+    # Run Tests
+    coverage run --source odoo_module_migrate setup.py test
+
 Structure of the Project
 ========================
 

@@ -26,7 +26,6 @@ This library will so:
 
 * (optionnaly) get commits from the old branch (if format-patch is enabled)
 * apply automatically changes. (renaming, replacing, etc.)
-* (depending of the config and the version) black your code.
 * commit your changes.
 * Display warnings or errors in log if your code belong obsolete code patterns.
 
@@ -144,9 +143,6 @@ Available arguments
 |``--remote-name``         | ``-rn``  | Default:        | Name of the main remote, used by format-patch command.|
 |                          |          | ``origin``      |                                                       |
 +--------------------------+----------+-----------------+-------------------------------------------------------+
-|``--force-black``         | ``-fb``  | depends on the  | Force to use black library.                           |
-|                          |          | configuration   |                                                       |
-+--------------------------+----------+-----------------+-------------------------------------------------------+
 |``--log-level``           | ``-ll``  | Default:        | Possible value: ``DEBUG``, ``INFO``, ``WARNING``, etc.|
 |                          |          | ``INFO``        |                                                       |
 +--------------------------+----------+-----------------+-------------------------------------------------------+
@@ -165,8 +161,20 @@ Roadmap / Know issues
   where there are many <data> occurency.
   We could fix that, using ``lxml`` lib instead of regular expression.
 
+* Add a call to ``pre-commit run -a``, if pre-commit is present in the
+  repository.
+
 Changes
 =======
+
+0.3.2 (December 04, 2019)
+------------------------
+* [REM] Remove black call. (Add call to more generic tool pre-commit
+  in the roadmap)
+* [IMP] Add --no-verify option in ``git commit`` to avoid to fail if pre-commit
+  is present
+* [REF] Refactor ``_execute_shell`` function
+
 
 0.2.0 (October 13, 2019)
 ------------------------
