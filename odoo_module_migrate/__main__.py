@@ -68,14 +68,6 @@ def get_parser():
     )
 
     main_parser.add_argument(
-        "-fb",
-        "--force-black",
-        action='store_true',
-        default=True,
-        help="Enable this option, if you want to use 'black' to clean the code"
-    )
-
-    main_parser.add_argument(
         "-rn",
         "--remote-name",
         dest="remote_name",
@@ -132,7 +124,7 @@ def main(args=False):
         migration = Migration(
             args.directory, args.init_version_name, args.target_version_name,
             module_names, args.format_patch, args.remote_name,
-            args.force_black, not args.no_commit,
+            not args.no_commit,
         )
 
         # run Migration

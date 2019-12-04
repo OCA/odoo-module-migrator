@@ -7,8 +7,7 @@
 #   the lib.
 # * init and target code are technical code used to name the migration script
 #   files.
-# * Optional : "use_black" (default=false) the migration will begin with
-#   a call of the library black.
+
 _AVAILABLE_MIGRATION_STEPS = [
     {
         "init_version_name": "8.0",
@@ -35,12 +34,9 @@ _AVAILABLE_MIGRATION_STEPS = [
         "target_version_name": "13.0",
         "init_version_code": "120",
         "target_version_code": "130",
-        "use_black": True,
     },
 ]
 
 _ALLOWED_EXTENSIONS = [".py", ".xml", ".js"]
-
-_BLACK_LINE_LENGTH = 79
 
 _MANIFEST_NAMES = ["__openerp__.py", "__manifest__.py"]
