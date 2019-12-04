@@ -25,7 +25,9 @@ def _get_latest_version_code():
     return _AVAILABLE_MIGRATION_STEPS[-1]["target_version_code"]
 
 
-def _execute_shell(shell_command):
+def _execute_shell(shell_command, path=False):
+    if path:
+        shell_command = "cd %s && %s" % (str(path.resolve()), shell_command)
     logger.debug("Execute Shell:\n%s" % (shell_command))
     return subprocess.check_output(shell_command, shell=True)
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<odoo>
+<odoo><data>
         <record id="action_order_custom_field_a" model="ir.actions.act_window">
             <field name="name">Custom field A</field>
             <field name="res_model">sale.report</field>
@@ -27,4 +27,4 @@
             <field name="view_mode">tree,form</field>
             <field name="domain">[('custom_field','=','d')]</field>
         </record>
-</odoo>
+</data></odoo>
