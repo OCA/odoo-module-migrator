@@ -123,8 +123,11 @@ class Migration():
     def _get_migration_scripts(self):
 
         # Add the script that will be allways executed
-        self._migration_scripts.append(importlib.import_module(
-            "odoo_module_migrate.migration_scripts.migrate_allways"))
+        module = importlib.import_module(
+            "odoo_module_migrate.migration_scripts.migrate_allways")
+        migrationScript = getattr(module, "MigrationScript")()
+        migrationScript.name = module.__file__.split('/')[-1].split('.')[-2]
+        self._migration_scripts.append(migrationScript)
 
         all_packages = importlib.import_module(
             "odoo_module_migrate.migration_scripts")
@@ -155,12 +158,18 @@ class Migration():
             if script_start >= migration_end or script_end <= migration_start:
                 continue
 
-            self._migration_scripts.append(importlib.import_module(full_name))
+            module = importlib.import_module(full_name)
+            migrationScript = getattr(module, "MigrationScript")()
+            migrationScript.name = module.\
+                __file__.\
+                split('/')[-1].\
+                split('.')[-2]
+            self._migration_scripts.append(migrationScript)
 
         logger.debug(
             "The following migration script will be"
             " executed:\n- %s" % '\n- '.join(
-                [x.__file__.split('/')[-1] for x in self._migration_scripts]))
+                [x.name for x in self._migration_scripts]))
 
     def run(self):
         logger.debug(
