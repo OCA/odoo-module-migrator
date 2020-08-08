@@ -14,6 +14,9 @@ _TEXT_REPLACES = {
     },
     ".xml": {
         r"kanban_state_selection": "state_selection",
+    },
+    ".py": {
+        r"ir.needaction_mixin": "mail.activity.mixin",
     }
 }
 
