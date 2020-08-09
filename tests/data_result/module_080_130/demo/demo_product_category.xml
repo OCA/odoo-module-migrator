@@ -1,5 +1,7 @@
-<odoo><data>
+<odoo>
+    <data>
         <record name="demo_category" model="product.category">
             <field name="name">My Demo Category</field>
         </record>
-</data></odoo>
+    </data>
+</odoo>
