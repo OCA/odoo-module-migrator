@@ -7,6 +7,9 @@
             <field name="view_mode">tree,form</field>
             <field name="domain">[('custom_field','=','a')]</field>
         </record>
+    </data>
+
+    <data noupdate="1">
 
         <record id="action_order_custom_field_b" model="ir.actions.act_window">
             <field name="name">Custom field B</field>
