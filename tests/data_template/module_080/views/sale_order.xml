@@ -32,5 +32,12 @@
             <field name="view_mode">tree,form</field>
             <field name="domain">[('custom_field','=','d')]</field>
         </record>
+
+        <act_window
+            id="act_window_example"
+            name="Example"
+            res_model="account.move.line"
+            src_model="account.move"
+            view_mode="tree"/>
     </data>
 </openerp>

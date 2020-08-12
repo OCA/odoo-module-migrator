@@ -28,5 +28,6 @@ _TEXT_REPLACES = {
     },
     ".xml": {
         r"( |\t)*<field name=('|\")view_type('|\")>.*</field>\n": "",
+        r"src_model": "binding_model",
     }
 }
