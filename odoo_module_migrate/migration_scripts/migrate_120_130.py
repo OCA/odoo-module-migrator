@@ -34,5 +34,6 @@ _TEXT_REPLACES = {
             r"\t\t<field name=\2domain_force\2>"
             r"['|',('company_id','=',False),"
             r"('company_id', 'in', company_ids)]</field>\n"
+        r"src_model": "binding_model"
     }
 }
