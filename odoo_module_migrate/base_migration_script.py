@@ -7,6 +7,7 @@ import re
 import pathlib
 import traceback
 
+
 class BaseMigrationScript(object):
     _TEXT_REPLACES = {}
     _TEXT_ERRORS = {}
@@ -23,13 +24,22 @@ class BaseMigrationScript(object):
             directory_path,
             commit_enabled):
         logger.debug('Running %s script' % self.name)
-        manifest_path = self._get_correct_manifest_path(manifest_path, self._FILE_RENAMES)
+        manifest_path = self._get_correct_manifest_path(
+            manifest_path,
+            self._FILE_RENAMES)
         for root, directories, filenames in os.walk(module_path.resolve()):
             for filename in filenames:
                 extension = os.path.splitext(filename)[1]
                 if extension not in _ALLOWED_EXTENSIONS:
                     continue
-                self.process_file(root, filename, extension, self._FILE_RENAMES, directory_path, commit_enabled)
+                self.process_file(
+                    root,
+                    filename,
+                    extension,
+                    self._FILE_RENAMES,
+                    directory_path,
+                    commit_enabled
+                )
 
         self.handle_deprecated_modules(manifest_path, self._DEPRECATED_MODULES)
 
@@ -44,7 +54,14 @@ class BaseMigrationScript(object):
                     tools=tools,
                 )
 
-    def process_file(self, root, filename, extension, file_renames, directory_path, commit_enabled):
+    def process_file(self,
+                     root,
+                     filename,
+                     extension,
+                     file_renames,
+                     directory_path,
+                     commit_enabled
+                     ):
         # Skip useless file
         # TODO, skip files present in some folders. (for exemple 'lib')
         absolute_file_path = os.path.join(root, filename)
@@ -166,5 +183,5 @@ class BaseMigrationScript(object):
                     "mv %s %s" % (old_file_path, new_file_path),
                     path=module_path
                 )
-        except Exception as e:
+        except BaseException:
             logger.error(traceback.format_exc())

@@ -1,0 +1,11 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v1.2.3
+    hooks:
+      - id: flake8
+        name: flake8 except __init__.py
+        exclude: /__init__\.py$|tests
+      - id: flake8
+        name: flake8 only __init__.py
+        args: ["--extend-ignore=F401"]  # ignore unused imports in __init__.py
+        files: /__init__\.py$
