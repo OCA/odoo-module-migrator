@@ -4,6 +4,7 @@
 
 import os
 import subprocess
+from odoo_module_migrate.base_migration_script import BaseMigrationScript
 
 _TEXT_REPLACES = {
     ".xml": {
@@ -15,7 +16,8 @@ _TEXT_REPLACES = {
 def bump_revision(**kwargs):
     tools = kwargs['tools']
     manifest_path = kwargs['manifest_path']
-    target_version_name = kwargs['migration_steps'][-1]["target_version_name"]
+    migration_steps = kwargs['migration_steps']
+    target_version_name = migration_steps[-1]["target_version_name"]
 
     new_version = "%s.1.0.0" % target_version_name
 
@@ -41,8 +43,15 @@ def remove_migration_folder(**kwargs):
     migration_path_folder = os.path.join(module_path, 'migrations')
     if os.path.exists(migration_path_folder):
         logger.info("Removing 'migrations' folder")
-        subprocess.check_output("rm -r %s" % migration_path_folder, shell=True)
+        subprocess.check_output(
+            "rm -r %s" % migration_path_folder, shell=True
+        )
 
 
-_GLOBAL_FUNCTIONS = [
-    remove_migration_folder, set_module_installable, bump_revision]
+class MigrationScript(BaseMigrationScript):
+    _TEXT_REPLACES = _TEXT_REPLACES
+    _GLOBAL_FUNCTIONS = [
+        remove_migration_folder,
+        set_module_installable,
+        bump_revision
+    ]

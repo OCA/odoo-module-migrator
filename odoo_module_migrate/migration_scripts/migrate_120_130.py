@@ -2,6 +2,8 @@
 # @author: Sylvain LE GAL (https://twitter.com/legalsylvain)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+from odoo_module_migrate.base_migration_script import BaseMigrationScript
+
 _TEXT_ERRORS = {
     "*": {
         "web_settings_dashboard":
@@ -34,3 +36,8 @@ _TEXT_REPLACES = {
         r"src_model": "binding_model",
     }
 }
+
+
+class MigrationScript(BaseMigrationScript):
+    _TEXT_ERRORS = _TEXT_ERRORS
+    _TEXT_REPLACES = _TEXT_REPLACES

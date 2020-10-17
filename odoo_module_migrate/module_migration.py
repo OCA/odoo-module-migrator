@@ -2,13 +2,10 @@
 # @author: Sylvain LE GAL (https://twitter.com/legalsylvain)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-import os
-import re
 from .log import logger
 
-from .config import _ALLOWED_EXTENSIONS, _MANIFEST_NAMES
+from .config import _MANIFEST_NAMES
 from .tools import _execute_shell
-from . import tools
 
 
 class ModuleMigration():
@@ -31,122 +28,17 @@ class ModuleMigration():
 
         # Apply migration script
         for migration_script in self._migration._migration_scripts:
-            self._run_migration_scripts(migration_script)
+            migration_script.run(self._module_path,
+                                 self._get_manifest_path(),
+                                 self._module_name,
+                                 self._migration._migration_steps,
+                                 self._migration._directory_path,
+                                 self._migration._commit_enabled
+                                 )
 
         self._commit_changes("[MIG] %s: Migration to %s" % (
             self._module_name,
             self._migration._migration_steps[-1]["target_version_name"]))
-
-    def _run_migration_scripts(self, migration_script):
-        file_renames = getattr(migration_script, "_FILE_RENAMES", {})
-        text_replaces = getattr(migration_script, "_TEXT_REPLACES", {})
-        text_errors = getattr(migration_script, "_TEXT_ERRORS", {})
-        global_functions = getattr(migration_script, "_GLOBAL_FUNCTIONS", {})
-        deprecated_modules = getattr(
-            migration_script, "_DEPRECATED_MODULES", {})
-
-        for root, directories, filenames in os.walk(
-                self._module_path.resolve()):
-            for filename in filenames:
-                # Skip useless file
-                # TODO, skip files present in some folders. (for exemple 'lib')
-                extension = os.path.splitext(filename)[1]
-                if extension not in _ALLOWED_EXTENSIONS:
-                    continue
-
-                absolute_file_path = os.path.join(root, filename)
-                logger.debug("Migrate '%s' file" % absolute_file_path)
-
-                # Rename file, if required
-                new_name = file_renames.get(filename)
-                if new_name:
-                    self._rename_file(
-                        self._migration._directory_path,
-                        absolute_file_path,
-                        os.path.join(root, new_name))
-                    absolute_file_path = os.path.join(root, new_name)
-
-                # Operate changes in the file (replacements, removals)
-                replaces = text_replaces.get("*", {})
-                replaces.update(text_replaces.get(extension, {}))
-
-                new_text = tools._replace_in_file(
-                    absolute_file_path, replaces,
-                    "Change file content of %s" % filename)
-
-                # Display errors if the new content contains some obsolete
-                # pattern
-                errors = text_errors.get("*", {})
-                errors.update(text_errors.get(extension, {}))
-                for pattern, error_message in errors.items():
-                    if re.findall(pattern, new_text):
-                        logger.error(error_message)
-
-        # Handle deprecated modules
-        current_manifest_text = tools._read_content(self._get_manifest_path())
-        new_manifest_text = current_manifest_text
-        for items in deprecated_modules:
-            old_module, action = items[0:2]
-            new_module = len(items) > 2 and items[2]
-            old_module_pattern = r"('|\"){0}('|\")".format(old_module)
-            if new_module:
-                new_module_pattern = r"('|\"){0}('|\")".format(new_module)
-                replace_pattern = r"\1{0}\2".format(new_module)
-
-            if not re.findall(old_module_pattern, new_manifest_text):
-                continue
-
-            if action == 'removed':
-                # The module has been removed, just log an error.
-                logger.error(
-                    "Depends on removed module '%s'" % (old_module))
-
-            elif action == 'renamed':
-                new_manifest_text = re.sub(
-                    old_module_pattern, replace_pattern, new_manifest_text)
-                logger.info(
-                    "Replaced dependency of '%s' by '%s'." % (
-                        old_module, new_module))
-
-            elif action == 'oca_moved':
-                new_manifest_text = re.sub(
-                    old_module_pattern, replace_pattern, new_manifest_text)
-                logger.warning(
-                    "Replaced dependency of '%s' by '%s' (%s)\n"
-                    "Check that '%s' is available on your system." % (
-                        old_module, new_module, items[3], new_module))
-
-            elif action == "merged":
-                if not re.findall(new_module_pattern, new_manifest_text):
-                    # adding dependency of the merged module
-                    new_manifest_text = re.sub(
-                        old_module_pattern, replace_pattern, new_manifest_text)
-                    logger.info(
-                        "'%s' merged in '%s'. Replacing dependency." % (
-                            old_module, new_module))
-                else:
-                    # TODO, improve me. we should remove the dependency
-                    # but it could generate coma trouble.
-                    # maybe handling this treatment by ast lib could fix
-                    # the problem.
-                    logger.error(
-                        "'%s' merged in '%s'. You should remove the"
-                        " dependency to '%s' manually." % (
-                            old_module, new_module, old_module))
-
-        if current_manifest_text != new_manifest_text:
-            tools._write_content(self._get_manifest_path(), new_manifest_text)
-
-        if global_functions:
-            for function in global_functions:
-                function(
-                    logger=logger,
-                    module_path=self._module_path,
-                    module_name=self._module_name,
-                    manifest_path=self._get_manifest_path(),
-                    migration_steps=self._migration._migration_steps,
-                    tools=tools,
-                )
 
     def _get_manifest_path(self):
         for manifest_name in _MANIFEST_NAMES:
