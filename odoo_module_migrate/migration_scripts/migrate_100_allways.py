@@ -5,9 +5,4 @@ from odoo_module_migrate.base_migration_script import BaseMigrationScript
 
 
 class MigrationScript(BaseMigrationScript):
-
-    def __init__(self):
-        self._TEXT_REPLACES = {".py": {
-                                    r"# (-\*- )?coding: utf-8( -\*-)?\n": ""
-                            }
-        }
+    _TEXT_REPLACES = {".py": {r"# (-\*- )?coding: utf-8( -\*-)?\n": ""}}

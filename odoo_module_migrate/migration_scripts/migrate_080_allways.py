@@ -5,16 +5,14 @@ from odoo_module_migrate.base_migration_script import BaseMigrationScript
 
 
 class MigrationScript(BaseMigrationScript):
+    _FILE_RENAMES = {"__openerp__.py": "__manifest__.py"}
 
-    def __init__(self):
-        self._FILE_RENAMES = {"__openerp__.py": "__manifest__.py"}
-
-        self._TEXT_REPLACES = {
-            ".py": {
-                "from openerp": "from odoo", "import openerp": "import odoo"
-            },
-            ".xml": {
-                r"( |\t)*<openerp>(\n| |\t)*<data>": "<odoo>",
-                r"( |\t)*<\/data>(\n| |\t)*<\/openerp>": "</odoo>",
-            }
+    _TEXT_REPLACES = {
+        ".py": {
+            "from openerp": "from odoo", "import openerp": "import odoo"
+        },
+        ".xml": {
+            r"( |\t)*<openerp>(\n| |\t)*<data>": "<odoo>",
+            r"( |\t)*<\/data>(\n| |\t)*<\/openerp>": "</odoo>",
         }
+    }

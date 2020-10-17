@@ -6,6 +6,7 @@ from . import tools
 import re
 import pathlib
 import traceback
+import inspect
 
 
 class BaseMigrationScript(object):
@@ -23,7 +24,10 @@ class BaseMigrationScript(object):
             migration_steps,
             directory_path,
             commit_enabled):
-        logger.debug('Running %s script' % self.name)
+        logger.debug(
+            'Running %s script' %
+            inspect.getfile(self.__class__).split('/')[-1]
+        )
         manifest_path = self._get_correct_manifest_path(
             manifest_path,
             self._FILE_RENAMES)

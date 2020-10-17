@@ -5,33 +5,32 @@ from odoo_module_migrate.base_migration_script import BaseMigrationScript
 
 
 class MigrationScript(BaseMigrationScript):
-    def __init__(self):
-        self._TEXT_ERRORS = {
-            "*": {
-                "web_settings_dashboard":
-                "[V13] Reference to 'web_settings_dashboard'"
-                ". This module has been removed."
-            },
-            ".py": {
-                r".*@api.returns.*\n":
-                "[13] Use of deprecated decorator '@api.returns'",
-                r".*@api.cr.*\n":
-                "[13] Use of deprecated decorator '@api.cr'",
-                r".*@api.model_cr.*\n":
-                "[13] Use of deprecated decorator '@api.model_cr'",
-            },
-        }
+    _TEXT_ERRORS = {
+        "*": {
+            "web_settings_dashboard":
+            "[V13] Reference to 'web_settings_dashboard'"
+            ". This module has been removed."
+        },
+        ".py": {
+            r".*@api.returns.*\n":
+            "[13] Use of deprecated decorator '@api.returns'",
+            r".*@api.cr.*\n":
+            "[13] Use of deprecated decorator '@api.cr'",
+            r".*@api.model_cr.*\n":
+            "[13] Use of deprecated decorator '@api.model_cr'",
+        },
+    }
 
-        self._TEXT_REPLACES = {
-            ".py": {
-                r".*@api.multi.*\n": "",
-                r".*@api.one.*\n": "",
-                r"\.sudo\((?P<user>[^/)]+?)\)": r".with_user(\g<user>)",
-                r"\.suspend_security": ".sudo",
-                r"\"base_suspend_security\",\n": "",
-            },
-            ".xml": {
-                r"( |\t)*<field name=('|\")view_type('|\")>.*</field>\n": "",
-                r"src_model": "binding_model",
-            }
+    _TEXT_REPLACES = {
+        ".py": {
+            r".*@api.multi.*\n": "",
+            r".*@api.one.*\n": "",
+            r"\.sudo\((?P<user>[^/)]+?)\)": r".with_user(\g<user>)",
+            r"\.suspend_security": ".sudo",
+            r"\"base_suspend_security\",\n": "",
+        },
+        ".xml": {
+            r"( |\t)*<field name=('|\")view_type('|\")>.*</field>\n": "",
+            r"src_model": "binding_model",
         }
+    }
