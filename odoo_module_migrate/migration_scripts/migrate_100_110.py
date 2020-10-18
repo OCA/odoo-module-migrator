@@ -46,7 +46,7 @@ _TEXT_ERRORS = {
             "report.external_layout_footer is obsolete.",
     },
     ".xml": {
-        "<tree(\n|.|\t)*color=\"[^>]*":
+        "<tree(\n|.|\t)*colors=\"[^>]*":
         "color attribute is deprecated in tree view. Use decoration- instead.",
     }
 }
