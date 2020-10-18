@@ -25,9 +25,10 @@ _TEXT_REPLACES = {
         r"\.sudo\((?P<user>[^/)]+?)\)": r".with_user(\g<user>)",
         r"\.suspend_security": ".sudo",
         r"\"base_suspend_security\",\n": "",
+        r"self.env.user.company_id": r"self.env.company"
     },
     ".xml": {
         r"( |\t)*<field name=('|\")view_type('|\")>.*</field>\n": "",
-        r"src_model": "binding_model",
+        r"src_model": "binding_model"
     }
 }
