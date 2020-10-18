@@ -103,6 +103,14 @@ The list of the operations are written in the subfolder
       "*":
           ir.values: "ir.values table does not exist anymore"
 
+* ``text_warnings/migrate_FROM_TO/NAME.yaml`` — display errors if files contains a
+  given partern. For example, for migration from version 12.0 to version 13.0:
+
+  .. code-block:: yaml
+
+      "*":
+          "@api.returns": "decorator @api.returns is deprecated"
+
 * ``deprecated_modules/migrate_FROM_TO/NAME.yaml`` — dependencies to obsoletes modules. There are following possibilities:
 
   * the module has been fully removed.
