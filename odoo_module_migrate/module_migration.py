@@ -40,6 +40,7 @@ class ModuleMigration():
     def _run_migration_scripts(self, migration_script):
         file_renames = getattr(migration_script, "_FILE_RENAMES", {})
         text_replaces = getattr(migration_script, "_TEXT_REPLACES", {})
+        text_warnings = getattr(migration_script, "_TEXT_WARNINGS", {})
         text_errors = getattr(migration_script, "_TEXT_ERRORS", {})
         global_functions = getattr(migration_script, "_GLOBAL_FUNCTIONS", {})
         deprecated_modules = getattr(
@@ -81,6 +82,15 @@ class ModuleMigration():
                 for pattern, error_message in errors.items():
                     if re.findall(pattern, new_text):
                         logger.error(error_message)
+
+                warnings = text_warnings.get("*", {})
+                warnings.update(text_warnings.get(extension, {}))
+                for pattern, warning_message in warnings.items():
+                    if re.findall(pattern, new_text):
+                        logger.warning(
+                            warning_message +
+                            '. File ' + root + os.sep + filename
+                        )
 
         # Handle deprecated modules
         current_manifest_text = tools._read_content(self._get_manifest_path())

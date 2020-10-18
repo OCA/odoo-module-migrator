@@ -2,6 +2,21 @@
 # @author: Sylvain LE GAL (https://twitter.com/legalsylvain)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+_TEXT_WARNINGS = {
+    ".xml": {
+        r'active.*widget="toggle_button"|widget="toggle_button".*active|'
+        r'widget="boolean_button".*active|active.*widget="boolean_button"':
+        'You can remove actions archive/unarchive'
+    },
+    ".py": {
+        r".*oldname":
+            "oldname is not supported yet. Create a migration script",
+        r"digits=[^, )]*get_precision":
+            'You can use string to qualify type of '
+            'precision without import nothing'
+    },
+}
+
 _TEXT_ERRORS = {
     "*": {
         "web_settings_dashboard":

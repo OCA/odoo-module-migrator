@@ -91,6 +91,18 @@ The list of the operations are written in the subfolder
         "__openerp__.py": "__manifest__.py",
     }
 
+* Warnings in files. For example, for migration from version 12.0 to 13.0
+  version
+
+.. code-block:: python
+
+    _TEXT_WARNINGS = {
+        ".py": {
+            r".*@api.returns.*\n":
+            "[13] Use of deprecated decorator '@api.returns'",
+        },
+    }
+
 * Replace pattern text by another. for exemple, for migration from version 8.0
   to version 9.0:
 
