@@ -6,6 +6,7 @@ import importlib
 import os
 import pathlib
 import pkgutil
+import subprocess
 
 from .config import _AVAILABLE_MIGRATION_STEPS, _MANIFEST_NAMES
 from .exception import ConfigException
@@ -170,3 +171,13 @@ class Migration():
                 self._directory_path.resolve()))
         for module_migration in self._module_migrations:
             module_migration.run()
+
+        if os.path.exists(
+                os.path.join(self._directory_path, '.pre-commit-config.yaml')
+        ):
+            logger.info('File .pre-commit-config.yaml finded. '
+                        'Running pre-commit')
+            subprocess.run(
+                ["pre-commit", "run", "-a"],
+                cwd=self._directory_path
+            )
