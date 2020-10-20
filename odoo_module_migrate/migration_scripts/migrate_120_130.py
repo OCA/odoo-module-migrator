@@ -25,6 +25,9 @@ _TEXT_REPLACES = {
         r"\.sudo\((?P<user>[^/)]+?)\)": r".with_user(\g<user>)",
         r"\.suspend_security": ".sudo",
         r"\"base_suspend_security\",\n": "",
+        r"\._find_partner_from_emails\(": "._mail_find_partner_from_emails(",
+        r"\._search_on_partner\(": "._mail_search_on_partner(",
+        r"\._search_on_user\(": "._mail_search_on_user(",
     },
     ".xml": {
         r"( |\t)*<field name=('|\")view_type('|\")>.*</field>\n": "",

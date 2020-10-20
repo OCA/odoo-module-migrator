@@ -28,4 +28,9 @@ class SaleOrder(models.Model):
         # 13.0 should replace with sudo()
         suspended = self.suspend_security()
         self.suspend_security().write({"name": "name"})
+
+        # 13.0 should replace with new method names
+        partner_ids = self._find_partner_from_emails(["Mr Test <test@example.com>"])
+        partner_ids = self._search_on_partner(["test@example.com"])
+        partner_ids = self._search_on_user(["test@example.com"])
         return
