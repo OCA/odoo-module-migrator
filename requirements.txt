@@ -1,3 +1,4 @@
 argcomplete
 colorama
+lxml
 pyyaml

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="act_window_example" model="ir.actions.act_window">
+        <field name="name">Example</field>
+        <field name="res_model">account.move.line</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="view_mode">tree</field>
+    </record>
+    <record id="report_example" model="ir.actions.report">
+        <field name="report_name">Name</field>
+        <field name="name">String</field>
+    </record>
+</odoo>

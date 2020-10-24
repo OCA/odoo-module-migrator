@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <act_window
+        id="act_window_example"
+        name="Example"
+        res_model="account.move.line"
+        src_model="account.move"
+        view_mode="tree"/>
+    <report
+        id="report_example"
+        name="Name"
+        string="String"
+    />
+</odoo>
