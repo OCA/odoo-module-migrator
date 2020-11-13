@@ -14,7 +14,7 @@ odoo-module-migrator
 
 ``odoo-module-migrator`` is a python3 library that allows you to realize automatically
 recurring changes when migrating Odoo modules from a version to another.
-for exemple: 
+for exemple:
 
 * renaming ``__openerp__.py`` file into ``__manifest__.py``
 * removing ``# -*- encoding: utf-8 -*-`` since V11.0
@@ -24,7 +24,8 @@ for exemple:
 
 This library will so:
 
-* (optionnaly) get commits from the old branch (if format-patch is enabled)
+* (optionnaly) get commits from the old branch and squash useless commit (if format-patch is enabled)
+* apply prettier and commit if config exist
 * apply automatically changes. (renaming, replacing, etc.)
 * commit your changes.
 * Display warnings or errors in log if your code belong obsolete code patterns.
@@ -97,6 +98,19 @@ the module ``pos_order_pricelist_change`` in the OCA "pos" repository.
         --init-version-name     8.0
         --target-version-name  12.0
         --format-patch
+
+Automatic Squashing
+----------------------
+The OCA recommand to squash automatic commit (from bot)
+This migration script will do it automatically but you need to configure
+correctly your git, so the script can apply the squash correctly
+
+You need to apply the following global config to your git
+
+.. code-block:: shell
+
+    git config --global --add rebase.instructionFormat "<%ae> %s"
+
 
 Without format Patch command
 ----------------------------

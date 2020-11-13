@@ -32,7 +32,9 @@ def _execute_shell(shell_command, path=False, raise_error=True):
     if raise_error:
         return subprocess.check_output(shell_command, shell=True)
     else:
-        return subprocess.run(shell_command, shell=True)
+        return subprocess.run(
+            shell_command, shell=True, stdout=subprocess.PIPE)
+
 
 def _read_content(file_path):
     f = open(file_path, "r")

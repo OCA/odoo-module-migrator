@@ -134,6 +134,13 @@ class Migration():
                 'module': module_name,
             }, path=self._directory_path)
 
+        logger.info("AutoSquash Commit")
+        _execute_shell(
+            "GIT_EDITOR=odoo-module-squasher "
+            "GIT_SEQUENCE_EDITOR=odoo-module-squasher "
+            "git rebase  -i %(target)s" % {"target": target_version}
+            )
+
     def _get_migration_scripts(self):
 
         # Add the script that will be allways executed
