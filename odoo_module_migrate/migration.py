@@ -89,7 +89,7 @@ class Migration():
         for module_name in module_names:
             self._module_migrations.append(ModuleMigration(self, module_name))
 
-        if os.path.exists(".pre-commit-config.yml"):
+        if os.path.exists(".pre-commit-config.yaml"):
             self._run_pre_commit(module_names)
 
         # get migration scripts, depending to the migration list
