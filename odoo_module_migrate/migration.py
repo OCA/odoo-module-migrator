@@ -89,8 +89,22 @@ class Migration():
         for module_name in module_names:
             self._module_migrations.append(ModuleMigration(self, module_name))
 
+        if os.path.exists(".pre-commit-config.yml"):
+            self._run_pre_commit(module_names)
+
         # get migration scripts, depending to the migration list
         self._get_migration_scripts()
+
+    def _run_pre_commit(self, module_names):
+        logger.info("Run pre-commit")
+        _execute_shell(
+            "pre-commit run -a", path=self._directory_path, raise_error=False)
+        logger.info("Add and commit change done by pre-commit")
+        _execute_shell("git add -A", path=self._directory_path)
+        _execute_shell(
+            "git commit -m '[IMP] %s: black, isort, prettier'  --no-verify"
+            % ", ".join(module_names),
+            path=self._directory_path)
 
     def _is_module_path(self, module_path):
         return any([(module_path / x).exists() for x in _MANIFEST_NAMES])
