@@ -14,7 +14,7 @@ odoo-module-migrator
 
 ``odoo-module-migrator`` is a python3 library that allows you to realize automatically
 recurring changes when migrating Odoo modules from a version to another.
-for exemple:
+for example:
 
 * renaming ``__openerp__.py`` file into ``__manifest__.py``
 * removing ``# -*- encoding: utf-8 -*-`` since V11.0
@@ -43,7 +43,7 @@ a more recent version:
 **WARNING log**
 
 It mentions that you should check something. There is *maybe* something to do
-to make the module working. For exemple:
+to make the module working. For example:
 
 .. code-block:: shell
 
@@ -85,7 +85,7 @@ Using Format Patch command
 
 (Recommanded by the OCA)
 
-If you want to migrate an Odoo module from a version 8.0 to 12.0, for exemple
+If you want to migrate an Odoo module from a version 8.0 to 12.0, for example
 the module ``pos_order_pricelist_change`` in the OCA "pos" repository.
 
 .. code-block:: shell
@@ -117,7 +117,7 @@ Without format Patch command
 
 (Mainly for your custom modules)
 
-if you have created a new branch (for exemple 12.0) based on your 10.0 branch
+if you have created a new branch (for example 12.0) based on your 10.0 branch
 you can run the following command
 
 .. code-block:: shell
