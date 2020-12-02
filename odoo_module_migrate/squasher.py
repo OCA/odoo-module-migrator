@@ -6,23 +6,40 @@ with `fixup ...`
 import sys
 import os
 from .log import logger
+import re
 
-SQUASH_LINES = [
-    "<transbot@odoo-community.org> "
-    "OCA Transbot updated translations from Transifex\n",
-    "<oca+oca-travis@odoo-community.org> [UPD] Update product_multi_ean.pot\n",
-    "<oca-git-bot@odoo-community.org> [UPD] README.rst\n",
-    "<transbot@odoo-community.org> Update translation files\n",
-    ]
+p = re.compile(r"^pick [0-9a-z]* <(.+)> (.+)$")
+
+MATCHER = {
+    "transbot@odoo-community.org": [
+        r"OCA Transbot updated translations from Transifex",
+        r"Update translation files",
+        ],
+    "oca+oca-travis@odoo-community.org": [
+        r"^\[UPD\] Update [a-zA-Z_]*.pot",
+        r"Update translation files",
+        ],
+    "oca-git-bot@odoo-community.org": [
+        r"\[UPD\] README.rst",
+        ]
+    }
 
 
 def autosquash(filepath):
     lines = []
     with open(filepath, "r") as infile:
         for line in infile.readlines():
-            if line[13:] in SQUASH_LINES:
-                logger.info("Squash commit %s" % line)
-                lines.append(line.replace("pick", "squash", 1))
+            m = p.match(line)
+            if m:
+                email, message = m.groups()
+                if any([
+                        re.match(regex, message)
+                        for regex in MATCHER.get(email, [])
+                        ]):
+                    logger.info("Squash commit %s" % line)
+                    lines.append(line.replace("pick", "squash", 1))
+                else:
+                    lines.append(line)
             else:
                 lines.append(line)
 
