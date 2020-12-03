@@ -111,6 +111,18 @@ You need to apply the following global config to your git
 
     git config --global --add rebase.instructionFormat "<%ae> %s"
 
+Then you can use the --auto-squash option
+
+
+.. code-block:: shell
+
+    odoo-module-migrator
+        --directory             ./
+        --modules               pos_order_pricelist_change
+        --init-version-name     8.0
+        --target-version-name  12.0
+        --format-patch
+        --auto-squash
 
 Without format Patch command
 ----------------------------
