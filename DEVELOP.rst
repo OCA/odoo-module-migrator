@@ -69,69 +69,72 @@ Migration Scripts
 -----------------
 
 The list of the operations are written in the subfolder
-``odoo_module_migrate/migration_scripts``:
+`<odoo_module_migrate/migration_scripts/>`__:
 
-* in a file for each migration for exemple ``migrate_090__100.py`` file
-  contains all the operations to do for a migration from 9.0 to 10.0.
+* each operaion has specification when it has to be applied: ``FROM_TO`` part of the path.
 
-* in a file for operations that should be execute since some revision, named
-  for exemple ``migrate_10_0__allways.py``
+  * `Possible values are <odoo_module_migrate/config.py>`__ ``090``, ``010``, ``011``, etc.
+  * The ``TO`` part may have value ``always``, which means is should be applied in every version since ``FROM`` version.
+  * Special value for ``FROM_TO`` is just a single ``allways`` (yes, it's mispealing) which means it will be applied whatever the init and target odoo version.
 
-* a file ``migrate_allways.py`` contains all the operations that will be
-  executed, whatever the init and the target versions.
+* ``migrate_FROM_TO.py`` — old way to specify operations. Normally, these files should not be changed.
 
-**List of the operations**
+* ``file_renames/migrate_FROM_TO/NAME.yaml`` — file renaming rules. For
+  example, for migration from version 8.0 to more recent version:
 
-* Rename files. For exemple, for migration from version 8.0 to more recent
-  version
+  .. code-block:: yaml
 
-.. code-block:: python
+      __openerp__.py: __manifest__.py
 
-    _FILE_RENAMES = {
-        "__openerp__.py": "__manifest__.py",
-    }
+* ``text_replaces/migrate_FROM_TO/NAME.yaml`` — replace pattern text by
+  another. for example, for migration from version 8.0 to version 9.0:
 
-* Replace pattern text by another. for exemple, for migration from version 8.0
-  to version 9.0:
+  .. code-block:: yaml
 
-.. code-block:: python
+      .py:
+          select=True: index=True
 
-   _TEXT_REPLACES = {
-        ".py": {
-            "select=True": "index=True",
-        }
-    }
 
-* Display errors if files contains a given partern. For exemple, for
-  migration from version 10.0 to version 11.0:
+* ``text_errors/migrate_FROM_TO/NAME.yaml`` — display errors if files contains a
+  given partern. For example, for migration from version 10.0 to version 11.0:
 
-.. code-block:: python
+  .. code-block:: yaml
 
-    _TEXT_ERRORS = {
-        "*": {
-            "ir.values": "ir.values table does not exist anymore"
-        }
-    }
+      "*":
+          ir.values: "ir.values table does not exist anymore"
 
-* Dependencies to obsoletes modules. There is four possibility:
-    * the module has been fully removed.
-    * the module has been renamed.
-    * the module features has been merged into another module.
-    * the module has been moved under OCA umbrella. (w/o another name)
+* ``deprecated_modules/migrate_FROM_TO/NAME.yaml`` — dependencies to obsoletes modules. There are following possibilities:
 
-.. code-block:: python
+  * the module has been fully removed.
+  * the module has been renamed.
+  * the module features has been merged into another module.
+  * the module has been moved under OCA umbrella. (w/o another name)
 
-    _DEPRECATED_MODULES = [
+  .. code-block:: yaml
 
-        ("account_anglo_saxon", "removed"),
+        - ["account_anglo_saxon", "removed"]
+        - ["account_check_writing", "renamed", "account_check_printing"]
+        - ["account_chart", "merged", "account"]
+        - ["account_analytic_analysis", "oca_moved", "contract", "Moved to OCA/contract"]
 
-        ("account_check_writing", "renamed", "account_check_printing"),
+* ``python_scripts/migrate_FROM_TO/NAME.py`` — for complex updates/checks. Must contain one or few functions that don't start with underscore symbol. The functions take following keyword arguments:
 
-        ("account_chart", "merged", "account"),
+  * ``logger``
+  * ``module_path``
+  * ``module_name``
+  * ``manifest_path``
+  * ``migration_steps`` — list of steps. See ``_AVAILABLE_MIGRATION_STEPS`` in `<odoo_module_migrate/config.py>`__
+  * ``tools`` — python module with some functions. See `<odoo_module_migrate/tools.py>`__
 
-        ("account_analytic_analysis", "oca_moved", "contract", "Moved to OCA/contract"),
+  .. code-block:: py
 
-    ]
+      def set_module_installable(**kwargs):
+          tools = kwargs['tools']
+          manifest_path = kwargs['manifest_path']
+          old_term = r"('|\")installable('|\").*(False)"
+          new_term = r"\1installable\2: True"
+          tools._replace_in_file(
+              manifest_path, {old_term: new_term}, "Set module installable")
 
 How to improve the library
 ==========================

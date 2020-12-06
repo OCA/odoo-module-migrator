@@ -7,6 +7,9 @@ import re
 import pathlib
 import traceback
 import inspect
+import glob
+import yaml
+import importlib
 
 
 class BaseMigrationScript(object):
@@ -14,8 +17,79 @@ class BaseMigrationScript(object):
     _TEXT_ERRORS = {}
     _DEPRECATED_MODULES = []
     _FILE_RENAMES = {}
-    _GLOBAL_FUNCTIONS = []
+    _GLOBAL_FUNCTIONS = []  # [function_object]
     _module_path = ''
+
+    def parse_rules(self):
+        script_parts = inspect.getfile(self.__class__).split('/')
+        migrate_from_to = script_parts[-1].split(".")[0]
+        migration_scripts_dir = "/".join(script_parts[:-1])
+
+        TYPE_ARRAY = "TYPE_ARRAY"
+        TYPE_DICT = "TYPE_DICT"
+        TYPE_DICT_OF_DICT = "TYPE_DICT_OF_DICT"
+        rules = {
+            # {filetype: {regex: replacement}}
+            "_TEXT_REPLACES": {
+                "type": TYPE_DICT_OF_DICT,
+            },
+            # {filetype: {regex: message}}
+            "_TEXT_ERRORS": {
+                "type": TYPE_DICT_OF_DICT,
+            },
+            # [(module, why, ...)]
+            "_DEPRECATED_MODULES": {
+                "type": TYPE_ARRAY,
+            },
+            # {old_name: new_name}
+            "_FILE_RENAMES": {
+                "type": TYPE_DICT,
+            },
+        }
+        # read
+        for rule in rules.keys():
+            rule_folder = rule[1:].lower()
+            file_pattern = "%s/%s/%s/*.yaml" % (
+                migration_scripts_dir,
+                rule_folder,
+                migrate_from_to
+            )
+            for filename in glob.glob(file_pattern):
+                with open(filename) as f:
+                    rules[rule]["doc"] = yaml.safe_load(f)
+        # extend
+        for rule, data in rules.items():
+            rtype = data["type"]
+            doc = data.get("doc")
+            if not doc:
+                continue
+
+            rvalues = getattr(self, rule)
+            if rtype == TYPE_ARRAY:
+                rvalues.extend(doc)
+            elif rtype == TYPE_DICT:
+                rvalues.update(doc)
+            else:
+                # TYPE_DICT_OF_DICT
+                for filetype, values in doc.items():
+                    rvalues.setdefault(filetype, {})
+                    rvalues[filetype].update(values or {})
+
+        file_pattern = "%s/python_scripts/%s/*.py" % (
+            migration_scripts_dir,
+            migrate_from_to
+        )
+        for path in glob.glob(file_pattern):
+            module_name = path.split("/")[-1].split(".")[0]
+            module_name = ".".join([
+                "odoo_module_migrate.migration_scripts.python_scripts",
+                migrate_from_to,
+                module_name,
+            ])
+            module = importlib.import_module(module_name)
+            for name, value in inspect.getmembers(module, inspect.isfunction):
+                if not name.startswith("_"):
+                    self._GLOBAL_FUNCTIONS.append(value)
 
     def run(self,
             module_path,
@@ -28,6 +102,7 @@ class BaseMigrationScript(object):
             'Running %s script' %
             inspect.getfile(self.__class__).split('/')[-1]
         )
+        self.parse_rules()
         manifest_path = self._get_correct_manifest_path(
             manifest_path,
             self._FILE_RENAMES)

@@ -50,7 +50,7 @@ def _replace_in_file(file_path, replaces, log_message=False):
     new_text = current_text
 
     for old_term, new_term in replaces.items():
-        new_text = re.sub(old_term, new_term, new_text)
+        new_text = re.sub(old_term, new_term or "", new_text)
 
     # Write file if changed
     if new_text != current_text:
