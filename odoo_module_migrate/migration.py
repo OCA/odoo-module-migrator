@@ -103,10 +103,13 @@ class Migration:
             "pre-commit run -a", path=self._directory_path, raise_error=False)
         logger.info("Add and commit change done by pre-commit")
         _execute_shell("git add -A", path=self._directory_path)
-        _execute_shell(
-            "git commit -m '[IMP] %s: black, isort, prettier'  --no-verify"
-            % ", ".join(module_names),
-            path=self._directory_path)
+        if self._commit_enabled:
+            diff = _execute_shell("git diff --cached")
+            if diff:
+                _execute_shell(
+                    "git commit -m '[IMP] %s: black, isort, prettier'  --no-verify"
+                    % ", ".join(module_names),
+                    path=self._directory_path)
 
     def _is_module_path(self, module_path):
         return any([(module_path / x).exists() for x in _MANIFEST_NAMES])
