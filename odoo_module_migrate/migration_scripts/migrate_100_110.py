@@ -47,9 +47,11 @@ _TEXT_ERRORS = {
     },
     ".xml": {
         "<tree[ \n\t][^>]*colors=":
-        "colors attribute is deprecated in tree view. Use decoration- instead.",
+        "colors attribute is deprecated in tree view."
+        " Use decoration- instead.",
         "<tree[ \n\t][^>]*fonts=":
-        "fonts attribute is deprecated in tree view. Use decoration- instead.",
+        "fonts attribute is deprecated in tree view."
+        " Use decoration- instead.",
     }
 }
 
