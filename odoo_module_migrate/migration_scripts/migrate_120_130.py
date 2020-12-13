@@ -22,7 +22,6 @@ _TEXT_ERRORS = {
 
 _TEXT_REPLACES = {
     ".py": {
-        r".*@api.multi.*\n": "",
         r".*@api.one.*\n": "",
         r"\.sudo\((?P<user>[^/)]+?)\)": r".with_user(\g<user>)",
         r"\.suspend_security": ".sudo",

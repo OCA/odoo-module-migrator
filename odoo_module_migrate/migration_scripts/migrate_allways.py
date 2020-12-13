@@ -13,21 +13,6 @@ _TEXT_REPLACES = {
 }
 
 
-def bump_revision(**kwargs):
-    tools = kwargs['tools']
-    manifest_path = kwargs['manifest_path']
-    migration_steps = kwargs['migration_steps']
-    target_version_name = migration_steps[-1]["target_version_name"]
-
-    new_version = "%s.1.0.0" % target_version_name
-
-    old_term = r"('|\")version('|\").*('|\").*('|\")"
-    new_term = r'\1version\2: "{0}"'.format(new_version)
-    tools._replace_in_file(
-        manifest_path, {old_term: new_term},
-        "Bump version to %s" % new_version)
-
-
 def set_module_installable(**kwargs):
     tools = kwargs['tools']
     manifest_path = kwargs['manifest_path']
@@ -53,5 +38,4 @@ class MigrationScript(BaseMigrationScript):
     _GLOBAL_FUNCTIONS = [
         remove_migration_folder,
         set_module_installable,
-        bump_revision
     ]

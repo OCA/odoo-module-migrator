@@ -21,9 +21,6 @@ _TEXT_REPLACES = {
 
 _TEXT_ERRORS = {
     "*": {
-        "('|\")ir.values('|\")":
-            "[V11] Reference to 'ir.values'."
-            " This model has been removed.",
         "('|\")workflow('|\")":
             "[V11] Reference to 'workflow'."
             " This model has been removed.",

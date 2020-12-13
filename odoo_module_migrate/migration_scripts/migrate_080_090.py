@@ -13,7 +13,6 @@ _DEPRECATED_MODULES = [
         "Moved to OCA/contract"),
     ("account_analytic_plans", "oca_moved", "account_analytic_distribution",
         "Moved to OCA/account_analytic"),
-    ("account_anglo_saxon", "removed"),
     ("account_bank_statement_extensions", "removed"),
     ("account_chart", "merged", "account"),
     ("account_check_writing", "renamed", "account_check_printing"),
