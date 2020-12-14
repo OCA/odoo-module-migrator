@@ -110,6 +110,12 @@ class Migration():
                 'version': target_version,
             }, path=self._directory_path)
 
+        logger.info("Getting latest changes from old branch")
+        # Depth is added just in case you had a shallow git history
+        _execute_shell(
+            "git fetch --depth 9999999 %s %s" % (remote_name, init_version)
+        )
+
         _execute_shell(
             "git format-patch --keep-subject "
             "--stdout %(remote)s/%(target)s..%(remote)s/%(init)s "
