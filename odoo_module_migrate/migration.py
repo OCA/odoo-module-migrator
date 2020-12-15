@@ -104,7 +104,7 @@ class Migration():
 
         logger.info("Creating new branch '%s' ..." % (branch_name))
         _execute_shell(
-            "git checkout -b %(branch)s %(remote)s/%(version)s" % {
+            "git checkout --no-track -b %(branch)s %(remote)s/%(version)s" % {
                 'branch': branch_name,
                 'remote': remote_name,
                 'version': target_version,
