@@ -101,6 +101,14 @@ def get_parser():
         " the changes. (using git add and git commit command)"
     )
 
+    main_parser.add_argument(
+        "-as",
+        "--auto-squash",
+        action='store_true',
+        help="Enable this option, if you want that the library squash "
+        "automatically all useless commit (anonymous translation, bot commit)"
+    )
+
     return main_parser
 
 
@@ -124,7 +132,7 @@ def main(args=False):
         migration = Migration(
             args.directory, args.init_version_name, args.target_version_name,
             module_names, args.format_patch, args.remote_name,
-            not args.no_commit,
+            args.auto_squash, not args.no_commit,
         )
 
         # run Migration

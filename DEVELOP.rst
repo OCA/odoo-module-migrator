@@ -52,7 +52,7 @@ In the ``odoo_module_migrate`` folder
   handles arguments, and launch the script.
 
 * ``config.py``: configuration file, to updated if new features are available
-  in this library. (For exemple, a new migration available from X to X+1)
+  in this library. (For example, a new migration available from X to X+1)
 
 * ``log.py``: Handle logs of this library.
 
@@ -71,18 +71,18 @@ Migration Scripts
 The list of the operations are written in the subfolder
 ``odoo_module_migrate/migration_scripts``:
 
-* in a file for each migration for exemple ``migrate_090__100.py`` file
+* in a file for each migration for example ``migrate_090__100.py`` file
   contains all the operations to do for a migration from 9.0 to 10.0.
 
 * in a file for operations that should be execute since some revision, named
-  for exemple ``migrate_10_0__allways.py``
+  for example ``migrate_10_0__allways.py``
 
 * a file ``migrate_allways.py`` contains all the operations that will be
   executed, whatever the init and the target versions.
 
 **List of the operations**
 
-* Rename files. For exemple, for migration from version 8.0 to more recent
+* Rename files. For example, for migration from version 8.0 to more recent
   version
 
 .. code-block:: python
@@ -91,7 +91,7 @@ The list of the operations are written in the subfolder
         "__openerp__.py": "__manifest__.py",
     }
 
-* Replace pattern text by another. for exemple, for migration from version 8.0
+* Replace pattern text by another. for example, for migration from version 8.0
   to version 9.0:
 
 .. code-block:: python
@@ -102,7 +102,7 @@ The list of the operations are written in the subfolder
         }
     }
 
-* Display errors if files contains a given partern. For exemple, for
+* Display errors if files contains a given partern. For example, for
   migration from version 10.0 to version 11.0:
 
 .. code-block:: python
@@ -143,7 +143,7 @@ How to improve the library
   https://odoo-development.readthedocs.io/en/latest/migration/
 
 * Discover what changed between two revisions, reading OpenUpgrade
-  documentation, specially the modules changes, for exemple:
+  documentation, specially the modules changes, for example:
   https://github.com/OCA/OpenUpgrade/blob/12.0/odoo/openupgrade/doc/source/modules110-120.rst
 
 * Create or complete the according migration file.

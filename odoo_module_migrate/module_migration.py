@@ -49,7 +49,7 @@ class ModuleMigration():
                 self._module_path.resolve()):
             for filename in filenames:
                 # Skip useless file
-                # TODO, skip files present in some folders. (for exemple 'lib')
+                # TODO, skip files present in some folders. (for example 'lib')
                 extension = os.path.splitext(filename)[1]
                 if extension not in _ALLOWED_EXTENSIONS:
                     continue

@@ -26,6 +26,7 @@ setuptools.setup(
     install_requires=open('requirements.txt').read().splitlines(),
     entry_points=dict(console_scripts=[
         'odoo-module-migrate=odoo_module_migrate.__main__:main',
+        'odoo-module-squasher=odoo_module_migrate.squasher:main',
     ]),
     keywords=[
         "Odoo Community Association (OCA)",

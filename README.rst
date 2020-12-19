@@ -14,7 +14,7 @@ odoo-module-migrator
 
 ``odoo-module-migrator`` is a python3 library that allows you to realize automatically
 recurring changes when migrating Odoo modules from a version to another.
-for exemple: 
+for example:
 
 * renaming ``__openerp__.py`` file into ``__manifest__.py``
 * removing ``# -*- encoding: utf-8 -*-`` since V11.0
@@ -24,7 +24,8 @@ for exemple:
 
 This library will so:
 
-* (optionnaly) get commits from the old branch (if format-patch is enabled)
+* (optionnaly) get commits from the old branch and squash useless commit (if format-patch is enabled)
+* apply prettier and commit if config exist
 * apply automatically changes. (renaming, replacing, etc.)
 * commit your changes.
 * Display warnings or errors in log if your code belong obsolete code patterns.
@@ -42,7 +43,7 @@ a more recent version:
 **WARNING log**
 
 It mentions that you should check something. There is *maybe* something to do
-to make the module working. For exemple:
+to make the module working. For example:
 
 .. code-block:: shell
 
@@ -84,7 +85,7 @@ Using Format Patch command
 
 (Recommanded by the OCA)
 
-If you want to migrate an Odoo module from a version 8.0 to 12.0, for exemple
+If you want to migrate an Odoo module from a version 8.0 to 12.0, for example
 the module ``pos_order_pricelist_change`` in the OCA "pos" repository.
 
 .. code-block:: shell
@@ -98,12 +99,37 @@ the module ``pos_order_pricelist_change`` in the OCA "pos" repository.
         --target-version-name  12.0
         --format-patch
 
+Automatic Squashing
+----------------------
+The OCA recommand to squash automatic commit (from bot)
+This migration script will do it automatically but you need to configure
+correctly your git, so the script can apply the squash correctly
+
+You need to apply the following global config to your git
+
+.. code-block:: shell
+
+    git config --global --add rebase.instructionFormat "<%ae> %s"
+
+Then you can use the --auto-squash option
+
+
+.. code-block:: shell
+
+    odoo-module-migrator
+        --directory             ./
+        --modules               pos_order_pricelist_change
+        --init-version-name     8.0
+        --target-version-name  12.0
+        --format-patch
+        --auto-squash
+
 Without format Patch command
 ----------------------------
 
 (Mainly for your custom modules)
 
-if you have created a new branch (for exemple 12.0) based on your 10.0 branch
+if you have created a new branch (for example 12.0) based on your 10.0 branch
 you can run the following command
 
 .. code-block:: shell
