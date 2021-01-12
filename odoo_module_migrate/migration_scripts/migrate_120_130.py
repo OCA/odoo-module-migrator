@@ -14,8 +14,10 @@ _TEXT_ERRORS = {
         "[13] Use of deprecated decorator '@api.returns'",
         r".*@api.cr.*\n":
         "[13] Use of deprecated decorator '@api.cr'",
-        r".*@api.model_cr.*\n":
+        r"@api.model_cr\b":
         "[13] Use of deprecated decorator '@api.model_cr'",
+        r"@api.model_cr_context\b":
+        "[13] Use of deprecated decorator '@api.model_cr_context'",
     },
 }
 
