@@ -149,6 +149,12 @@ def reformat_deprecated_tags(logger,
 
 
 _TEXT_REPLACES = {
+    ".js": {
+        r"tour\.STEPS\.SHOW_APPS_MENU_ITEM":
+        "tour.stepUtils.showAppsMenuItem()",
+        r"tour\.STEPS\.TOGGLE_HOME_MENU":
+        "tour.stepUtils.toggleHomeMenu()",
+    },
     ".py": {
         r"\.phantom_js\(": ".browser_js(",
     }
