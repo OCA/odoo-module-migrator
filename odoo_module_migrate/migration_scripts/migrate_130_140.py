@@ -148,6 +148,14 @@ def reformat_deprecated_tags(logger,
                  f"{list(reformatted_files)}")
 
 
+_TEXT_REPLACES = {
+    ".py": {
+        r"\.phantom_js\(": ".browser_js(",
+    }
+}
+
+
 class MigrationScript(BaseMigrationScript):
 
     _GLOBAL_FUNCTIONS = [reformat_deprecated_tags]
+    _TEXT_REPLACES = _TEXT_REPLACES
