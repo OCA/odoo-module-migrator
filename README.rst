@@ -91,7 +91,7 @@ the module ``pos_order_pricelist_change`` in the OCA "pos" repository.
 
     git clone https://github.com/OCA/pos -b 12.0
     cd pos
-    odoo-module-migrator
+    odoo-module-migrate
         --directory             ./
         --modules               pos_order_pricelist_change
         --init-version-name     8.0
@@ -108,7 +108,7 @@ you can run the following command
 
 .. code-block:: shell
 
-    odoo-module-migrator
+    odoo-module-migrate
         --directory             /path/to/repository
         --modules               module_1,module_2,module_3
         --init-version-name     10.0
