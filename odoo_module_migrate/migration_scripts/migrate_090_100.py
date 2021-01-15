@@ -2,6 +2,8 @@
 # @author: Sylvain LE GAL (https://twitter.com/legalsylvain)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+from odoo_module_migrate.base_migration_script import BaseMigrationScript
+
 _TEXT_REPLACES = {
     "*": {
         "base.group_configuration": "base.group_system",
@@ -36,3 +38,8 @@ _DEPRECATED_MODULES = [
     ("web_view_editor", "removed"),
     ("website_crm_claim", "removed"),
 ]
+
+
+class MigrationScript(BaseMigrationScript):
+    _TEXT_REPLACES = _TEXT_REPLACES
+    _DEPRECATED_MODULES = _DEPRECATED_MODULES

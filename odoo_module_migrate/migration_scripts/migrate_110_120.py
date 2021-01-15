@@ -2,6 +2,8 @@
 # @author: Sylvain LE GAL (https://twitter.com/legalsylvain)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+from odoo_module_migrate.base_migration_script import BaseMigrationScript
+
 # TODO
 # All <label> elements in views must have a for="" attribute.
 # All <filter> elements in search views must have a name attribute.
@@ -41,3 +43,8 @@ _DEPRECATED_MODULES = [
     ("website_sale_options", "removed"),
     ("website_sale_stock_options", "removed"),
 ]
+
+
+class MigrationScript(BaseMigrationScript):
+    _TEXT_REPLACES = _TEXT_REPLACES
+    _DEPRECATED_MODULES = _DEPRECATED_MODULES

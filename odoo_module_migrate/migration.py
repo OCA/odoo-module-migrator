@@ -6,6 +6,7 @@ import importlib
 import os
 import pathlib
 import pkgutil
+import inspect
 
 from .config import _AVAILABLE_MIGRATION_STEPS, _MANIFEST_NAMES
 from .exception import ConfigException
@@ -126,14 +127,22 @@ class Migration():
                 'module': module_name,
             }, path=self._directory_path)
 
+    def _load_migration_script(self, full_name):
+        module = importlib.import_module(full_name)
+        result = [x[1]()
+                  for x in inspect.getmembers(module, inspect.isclass)
+                  if x[0] != 'BaseMigrationScript']
+        return result
+
     def _get_migration_scripts(self):
-
         # Add the script that will be allways executed
-        self._migration_scripts.append(importlib.import_module(
-            "odoo_module_migrate.migration_scripts.migrate_allways"))
-
-        all_packages = importlib.import_module(
-            "odoo_module_migrate.migration_scripts")
+        self._migration_scripts.extend(
+            self._load_migration_script(
+                "odoo_module_migrate.migration_scripts.migrate_allways"
+            )
+        )
+        all_packages = importlib.\
+            import_module("odoo_module_migrate.migration_scripts")
 
         migration_start = float(self._migration_steps[0]["init_version_code"])
         migration_end = float(self._migration_steps[-1]["target_version_code"])
@@ -161,12 +170,18 @@ class Migration():
             if script_start >= migration_end or script_end <= migration_start:
                 continue
 
-            self._migration_scripts.append(importlib.import_module(full_name))
+            self._migration_scripts.extend(
+                self._load_migration_script(full_name)
+            )
 
         logger.debug(
             "The following migration script will be"
             " executed:\n- %s" % '\n- '.join(
-                [x.__file__.split('/')[-1] for x in self._migration_scripts]))
+                [
+                    inspect.getfile(x.__class__).split('/')[-1]
+                    for x in self._migration_scripts]
+            )
+        )
 
     def run(self):
         logger.debug(

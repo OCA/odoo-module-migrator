@@ -3,6 +3,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 import re
 
+from odoo_module_migrate.base_migration_script import BaseMigrationScript
+
 _TEXT_ERRORS = {
     "*": {
         "web_settings_dashboard":
@@ -21,7 +23,6 @@ _TEXT_ERRORS = {
 
 _TEXT_REPLACES = {
     ".py": {
-        r".*@api.multi.*\n": "",
         r".*@api.one.*\n": "",
         r"\.sudo\((?P<user>[^/)]+?)\)": r".with_user(\g<user>)",
         r"\.suspend_security": ".sudo",
@@ -70,3 +71,8 @@ _TEXT_REPLACES = {
             """,
     },
 }
+
+
+class MigrationScript(BaseMigrationScript):
+    _TEXT_ERRORS = _TEXT_ERRORS
+    _TEXT_REPLACES = _TEXT_REPLACES
