@@ -13,6 +13,7 @@ from .exception import ConfigException
 from .log import logger
 from .tools import _execute_shell, _get_latest_version_code
 from .module_migration import ModuleMigration
+from .base_migration_script import BaseMigrationScript
 
 
 class Migration():
@@ -131,7 +132,8 @@ class Migration():
         module = importlib.import_module(full_name)
         result = [x[1]()
                   for x in inspect.getmembers(module, inspect.isclass)
-                  if x[0] != 'BaseMigrationScript']
+                  if x[0] != 'BaseMigrationScript'
+                  and issubclass(x[1], BaseMigrationScript)]
         return result
 
     def _get_migration_scripts(self):
