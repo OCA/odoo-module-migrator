@@ -16,20 +16,20 @@ from .module_migration import ModuleMigration
 from .base_migration_script import BaseMigrationScript
 
 
-class Migration():
-
-    _migration_steps = []
-    _directory_path = False
-    _migration_scripts = []
-    _module_migrations = []
-    _commit_enabled = True
+class Migration:
 
     def __init__(
         self, relative_directory_path, init_version_name, target_version_name,
-        module_names=[], format_patch=False, remote_name='origin',
+        module_names=None, format_patch=False, remote_name='origin',
         commit_enabled=True,
     ):
+        if not module_names:
+            module_names = []
         self._commit_enabled = commit_enabled
+        self._migration_steps = []
+        self._migration_scripts = []
+        self._module_migrations = []
+        self._directory_path = False
 
         # Get migration steps that will be runned
         found = False
