@@ -1,0 +1,4 @@
+.py:
+  import\sodoo\.addons\.decimal_precision\b.*\n:
+  from\sodoo\.addons\simport\sdecimal_precision\b.*\n:
+  digits\=dp\.get_precision\((?P<field>[^/)]+?)\): digits=\g<field>
