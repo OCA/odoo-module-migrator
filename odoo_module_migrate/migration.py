@@ -13,22 +13,23 @@ from .exception import ConfigException
 from .log import logger
 from .tools import _execute_shell, _get_latest_version_code
 from .module_migration import ModuleMigration
+from .base_migration_script import BaseMigrationScript
 
 
-class Migration():
-
-    _migration_steps = []
-    _directory_path = False
-    _migration_scripts = []
-    _module_migrations = []
-    _commit_enabled = True
+class Migration:
 
     def __init__(
         self, relative_directory_path, init_version_name, target_version_name,
-        module_names=[], format_patch=False, remote_name='origin',
+        module_names=None, format_patch=False, remote_name='origin',
         commit_enabled=True,
     ):
+        if not module_names:
+            module_names = []
         self._commit_enabled = commit_enabled
+        self._migration_steps = []
+        self._migration_scripts = []
+        self._module_migrations = []
+        self._directory_path = False
 
         # Get migration steps that will be runned
         found = False
@@ -131,7 +132,8 @@ class Migration():
         module = importlib.import_module(full_name)
         result = [x[1]()
                   for x in inspect.getmembers(module, inspect.isclass)
-                  if x[0] != 'BaseMigrationScript']
+                  if x[0] != 'BaseMigrationScript'
+                  and issubclass(x[1], BaseMigrationScript)]
         return result
 
     def _get_migration_scripts(self):

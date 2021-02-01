@@ -73,3 +73,12 @@ class TestMigration(unittest.TestCase):
                 len(re.findall(pattern, log_content)),
                 0,
                 "%s not found in the log" % pattern)
+
+    def test_migration_130_140(self):
+        self._migrate_module("module_130", "module_130_140", "13.0", "14.0")
+        comparison = self._get_comparison("module_130", "module_130_140")
+        diff_files = self._get_diff_files(comparison, "./")
+        self.assertEqual(
+            len(diff_files), 0,
+            "Differences found in the following files\n- %s" % (
+                "\n- ".join(diff_files)))
