@@ -33,22 +33,27 @@ class BaseMigrationScript(object):
             # {filetype: {regex: replacement}}
             "_TEXT_REPLACES": {
                 "type": TYPE_DICT_OF_DICT,
+                "doc": {},
             },
             # {filetype: {regex: message}}
             "_TEXT_ERRORS": {
                 "type": TYPE_DICT_OF_DICT,
+                "doc": {},
             },
             # {filetype: {regex: message}}
             "_TEXT_WARNINGS": {
                 "type": TYPE_DICT_OF_DICT,
+                "doc": {},
             },
             # [(module, why, ...)]
             "_DEPRECATED_MODULES": {
                 "type": TYPE_ARRAY,
+                "doc": [],
             },
             # {old_name: new_name}
             "_FILE_RENAMES": {
                 "type": TYPE_DICT,
+                "doc": {},
             },
         }
         # read
@@ -61,7 +66,16 @@ class BaseMigrationScript(object):
             )
             for filename in glob.glob(file_pattern):
                 with open(filename) as f:
-                    rules[rule]["doc"] = yaml.safe_load(f)
+                    new_rules = yaml.safe_load(f)
+                    if rules[rule]["type"] == TYPE_DICT_OF_DICT:
+                        for f_type, data in new_rules.items():
+                            if f_type not in rules[rule]["doc"]:
+                                rules[rule]["doc"][f_type] = {}
+                            rules[rule]["doc"][f_type].update(data)
+                    elif rules[rule]["type"] == TYPE_DICT:
+                        rules[rule]["doc"].update(new_rules)
+                    elif rules[rule]["type"] == TYPE_ARRAY:
+                        rules[rule]["doc"].extend(new_rules)
         # extend
         for rule, data in rules.items():
             rtype = data["type"]
