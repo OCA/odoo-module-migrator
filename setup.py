@@ -13,8 +13,9 @@ setuptools.setup(
     " to another",
     long_description=open('README.rst').read(),
     long_description_content_type='text/x-rst',
-    url="https://github.com/grap/odoo-module-migrator",
+    url="https://github.com/OCA/odoo-module-migrator",
     packages=['odoo_module_migrate', 'odoo_module_migrate.migration_scripts'],
+    include_package_data=True,
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Framework :: Odoo",

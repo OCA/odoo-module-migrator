@@ -1,1 +1,2 @@
 include requirements.txt
+recursive-include odoo_module_migrate/migration_scripts/ *.py *.yaml
