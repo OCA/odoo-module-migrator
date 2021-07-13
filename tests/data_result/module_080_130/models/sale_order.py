@@ -7,7 +7,7 @@ from odoo import api, fields, models
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    custom_field = fields.Char(string="My Custom Field")
+    custom_field = fields.Char(string="My Custom Field", tracking=True)
 
     def write(self, vals):
         # something

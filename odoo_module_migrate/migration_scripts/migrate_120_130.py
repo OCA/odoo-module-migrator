@@ -28,6 +28,8 @@ _TEXT_REPLACES = {
         r"\._find_partner_from_emails\(": "._mail_find_partner_from_emails(",
         r"\._search_on_partner\(": "._mail_search_on_partner(",
         r"\._search_on_user\(": "._mail_search_on_user(",
+        r'\btrack_visibility="[^"]*"': "tracking=True",
+        r"\btrack_visibility='[^']*'": "tracking=True",
     },
     ".xml": {
         r"( |\t)*<field name=('|\")view_type('|\")>.*</field>\n": "",
