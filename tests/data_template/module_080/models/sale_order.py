@@ -8,7 +8,7 @@ from openerp import api, fields, models
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    custom_field = fields.Char(string="My Custom Field")
+    custom_field = fields.Char(string="My Custom Field", track_visibility="onchange")
 
     @api.multi
     def write(self, vals):
