@@ -21,11 +21,12 @@ class Migration:
     def __init__(
         self, relative_directory_path, init_version_name, target_version_name,
         module_names=None, format_patch=False, remote_name='origin',
-        commit_enabled=True,
+        commit_enabled=True, pre_commit=True,
     ):
         if not module_names:
             module_names = []
         self._commit_enabled = commit_enabled
+        self._pre_commit = pre_commit
         self._migration_steps = []
         self._migration_scripts = []
         self._module_migrations = []
@@ -91,7 +92,7 @@ class Migration:
         for module_name in module_names:
             self._module_migrations.append(ModuleMigration(self, module_name))
 
-        if os.path.exists(".pre-commit-config.yaml"):
+        if os.path.exists(".pre-commit-config.yaml") and self._pre_commit:
             self._run_pre_commit(module_names)
 
         # get migration scripts, depending to the migration list
@@ -101,15 +102,15 @@ class Migration:
         logger.info("Run pre-commit")
         _execute_shell(
             "pre-commit run -a", path=self._directory_path, raise_error=False)
-        logger.info("Add and commit change done by pre-commit")
-        _execute_shell("git add -A", path=self._directory_path)
         if self._commit_enabled:
-            diff = _execute_shell("git diff --cached")
-            if diff:
-                _execute_shell(
-                    "git commit -m '[IMP] %s: black, isort, prettier'  --no-verify"
-                    % ", ".join(module_names),
-                    path=self._directory_path)
+            logger.info("Stage and commit changes done by pre-commit")
+            _execute_shell("git add -A", path=self._directory_path)
+            _execute_shell(
+                "git commit -m '[IMP] %s: pre-commit execution' --no-verify"
+                % ", ".join(module_names),
+                path=self._directory_path,
+                raise_error=False,  # Don't fail if there is nothing to commit
+            )
 
     def _is_module_path(self, module_path):
         return any([(module_path / x).exists() for x in _MANIFEST_NAMES])
