@@ -2,6 +2,8 @@
 # @author: Sylvain LE GAL (https://twitter.com/legalsylvain)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+from odoo_module_migrate.base_migration_script import BaseMigrationScript
+
 _FILE_RENAMES = {"__openerp__.py": "__manifest__.py"}
 
 _TEXT_REPLACES = {
@@ -11,3 +13,9 @@ _TEXT_REPLACES = {
         r"( |\t)*<\/data>(\n| |\t)*<\/openerp>": "</odoo>",
     }
 }
+
+
+class MigrationScript(BaseMigrationScript):
+
+    _FILE_RENAMES = _FILE_RENAMES
+    _TEXT_REPLACES = _TEXT_REPLACES

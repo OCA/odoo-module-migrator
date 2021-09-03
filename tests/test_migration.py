@@ -73,3 +73,36 @@ class TestMigration(unittest.TestCase):
                 len(re.findall(pattern, log_content)),
                 0,
                 "%s not found in the log" % pattern)
+
+    def test_migration_120_130(self):
+        self._migrate_module("module_120", "module_120_130", "12.0", "13.0")
+        comparison = self._get_comparison("module_120", "module_120_130")
+        diff_files = self._get_diff_files(comparison, "./")
+        log_content = _read_content(str(self._working_path / "test_log.log"))
+        self.assertEqual(
+            len(diff_files), 0,
+            "Differences found in the following files\n- %s" % (
+                "\n- ".join(diff_files)))
+
+        required_logs = [
+            (
+                "WARNING",
+                "[13].*change.*env\\.user\\.company_id.*to.*\\.env\\.company",
+            ),
+        ]
+        for required_log in required_logs:
+            level, message = required_log
+            pattern = "{0}.*{1}".format(level, message)
+            self.assertNotEqual(
+                len(re.findall(pattern, log_content)),
+                0,
+                "%s not found in the log" % pattern)
+
+    def test_migration_130_140(self):
+        self._migrate_module("module_130", "module_130_140", "13.0", "14.0")
+        comparison = self._get_comparison("module_130", "module_130_140")
+        diff_files = self._get_diff_files(comparison, "./")
+        self.assertEqual(
+            len(diff_files), 0,
+            "Differences found in the following files\n- %s" % (
+                "\n- ".join(diff_files)))

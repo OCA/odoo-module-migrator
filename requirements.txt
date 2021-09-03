@@ -1,2 +1,4 @@
 argcomplete
 colorama
+lxml
+pyyaml

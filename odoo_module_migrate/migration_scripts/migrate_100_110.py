@@ -2,6 +2,8 @@
 # @author: Sylvain LE GAL (https://twitter.com/legalsylvain)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+from odoo_module_migrate.base_migration_script import BaseMigrationScript
+
 # TODO: Call 2to3
 
 _TEXT_REPLACES = {
@@ -19,9 +21,6 @@ _TEXT_REPLACES = {
 
 _TEXT_ERRORS = {
     "*": {
-        "('|\")ir.values('|\")":
-            "[V11] Reference to 'ir.values'."
-            " This model has been removed.",
         "('|\")workflow('|\")":
             "[V11] Reference to 'workflow'."
             " This model has been removed.",
@@ -46,12 +45,10 @@ _TEXT_ERRORS = {
             "report.external_layout_footer is obsolete.",
     },
     ".xml": {
-        r"<tree[\s][^>]*colors=":
-        "colors attribute is deprecated in tree view."
-        " Use decoration- instead.",
-        r"<tree[\s][^>]*fonts=":
-        "fonts attribute is deprecated in tree view."
-        " Use decoration- instead.",
+        "<tree[\s][^>]*colors=":
+        "colors attribute is deprecated in tree view. Use decoration- instead.",
+        "<tree[\s][^>]*fonts=":
+        "fonts attribute is deprecated in tree view. Use decoration- instead.",
     }
 }
 
@@ -85,3 +82,10 @@ _DEPRECATED_MODULES = [
     ("website_rating_project_issue", "renamed", "website_rating_project"),
 
 ]
+
+
+class MigrationScript(BaseMigrationScript):
+
+    _TEXT_REPLACES = _TEXT_REPLACES
+    _TEXT_ERRORS = _TEXT_ERRORS
+    _DEPRECATED_MODULES = _DEPRECATED_MODULES

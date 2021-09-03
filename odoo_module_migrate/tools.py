@@ -25,11 +25,14 @@ def _get_latest_version_code():
     return _AVAILABLE_MIGRATION_STEPS[-1]["target_version_code"]
 
 
-def _execute_shell(shell_command, path=False):
+def _execute_shell(shell_command, path=False, raise_error=True):
     if path:
         shell_command = "cd %s && %s" % (str(path.resolve()), shell_command)
     logger.debug("Execute Shell:\n%s" % (shell_command))
-    return subprocess.check_output(shell_command, shell=True)
+    if raise_error:
+        return subprocess.check_output(shell_command, shell=True)
+    else:
+        return subprocess.run(shell_command, shell=True)
 
 
 def _read_content(file_path):
@@ -50,7 +53,7 @@ def _replace_in_file(file_path, replaces, log_message=False):
     new_text = current_text
 
     for old_term, new_term in replaces.items():
-        new_text = re.sub(old_term, new_term, new_text)
+        new_text = re.sub(old_term, new_term or "", new_text)
 
     # Write file if changed
     if new_text != current_text:

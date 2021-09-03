@@ -1,0 +1,3 @@
+
+.py:
+  env.user.company_id: "[13] If the intended use is to get the current active company, you need to change '.env.user.company_id' to '.env.company'"

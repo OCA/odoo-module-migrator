@@ -104,6 +104,9 @@ venv.bak/
 # PyCharm projecy settings
 .idea
 
+# VSCode
+.vscode
+
 # mkdocs documentation
 /site
 

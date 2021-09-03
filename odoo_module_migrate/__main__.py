@@ -101,6 +101,12 @@ def get_parser():
         " the changes. (using git add and git commit command)"
     )
 
+    # TODO: Move to `argparse.BooleanOptionalAction` once in Python 3.9+
+    main_parser.add_argument(
+        "-npc", "--no-pre-commit", dest="pre_commit", action="store_false",
+        help="Skip pre-commit execution",
+    )
+
     return main_parser
 
 
@@ -124,7 +130,7 @@ def main(args=False):
         migration = Migration(
             args.directory, args.init_version_name, args.target_version_name,
             module_names, args.format_patch, args.remote_name,
-            not args.no_commit,
+            not args.no_commit, args.pre_commit,
         )
 
         # run Migration
