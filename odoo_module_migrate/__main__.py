@@ -107,6 +107,13 @@ def get_parser():
         help="Skip pre-commit execution",
     )
 
+    # TODO: Move to `argparse.BooleanOptionalAction` once in Python 3.9+
+    main_parser.add_argument(
+        "-nrmf", "--no-remove-migration-folder",
+        dest="remove_migration_folder", action="store_false",
+        help="Skip removing migration folder",
+    )
+
     return main_parser
 
 
@@ -130,7 +137,7 @@ def main(args=False):
         migration = Migration(
             args.directory, args.init_version_name, args.target_version_name,
             module_names, args.format_patch, args.remote_name,
-            not args.no_commit, args.pre_commit,
+            not args.no_commit, args.pre_commit, args.remove_migration_folder,
         )
 
         # run Migration
