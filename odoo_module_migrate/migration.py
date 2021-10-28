@@ -106,7 +106,7 @@ class Migration:
             logger.info("Stage and commit changes done by pre-commit")
             _execute_shell("git add -A", path=self._directory_path)
             _execute_shell(
-                "git commit -m '[IMP] %s: pre-commit execution' --no-verify"
+                "git commit -m '[IMP] %s: black, isort, prettier' --no-verify"
                 % ", ".join(module_names),
                 path=self._directory_path,
                 raise_error=False,  # Don't fail if there is nothing to commit
