@@ -2,6 +2,7 @@
 # @author: Sylvain LE GAL (https://twitter.com/legalsylvain)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+import click
 import importlib
 import os
 import pathlib
@@ -9,7 +10,7 @@ import pkgutil
 import inspect
 
 from .config import _AVAILABLE_MIGRATION_STEPS, _MANIFEST_NAMES
-from .exception import ConfigException
+from .exception import ConfigException, CommandException
 from .log import logger
 from .tools import _execute_shell, _get_latest_version_code
 from .module_migration import ModuleMigration
@@ -99,48 +100,71 @@ class Migration:
         # get migration scripts, depending to the migration list
         self._get_migration_scripts()
 
+    def _execute_shell(self, shell_command, **kwargs):
+        """Helper to execute shell commands in the directory_path"""
+        if "path" not in kwargs:
+            kwargs["path"] = self._directory_path
+        return _execute_shell(shell_command, **kwargs)
+
     def _run_pre_commit(self, module_names):
         logger.info("Run pre-commit")
-        _execute_shell(
-            "pre-commit run -a", path=self._directory_path, raise_error=False)
+        self._execute_shell("pre-commit run -a", raise_error=False)
         if self._commit_enabled:
             logger.info("Stage and commit changes done by pre-commit")
-            _execute_shell("git add -A", path=self._directory_path)
-            _execute_shell(
+            self._execute_shell("git add -A")
+            self._execute_shell(
                 "git commit -m '[IMP] %s: pre-commit execution' --no-verify"
                 % ", ".join(module_names),
-                path=self._directory_path,
                 raise_error=False,  # Don't fail if there is nothing to commit
             )
 
     def _is_module_path(self, module_path):
         return any([(module_path / x).exists() for x in _MANIFEST_NAMES])
 
+    def _create_migration_branch(self, module_name, remote_name):
+        """Creates the migration branch"""
+        target_version = self._migration_steps[-1]["target_version_name"]
+        branch_name = "{version}-mig-{module_name}".format(
+            version=target_version, module_name=module_name
+        )
+        logger.info(f"Creating new branch '{branch_name}' ...")
+        if self._execute_shell(f"git branch --list {branch_name}"):
+            msg = (
+                "Branch %(branch)s already exists.\n"
+                "Do you want to recreate it? ⚠️  "
+                "You will lose the existing branch."
+                % {
+                    "branch": branch_name
+                }
+            )
+            if click.confirm(msg):
+                self._execute_shell(f"git branch -D {branch_name}")
+            else:
+                raise CommandException(
+                    f"Branch '{branch_name}' already exists. Aborting..."
+                )
+        self._execute_shell(
+            "git checkout --no-track -b %(branch)s %(remote)s/%(version)s" % {
+                "branch": branch_name,
+                "remote": remote_name,
+                "version": target_version,
+            }
+        )
+
     def _get_code_from_previous_branch(self, module_name, remote_name):
         init_version = self._migration_steps[0]["init_version_name"]
         target_version = self._migration_steps[-1]["target_version_name"]
-        branch_name = "%(version)s-mig-%(module_name)s" % {
-            'version': target_version,
-            'module_name': module_name}
-
-        logger.info("Creating new branch '%s' ..." % (branch_name))
-        _execute_shell(
-            "git checkout --no-track -b %(branch)s %(remote)s/%(version)s" % {
-                'branch': branch_name,
-                'remote': remote_name,
-                'version': target_version,
-            }, path=self._directory_path)
+        self._create_migration_branch(module_name, remote_name)
 
         logger.info("Getting latest changes from old branch")
         # Depth is added just in case you had a shallow git history
-        _execute_shell(
+        self._execute_shell(
             "git fetch --depth 9999999 %(remote)s %(init)s" % {
                 'remote': remote_name,
                 'init': init_version,
-            }, path=self._directory_path
+            }
         )
-
-        _execute_shell(
+        self._execute_shell(
             "git format-patch --keep-subject "
             "--stdout %(remote)s/%(target)s..%(remote)s/%(init)s "
             "-- %(module)s | git am -3 --keep" % {
@@ -148,7 +172,8 @@ class Migration:
                 'init': init_version,
                 'target': target_version,
                 'module': module_name,
-            }, path=self._directory_path)
+            }
+        )
 
     def _load_migration_script(self, full_name):
         module = importlib.import_module(full_name)

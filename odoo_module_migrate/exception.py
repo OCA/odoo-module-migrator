@@ -9,3 +9,7 @@ class OdooMigrateException(Exception):
 
 class ConfigException(OdooMigrateException):
     pass
+
+
+class CommandException(OdooMigrateException):
+    pass
