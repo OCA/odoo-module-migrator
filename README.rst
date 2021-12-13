@@ -12,14 +12,15 @@
 odoo-module-migrator
 ====================
 
-``odoo-module-migrator`` is a python3 library that allows you to realize automatically
-recurring changes when migrating Odoo modules from a version to another.
+``odoo-module-migrator`` is a python3 library that allows you to automatically migrate 
+module code to make it compatible with newer Odoo version.
 for exemple: 
 
 * renaming ``__openerp__.py`` file into ``__manifest__.py``
 * removing ``# -*- encoding: utf-8 -*-`` since V11.0
 * replacing ``openerp`` import by ``odoo`` import
 * removing ``migrations`` folders
+* changing <act_window> to <record model="ir.actions.window">
 * ...
 
 This library will so:
@@ -28,6 +29,10 @@ This library will so:
 * apply automatically changes. (renaming, replacing, etc.)
 * commit your changes.
 * Display warnings or errors in log if your code belong obsolete code patterns.
+
+This project is about migrating code. If you're looking for database data migration
+between Odoo versions, take a look
+at the https://github.com/OCA/OpenUpgrade project.
 
 **INFO log**
 
