@@ -21,12 +21,13 @@ class Migration:
     def __init__(
         self, relative_directory_path, init_version_name, target_version_name,
         module_names=None, format_patch=False, remote_name='origin',
-        commit_enabled=True, pre_commit=True,
+        commit_enabled=True, pre_commit=True, remove_migration_folder=True,
     ):
         if not module_names:
             module_names = []
         self._commit_enabled = commit_enabled
         self._pre_commit = pre_commit
+        self._remove_migration_folder = remove_migration_folder
         self._migration_steps = []
         self._migration_scripts = []
         self._module_migrations = []
@@ -161,6 +162,13 @@ class Migration:
                 "odoo_module_migrate.migration_scripts.migrate_allways"
             )
         )
+        if self._remove_migration_folder:
+            self._migration_scripts.extend(
+                self._load_migration_script(
+                    "odoo_module_migrate.migration_scripts."
+                    "migrate_remove_migration_folder"
+                )
+            )
         all_packages = importlib.\
             import_module("odoo_module_migrate.migration_scripts")
 
@@ -171,7 +179,7 @@ class Migration:
                 all_packages.__path__):
             # Ignore script that will be allways executed.
             # this script will be added at the end.
-            if name == 'migrate_allways':
+            if name in ('migrate_allways', 'migrate_remove_migration_folder'):
                 continue
 
             # Filter migration scripts, depending of the configuration
