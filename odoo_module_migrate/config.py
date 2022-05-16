@@ -44,6 +44,11 @@ _AVAILABLE_MIGRATION_STEPS = [
         "target_version_name": "15.0",
         "init_version_code": "140",
         "target_version_code": "150",
+    }, {
+        "init_version_name": "15.0",
+        "target_version_name": "16.0",
+        "init_version_code": "150",
+        "target_version_code": "160",
     },
 ]
 
