@@ -2,7 +2,7 @@
 # @author Iván Todorovich <ivan.todorovich@camptocamp.com>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from odoo import models
+from odoo import models, api
 
 
 class ResPartner(models.Model):
@@ -15,3 +15,11 @@ class ResPartner(models.Model):
         group_fields = [f for f in self.fields_get_keys() if f.startswith("group_")]
         for group_field in group_fields:
             print(group_field)
+
+    @api.model
+    def _name_search(self, name, args=None, operator='ilike', limit=100, name_get_uid=None):
+        args = args or []
+        if name:
+            name = name.split(' / ')[-1]
+            args = [('name', operator, name)] + args
+        return self._search(args, limit=limit, access_rights_uid=name_get_uid)
