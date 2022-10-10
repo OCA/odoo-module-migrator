@@ -134,7 +134,10 @@ class Migration:
         logger.info("Getting latest changes from old branch")
         # Depth is added just in case you had a shallow git history
         _execute_shell(
-            "git fetch --depth 9999999 %s %s" % (remote_name, init_version)
+            "git fetch --depth 9999999 %(remote)s %(init)s" % {
+                'remote': remote_name,
+                'init': init_version,
+            }, path=self._directory_path
         )
 
         _execute_shell(
