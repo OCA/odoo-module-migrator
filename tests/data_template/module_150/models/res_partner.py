@@ -16,6 +16,9 @@ class ResPartner(models.Model):
         for group_field in group_fields:
             print(group_field)
 
+    def test_removed_field(self):
+        return self.env['product.product'].search([], limit=1).price
+
     @api.model
     def _name_search(self, name, args=None, operator='ilike', limit=100, name_get_uid=None):
         self.flush()
