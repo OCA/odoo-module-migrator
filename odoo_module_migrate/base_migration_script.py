@@ -21,6 +21,7 @@ class BaseMigrationScript(object):
     _REMOVED_FIELDS = []
     _RENAMED_FIELDS = []
     _RENAMED_MODELS = []
+    _REMOVED_MODELS = []
     _GLOBAL_FUNCTIONS = []  # [function_object]
     _module_path = ""
 
@@ -70,6 +71,11 @@ class BaseMigrationScript(object):
             },
             # [(old.model.name, new.model.name, more_info)]
             "_RENAMED_MODELS": {
+                "type": TYPE_ARRAY,
+                "doc": [],
+            },
+            # [(old.model.name, more_info)]
+            "_REMOVED_MODELS": {
                 "type": TYPE_ARRAY,
                 "doc": [],
             },
@@ -195,11 +201,13 @@ class BaseMigrationScript(object):
         removed_fields = self.handle_removed_fields(self._REMOVED_FIELDS)
         renamed_fields = self.handle_renamed_fields(self._RENAMED_FIELDS)
         renamed_models = self.handle_renamed_models(self._RENAMED_MODELS)
+        removed_models = self.handle_removed_models(self._REMOVED_MODELS)
 
         # Operate changes in the file (replacements, removals)
         replaces = self._TEXT_REPLACES.get("*", {})
         replaces.update(self._TEXT_REPLACES.get(extension, {}))
         replaces.update(renamed_models.get('replaces'))
+        replaces.update(removed_models.get('replaces'))
 
         new_text = tools._replace_in_file(
             absolute_file_path, replaces, "Change file content of %s" % filename
@@ -210,6 +218,7 @@ class BaseMigrationScript(object):
         errors = self._TEXT_ERRORS.get("*", {})
         errors.update(self._TEXT_ERRORS.get(extension, {}))
         errors.update(renamed_models.get('errors'))
+        errors.update(removed_models.get('errors'))
         for pattern, error_message in errors.items():
             if re.findall(pattern, new_text):
                 logger.error(error_message)
@@ -218,6 +227,8 @@ class BaseMigrationScript(object):
         warnings.update(self._TEXT_WARNINGS.get(extension, {}))
         warnings.update(removed_fields.get("warnings"))
         warnings.update(renamed_fields.get("warnings"))
+        warnings.update(renamed_models.get('warnings'))
+        warnings.update(removed_models.get('warnings'))
         for pattern, warning_message in warnings.items():
             if re.findall(pattern, new_text):
                 logger.warning(warning_message + ". File " + root + os.sep + filename)
@@ -356,6 +367,46 @@ class BaseMigrationScript(object):
             res['warnings'].update({
                 old_name_esc: msg,
                 old_table_name: msg,
+            })
+        return res
+
+    def handle_removed_models(self, removed_models):
+        ''' removed_models = [(old.model, msg)]
+            returns dictionary of all replaces / warnings / errors produced
+            by a model renamed
+            {
+                'error':
+                    {
+                        "old_model_name", 'old_model_name': new_model_name
+                        old_table_name["',]: new_table_name["',]
+                    },
+                'warnings':
+                    {
+                        old.model.name: warning msg
+                        old_model_name: warning msg
+                    }
+            }
+        '''
+        res = {'replaces': {}, 'warnings': {}, 'errors': {}}
+        for model_name, more_info in removed_models:
+            table_name = model_name.replace('.', '_')
+            model_name_esc = re.escape(model_name)
+
+            msg = "The model %s has been .%s" % (
+                model_name, (" %s" % more_info) or "")
+
+            res['errors'].update({
+                r"\"%s\"" % model_name_esc: msg,
+                r"\'%s\'" % model_name_esc: msg,
+                r"\"%s\"" % table_name: msg,
+                r"\'%s\'" % table_name: msg,
+                r"model_%s\"" % table_name: msg,
+                r"model_%s\'" % table_name: msg,
+                r"model_%s," % table_name: msg,
+            })
+            res['warnings'].update({
+                model_name_esc: msg,
+                table_name: msg,
             })
         return res
 
