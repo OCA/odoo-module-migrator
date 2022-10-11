@@ -1,0 +1,4 @@
+
+.py:
+  (flush\(.*\)|recompute\(.*\)): "[16] The methods flush() and recompute() are deprecated. Use flush_model(), flush_recordset() or env.flush_all() instead depending on the needed granularity. More details at https://github.com/odoo/odoo/commit/32bc28aa665c479e31a40afffca2f03f6f2cc805."
+  (refresh\(.*\)|invalidate_cache\(.*\)): "[16] The methods refresh() and invalidate_cache() are deprecated. Use invalidate_model(), invalidate_recordset() or env.invalidate_all() instead depending on the needed granularity. More details at https://github.com/odoo/odoo/commit/32bc28aa665c479e31a40afffca2f03f6f2cc805."
