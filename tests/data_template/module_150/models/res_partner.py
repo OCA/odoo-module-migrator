@@ -19,6 +19,9 @@ class ResPartner(models.Model):
     def test_removed_field(self):
         return self.env['product.product'].search([], limit=1).price
 
+    def test_renamed_field(self):
+        return self.env['account.account'].search([], limit=1).user_type_id
+
     @api.model
     def _name_search(self, name, args=None, operator='ilike', limit=100, name_get_uid=None):
         self.flush()

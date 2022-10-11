@@ -19,6 +19,7 @@ class BaseMigrationScript(object):
     _DEPRECATED_MODULES = []
     _FILE_RENAMES = {}
     _REMOVED_FIELDS = []
+    _RENAMED_FIELDS = []
     _GLOBAL_FUNCTIONS = []  # [function_object]
     _module_path = ''
 
@@ -58,6 +59,11 @@ class BaseMigrationScript(object):
             },
             # [(model_name, field_name, more_info), ...)]
             "_REMOVED_FIELDS": {
+                "type": TYPE_ARRAY,
+                "doc": {},
+            },
+            # [(model_name, old_field_name, new_field_name, more_info), ...)]
+            "_RENAMED_FIELDS": {
                 "type": TYPE_ARRAY,
                 "doc": {},
             },
@@ -183,6 +189,7 @@ class BaseMigrationScript(object):
             absolute_file_path = os.path.join(root, new_name)
 
         removed_fields = self.handle_removed_fields(self._REMOVED_FIELDS)
+        renamed_fields = self.handle_renamed_fields(self._RENAMED_FIELDS)
 
         # Operate changes in the file (replacements, removals)
         replaces = self._TEXT_REPLACES.get("*", {})
@@ -203,6 +210,7 @@ class BaseMigrationScript(object):
         warnings = self._TEXT_WARNINGS.get("*", {})
         warnings.update(self._TEXT_WARNINGS.get(extension, {}))
         warnings.update(removed_fields.get('warnings'))
+        warnings.update(renamed_fields.get('warnings'))
         for pattern, warning_message in warnings.items():
             if re.findall(pattern, new_text):
                 logger.warning(
@@ -226,6 +234,25 @@ class BaseMigrationScript(object):
                     ' %s' % more_info if more_info else ''
                 )
             res[r"""(['"]{0}['"]|\.{0}[\s,=])""".format(field_name)] = msg
+        return {'warnings': res}
+
+    def handle_renamed_fields(self, removed_fields):
+        """ Give warnings if old_field_name is found on the code. To minimize
+         two many false positives we search for field name on this situations:
+         * with simple/double quotes
+         * prefixed with dot and with space, comma or equal after the string
+        For now this handler is simple but the idea would be to improve it
+        with deeper analysis and direct replaces if it is possible and secure.
+        For that analysis model_name could be used
+         """
+        res = {}
+        for model_name, old_field_name, new_field_name, more_info in \
+                removed_fields:
+            msg = 'On the model %s, the field %s was renamed to %s.%s' % (
+                    model_name, old_field_name, new_field_name,
+                    ' %s' % more_info if more_info else ''
+                )
+            res[r"""(['"]{0}['"]|\.{0}[\s,=])""".format(old_field_name)] = msg
         return {'warnings': res}
 
     def handle_deprecated_modules(self, manifest_path, deprecated_modules):
