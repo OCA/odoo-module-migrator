@@ -59,6 +59,6 @@ _AVAILABLE_MIGRATION_STEPS = [
     },
 ]
 
-_ALLOWED_EXTENSIONS = [".py", ".xml", ".js"]
+_ALLOWED_EXTENSIONS = [".py", ".xml", ".js", ".csv"]
 
 _MANIFEST_NAMES = ["__openerp__.py", "__manifest__.py"]

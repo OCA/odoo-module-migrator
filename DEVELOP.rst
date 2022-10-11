@@ -162,6 +162,22 @@ The list of the operations are written in the subfolder
   .. code-block:: yaml
     - ['account.account', 'user_type_id', 'account_type', 'Commit https://github.com/odoo/odoo/commit/26b2472f4977ccedbb0b5ed5f']
 
+* ``removed_models/migrate_FROM_TO/NAME.yaml`` — removed models rule. Display errors / warnings if files contains a given partern:
+     * errors: "old_model_name", 'old_model_name', old_table_name["',]
+     * warnings: old.model.name, old_model_name
+
+ For example, for migration from version 15.0 to 16.0:
+  .. code-block:: yaml
+    - ["account.account.type", "Commit https://github.com/odoo/odoo/commit/26b2472f4977ccedbb0b5ed5f"]
+
+* ``renamed_models/migrate_FROM_TO/NAME.yaml`` — renamed models rule. Display errors / warnings if files contains a given partern:
+     * errors: "old_model_name", 'old_model_name', old_table_name["',]
+     * warnings: old.model.name, old_model_name
+
+ For example, for migration from version 15.0 to 16.0:
+  .. code-block:: yaml
+    - ["stock.production.lot", "stock.lot", None]
+
 How to improve the library
 ==========================
 
