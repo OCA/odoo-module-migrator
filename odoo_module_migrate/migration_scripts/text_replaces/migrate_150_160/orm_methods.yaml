@@ -1,0 +1,3 @@
+.py:
+  \.get_xml_id\(: ".get_external_id("
+  \.fields_get_keys\(\): "._fields"
