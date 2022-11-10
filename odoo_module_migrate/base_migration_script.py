@@ -60,12 +60,12 @@ class BaseMigrationScript(object):
             # [(model_name, field_name, more_info), ...)]
             "_REMOVED_FIELDS": {
                 "type": TYPE_ARRAY,
-                "doc": {},
+                "doc": [],
             },
             # [(model_name, old_field_name, new_field_name, more_info), ...)]
             "_RENAMED_FIELDS": {
                 "type": TYPE_ARRAY,
-                "doc": {},
+                "doc": [],
             },
         }
         # read
