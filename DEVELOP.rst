@@ -144,6 +144,24 @@ The list of the operations are written in the subfolder
           tools._replace_in_file(
               manifest_path, {old_term: new_term}, "Set module installable")
 
+* ``removed_fields/migrate_FROM_TO/NAME.yaml`` — removed fields rule. Give warnings if field name is found on the code.
+    To minimize two many false positives we search for field name on this situations:
+         * with simple/double quotes
+         * prefixed with dot and with space, comma or equal after the string
+
+ For example, for migration from version 15.0 to 16.0:
+  .. code-block:: yaml
+    - ['product.product', 'price', 'Commit https://github.com/odoo/odoo/commit/9e99a9df464d97a74ca320d']
+
+* ``renamed_fields/migrate_FROM_TO/NAME.yaml`` — renamed fields rule. Give warnings if old field name is found on the code.
+    To minimize two many false positives we search for field name on this situations:
+         * with simple/double quotes
+         * prefixed with dot and with space, comma or equal after the string
+
+ For example, for migration from version 15.0 to 16.0:
+  .. code-block:: yaml
+    - ['account.account', 'user_type_id', 'account_type', 'Commit https://github.com/odoo/odoo/commit/26b2472f4977ccedbb0b5ed5f']
+
 How to improve the library
 ==========================
 
