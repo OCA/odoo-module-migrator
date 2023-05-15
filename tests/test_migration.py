@@ -25,26 +25,33 @@ class TestMigration(unittest.TestCase):
         shutil.rmtree(self._working_path, ignore_errors=True)
         shutil.copytree(self._template_path, self._working_path)
 
-        main([
-            "--directory", str(self._working_path),
-            "--init-version-name", init_version_name,
-            "--target-version-name", target_version_name,
-            "--modules", module_name,
-            "--log-path", str(self._working_path / "test_log.log"),
-            "--no-commit",
-        ])
+        main(
+            [
+                "--directory",
+                str(self._working_path),
+                "--init-version-name",
+                init_version_name,
+                "--target-version-name",
+                target_version_name,
+                "--modules",
+                module_name,
+                "--log-path",
+                str(self._working_path / "test_log.log"),
+                "--no-commit",
+            ]
+        )
 
     def _get_comparison(self, module_name, result_name):
         comparison = dircmp(
             str(self._expected_path / result_name),
-            str(self._working_path / module_name))
+            str(self._working_path / module_name),
+        )
         return comparison
 
     def _get_diff_files(self, comparison, folder):
         res = [os.path.join(folder, x) for x in comparison.diff_files]
         for subfolder, subcomparison in comparison.subdirs.items():
-            res += self._get_diff_files(
-                subcomparison, os.path.join(folder, subfolder))
+            res += self._get_diff_files(subcomparison, os.path.join(folder, subfolder))
         return res
 
     def test_migration_080_130(self):
@@ -52,9 +59,11 @@ class TestMigration(unittest.TestCase):
         comparison = self._get_comparison("module_080", "module_080_130")
         diff_files = self._get_diff_files(comparison, "./")
         self.assertEqual(
-            len(diff_files), 0,
-            "Differences found in the following files\n- %s" % (
-                "\n- ".join(diff_files)))
+            len(diff_files),
+            0,
+            "Differences found in the following files\n- %s"
+            % ("\n- ".join(diff_files)),
+        )
 
         log_content = _read_content(str(self._working_path / "test_log.log"))
 
@@ -72,7 +81,8 @@ class TestMigration(unittest.TestCase):
             self.assertNotEqual(
                 len(re.findall(pattern, log_content)),
                 0,
-                "%s not found in the log" % pattern)
+                "%s not found in the log" % pattern,
+            )
 
     def test_migration_120_130(self):
         self._migrate_module("module_120", "module_120_130", "12.0", "13.0")
@@ -80,9 +90,11 @@ class TestMigration(unittest.TestCase):
         diff_files = self._get_diff_files(comparison, "./")
         log_content = _read_content(str(self._working_path / "test_log.log"))
         self.assertEqual(
-            len(diff_files), 0,
-            "Differences found in the following files\n- %s" % (
-                "\n- ".join(diff_files)))
+            len(diff_files),
+            0,
+            "Differences found in the following files\n- %s"
+            % ("\n- ".join(diff_files)),
+        )
 
         required_logs = [
             (
@@ -96,22 +108,27 @@ class TestMigration(unittest.TestCase):
             self.assertNotEqual(
                 len(re.findall(pattern, log_content)),
                 0,
-                "%s not found in the log" % pattern)
+                "%s not found in the log" % pattern,
+            )
 
     def test_migration_130_140(self):
         self._migrate_module("module_130", "module_130_140", "13.0", "14.0")
         comparison = self._get_comparison("module_130", "module_130_140")
         diff_files = self._get_diff_files(comparison, "./")
         self.assertEqual(
-            len(diff_files), 0,
-            "Differences found in the following files\n- %s" % (
-                "\n- ".join(diff_files)))
+            len(diff_files),
+            0,
+            "Differences found in the following files\n- %s"
+            % ("\n- ".join(diff_files)),
+        )
 
     def test_migration_150_160(self):
         self._migrate_module("module_150", "module_150_160", "15.0", "16.0")
         comparison = self._get_comparison("module_150", "module_150_160")
         diff_files = self._get_diff_files(comparison, "./")
         self.assertEqual(
-            len(diff_files), 0,
-            "Differences found in the following files\n- %s" % (
-                "\n- ".join(diff_files)))
+            len(diff_files),
+            0,
+            "Differences found in the following files\n- %s"
+            % ("\n- ".join(diff_files)),
+        )

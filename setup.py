@@ -6,15 +6,14 @@ import setuptools
 
 setuptools.setup(
     name="odoo-module-migrator",
-    version="0.3.2",
+    version="0.4.0",
     author="GRAP, Groupement Régional Alimentaire de Proximité",
     author_email="informatique@grap.coop",
-    description="Small tools to migrate Odoo modules from a version"
-    " to another",
-    long_description=open('README.rst').read(),
-    long_description_content_type='text/x-rst',
+    description="Small tools to migrate Odoo modules from a version" " to another",
+    long_description=open("README.rst").read(),
+    long_description_content_type="text/x-rst",
     url="https://github.com/OCA/odoo-module-migrator",
-    packages=['odoo_module_migrate', 'odoo_module_migrate.migration_scripts'],
+    packages=["odoo_module_migrate", "odoo_module_migrate.migration_scripts"],
     include_package_data=True,
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -24,12 +23,17 @@ setuptools.setup(
         "License :: OSI Approved :: GNU Affero General Public License v3",
         "Environment :: Console",
     ],
-    install_requires=open('requirements.txt').read().splitlines(),
-    entry_points=dict(console_scripts=[
-        'odoo-module-migrate=odoo_module_migrate.__main__:main',
-    ]),
+    install_requires=open("requirements.txt").read().splitlines(),
+    entry_points=dict(
+        console_scripts=[
+            "odoo-module-migrate=odoo_module_migrate.__main__:main",
+        ]
+    ),
     keywords=[
         "Odoo Community Association (OCA)",
-        "Odoo", "Migration", "Upgrade", "Module",
+        "Odoo",
+        "Migration",
+        "Upgrade",
+        "Module",
     ],
 )

@@ -3,18 +3,16 @@
     :alt: License: AGPL-3
 .. image:: https://img.shields.io/badge/python-3.6-blue.svg
     :alt: Python support: 3.6
-.. image:: https://travis-ci.org/grap/odoo-module-migrator.svg?branch=master
-    :target: https://travis-ci.org/grap/odoo-module-migrator
-.. image:: https://coveralls.io/repos/grap/odoo-module-migrator/badge.png?branch=master
-    :target: https://coveralls.io/r/grap/odoo-module-migrator?branch=master
+.. image:: https://app.travis-ci.com/OCA/odoo-module-migrator.svg?branch=master
+    :target: https://app.travis-ci.com/OCA/odoo-module-migrator
 
 ====================
 odoo-module-migrator
 ====================
 
-``odoo-module-migrator`` is a python3 library that allows you to automatically migrate 
+``odoo-module-migrator`` is a python3 library that allows you to automatically migrate
 module code to make it compatible with newer Odoo version.
-for exemple: 
+for exemple:
 
 * renaming ``__openerp__.py`` file into ``__manifest__.py``
 * removing ``# -*- encoding: utf-8 -*-`` since V11.0
@@ -243,4 +241,3 @@ Contributors
 ------------
 
 * Sylvain LE GAL (https://www.twitter.com/legalsylvain)
-

@@ -17,10 +17,10 @@ def src_model_new_value(field_elem, model_dot_name):
     old attribute `src_model=account.move`
     to `<field name="binding_model_id" ref="account.model_account_move"/>`.
     """
-    module_name = model_dot_name.split('.')[0]
-    model_und_name = model_dot_name.replace('.', '_')
-    ref_value = f'{module_name}.model_{model_und_name}'
-    field_elem.set('ref', ref_value)
+    module_name = model_dot_name.split(".")[0]
+    model_und_name = model_dot_name.replace(".", "_")
+    ref_value = f"{module_name}.model_{model_und_name}"
+    field_elem.set("ref", ref_value)
 
 
 def value_to_text(field_elem, attr_value):
@@ -29,13 +29,13 @@ def value_to_text(field_elem, attr_value):
 
 
 TAG_ATTR_RENAMING = {
-    'report': {
-        'name': ('report_name', value_to_text),
-        'string': ('name', value_to_text),
+    "report": {
+        "name": ("report_name", value_to_text),
+        "string": ("name", value_to_text),
     },
-    'act_window': {
-        'src_model': ('binding_model_id', src_model_new_value),
-    }
+    "act_window": {
+        "src_model": ("binding_model_id", src_model_new_value),
+    },
 }
 """
 Configuration for renaming particular attributes.
@@ -66,14 +66,13 @@ def _reformat_file(file_path: Path):
     if not reformat_tags:
         return None
 
-    regexp = r"(?P<indent>[ \t]*)" \
-             r"(?P<tag><{tag_type}[^/]*id=\"{tag_id}\"[^/]*/>)"
+    regexp = r"(?P<indent>[ \t]*)" r"(?P<tag><{tag_type}[^/]*id=\"{tag_id}\"[^/]*/>)"
 
     new_tags_dict = dict()
     for tag in reformat_tags:
         tag_regex = regexp.format(
             tag_type=tag.tag,
-            tag_id=tag.attrib['id'],
+            tag_id=tag.attrib["id"],
         )
         for attrib, value in tag.attrib.items():
             if attrib == "id":
@@ -101,8 +100,8 @@ def _reformat_file(file_path: Path):
     for tag_regex, tag in new_tags_dict.items():
         match = re.search(tag_regex, xml_file)
         if match:
-            indent = match.group('indent')
-            tag_match = match.group('tag')
+            indent = match.group("indent")
+            tag_match = match.group("tag")
             et.indent(tag, space=indent, level=1)
             # Remove trailing newline
             tag_string = et.tostring(tag, pretty_print=True)[:-1]
@@ -122,12 +121,9 @@ def _get_files(module_path, reformat_file_ext):
     return file_paths
 
 
-def reformat_deprecated_tags(logger,
-                             module_path,
-                             module_name,
-                             manifest_path,
-                             migration_steps,
-                             tools):
+def reformat_deprecated_tags(
+    logger, module_path, module_name, manifest_path, migration_steps, tools
+):
     """Reformat deprecated tags in XML files.
 
     Deprecated tags are `act_window` and `report`:
@@ -136,28 +132,24 @@ def reformat_deprecated_tags(logger,
 
     reformat_file_ext = ".xml"
     file_paths = _get_files(module_path, reformat_file_ext)
-    logger.debug(f"{reformat_file_ext} files found:\n"
-                 f"{list(map(str, file_paths))}")
+    logger.debug(f"{reformat_file_ext} files found:\n" f"{list(map(str, file_paths))}")
 
     reformatted_files = list()
     for file_path in file_paths:
         reformatted_file = _reformat_file(file_path)
         if reformatted_file:
             reformatted_files.append(reformatted_file)
-    logger.debug("Reformatted files:\n"
-                 f"{list(reformatted_files)}")
+    logger.debug("Reformatted files:\n" f"{list(reformatted_files)}")
 
 
 _TEXT_REPLACES = {
     ".js": {
-        r"tour\.STEPS\.SHOW_APPS_MENU_ITEM":
-        "tour.stepUtils.showAppsMenuItem()",
-        r"tour\.STEPS\.TOGGLE_HOME_MENU":
-        "tour.stepUtils.toggleHomeMenu()",
+        r"tour\.STEPS\.SHOW_APPS_MENU_ITEM": "tour.stepUtils.showAppsMenuItem()",
+        r"tour\.STEPS\.TOGGLE_HOME_MENU": "tour.stepUtils.toggleHomeMenu()",
     },
     ".py": {
         r"\.phantom_js\(": ".browser_js(",
-    }
+    },
 }
 
 
