@@ -173,7 +173,7 @@ Changes
 =======
 
 0.3.2 (December 04, 2019)
-------------------------
+-------------------------
 * [REM] Remove black call. (Add call to more generic tool pre-commit
   in the roadmap)
 * [IMP] Add --no-verify option in ``git commit`` to avoid to fail if pre-commit
