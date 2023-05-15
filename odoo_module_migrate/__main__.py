@@ -13,9 +13,7 @@ from .migration import Migration
 
 def get_parser():
 
-    main_parser = argparse.ArgumentParser(
-        formatter_class=argparse.RawTextHelpFormatter
-    )
+    main_parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 
     main_parser.add_argument(
         "-d",
@@ -62,16 +60,16 @@ def get_parser():
     main_parser.add_argument(
         "-fp",
         "--format-patch",
-        action='store_true',
+        action="store_true",
         help="Enable this option, if you want to get the code from the"
-        " previous branch."
+        " previous branch.",
     )
 
     main_parser.add_argument(
         "-rn",
         "--remote-name",
         dest="remote_name",
-        default='origin',
+        default="origin",
         type=str,
     )
 
@@ -95,22 +93,27 @@ def get_parser():
     main_parser.add_argument(
         "-nc",
         "--no-commit",
-        action='store_true',
+        action="store_true",
         default=False,
         help="Enable this option, if you don't want that the library commits"
-        " the changes. (using git add and git commit command)"
+        " the changes. (using git add and git commit command)",
     )
 
     # TODO: Move to `argparse.BooleanOptionalAction` once in Python 3.9+
     main_parser.add_argument(
-        "-npc", "--no-pre-commit", dest="pre_commit", action="store_false",
+        "-npc",
+        "--no-pre-commit",
+        dest="pre_commit",
+        action="store_false",
         help="Skip pre-commit execution",
     )
 
     # TODO: Move to `argparse.BooleanOptionalAction` once in Python 3.9+
     main_parser.add_argument(
-        "-nrmf", "--no-remove-migration-folder",
-        dest="remove_migration_folder", action="store_false",
+        "-nrmf",
+        "--no-remove-migration-folder",
+        dest="remove_migration_folder",
+        action="store_false",
         help="Skip removing migration folder",
     )
 
@@ -131,13 +134,22 @@ def main(args=False):
 
     try:
         # Create a new Migration Object
-        module_names = args.modules\
-            and [x.strip() for x in args.modules.split(",") if x.strip()] or []
+        module_names = (
+            args.modules
+            and [x.strip() for x in args.modules.split(",") if x.strip()]
+            or []
+        )
 
         migration = Migration(
-            args.directory, args.init_version_name, args.target_version_name,
-            module_names, args.format_patch, args.remote_name,
-            not args.no_commit, args.pre_commit, args.remove_migration_folder,
+            args.directory,
+            args.init_version_name,
+            args.target_version_name,
+            module_names,
+            args.format_patch,
+            args.remote_name,
+            not args.no_commit,
+            args.pre_commit,
+            args.remove_migration_folder,
         )
 
         # run Migration

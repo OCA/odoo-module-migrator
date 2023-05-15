@@ -12,12 +12,13 @@ _TEXT_REPLACES = {
 
 
 def set_module_installable(**kwargs):
-    tools = kwargs['tools']
-    manifest_path = kwargs['manifest_path']
+    tools = kwargs["tools"]
+    manifest_path = kwargs["manifest_path"]
     old_term = r"('|\")installable('|\").*(False)"
     new_term = r"\1installable\2: True"
     tools._replace_in_file(
-        manifest_path, {old_term: new_term}, "Set module installable")
+        manifest_path, {old_term: new_term}, "Set module installable"
+    )
 
 
 class MigrationScript(BaseMigrationScript):

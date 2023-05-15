@@ -10,9 +10,9 @@
 odoo-module-migrator
 ====================
 
-``odoo-module-migrator`` is a python3 library that allows you to automatically migrate 
+``odoo-module-migrator`` is a python3 library that allows you to automatically migrate
 module code to make it compatible with newer Odoo version.
-for exemple: 
+for exemple:
 
 * renaming ``__openerp__.py`` file into ``__manifest__.py``
 * removing ``# -*- encoding: utf-8 -*-`` since V11.0
@@ -241,4 +241,3 @@ Contributors
 ------------
 
 * Sylvain LE GAL (https://www.twitter.com/legalsylvain)
-

@@ -7,19 +7,14 @@ from odoo_module_migrate.base_migration_script import BaseMigrationScript
 
 _TEXT_ERRORS = {
     "*": {
-        "web_settings_dashboard":
-        "[V13] Reference to 'web_settings_dashboard'"
+        "web_settings_dashboard": "[V13] Reference to 'web_settings_dashboard'"
         ". This module has been removed."
     },
     ".py": {
-        r".*@api.returns.*\n":
-        "[13] Use of deprecated decorator '@api.returns'",
-        r".*@api.cr.*\n":
-        "[13] Use of deprecated decorator '@api.cr'",
-        r"@api.model_cr\b":
-        "[13] Use of deprecated decorator '@api.model_cr'",
-        r"@api.model_cr_context\b":
-        "[13] Use of deprecated decorator '@api.model_cr_context'",
+        r".*@api.returns.*\n": "[13] Use of deprecated decorator '@api.returns'",
+        r".*@api.cr.*\n": "[13] Use of deprecated decorator '@api.cr'",
+        r"@api.model_cr\b": "[13] Use of deprecated decorator '@api.model_cr'",
+        r"@api.model_cr_context\b": "[13] Use of deprecated decorator '@api.model_cr_context'",
     },
 }
 

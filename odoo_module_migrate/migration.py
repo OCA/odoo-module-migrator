@@ -17,11 +17,17 @@ from .base_migration_script import BaseMigrationScript
 
 
 class Migration:
-
     def __init__(
-        self, relative_directory_path, init_version_name, target_version_name,
-        module_names=None, format_patch=False, remote_name='origin',
-        commit_enabled=True, pre_commit=True, remove_migration_folder=True,
+        self,
+        relative_directory_path,
+        init_version_name,
+        target_version_name,
+        module_names=None,
+        format_patch=False,
+        remote_name="origin",
+        commit_enabled=True,
+        pre_commit=True,
+        remove_migration_folder=True,
     ):
         if not module_names:
             module_names = []
@@ -48,14 +54,16 @@ class Migration:
         # Check consistency between format patch and module_names args
         if format_patch and len(module_names) != 1:
             raise ConfigException(
-                "Format patch option can only be used for a single module")
+                "Format patch option can only be used for a single module"
+            )
         logger.debug("Module list: %s" % module_names)
         logger.debug("format patch option : %s" % format_patch)
 
         # convert relative or absolute directory into Path Object
         if not os.path.exists(relative_directory_path):
             raise ConfigException(
-                "Unable to find directory: %s" % relative_directory_path)
+                "Unable to find directory: %s" % relative_directory_path
+            )
 
         root_path = pathlib.Path(relative_directory_path)
         self._directory_path = pathlib.Path(root_path.resolve(strict=True))
@@ -63,12 +71,12 @@ class Migration:
         # format-patch, if required
         if format_patch:
             if not (root_path / module_names[0]).is_dir():
-                self._get_code_from_previous_branch(
-                    module_names[0], remote_name)
+                self._get_code_from_previous_branch(module_names[0], remote_name)
             else:
                 logger.warning(
                     "Ignoring format-patch argument, as the module %s"
-                    " is still present in the repository" % (module_names[0]))
+                    " is still present in the repository" % (module_names[0])
+                )
 
         # Guess modules if not provided, and check validity
         if not module_names:
@@ -85,7 +93,8 @@ class Migration:
                     module_names.remove(child_path.name)
                     logger.warning(
                         "No valid module found for '%s' in the directory '%s'"
-                        % (child_path.name, root_path.resolve()))
+                        % (child_path.name, root_path.resolve())
+                    )
 
         if not module_names:
             raise ConfigException("No modules found to migrate. Exiting.")
@@ -102,7 +111,8 @@ class Migration:
     def _run_pre_commit(self, module_names):
         logger.info("Run pre-commit")
         _execute_shell(
-            "pre-commit run -a", path=self._directory_path, raise_error=False)
+            "pre-commit run -a", path=self._directory_path, raise_error=False
+        )
         if self._commit_enabled:
             logger.info("Stage and commit changes done by pre-commit")
             _execute_shell("git add -A", path=self._directory_path)
@@ -120,42 +130,52 @@ class Migration:
         init_version = self._migration_steps[0]["init_version_name"]
         target_version = self._migration_steps[-1]["target_version_name"]
         branch_name = "%(version)s-mig-%(module_name)s" % {
-            'version': target_version,
-            'module_name': module_name}
+            "version": target_version,
+            "module_name": module_name,
+        }
 
         logger.info("Creating new branch '%s' ..." % (branch_name))
         _execute_shell(
-            "git checkout --no-track -b %(branch)s %(remote)s/%(version)s" % {
-                'branch': branch_name,
-                'remote': remote_name,
-                'version': target_version,
-            }, path=self._directory_path)
+            "git checkout --no-track -b %(branch)s %(remote)s/%(version)s"
+            % {
+                "branch": branch_name,
+                "remote": remote_name,
+                "version": target_version,
+            },
+            path=self._directory_path,
+        )
 
         logger.info("Getting latest changes from old branch")
         # Depth is added just in case you had a shallow git history
         _execute_shell(
-            "git fetch --depth 9999999 %(remote)s %(init)s" % {
-                'remote': remote_name,
-                'init': init_version,
-            }, path=self._directory_path
+            "git fetch --depth 9999999 %(remote)s %(init)s"
+            % {
+                "remote": remote_name,
+                "init": init_version,
+            },
+            path=self._directory_path,
         )
 
         _execute_shell(
             "git format-patch --keep-subject "
             "--stdout %(remote)s/%(target)s..%(remote)s/%(init)s "
-            "-- %(module)s | git am -3 --keep" % {
-                'remote': remote_name,
-                'init': init_version,
-                'target': target_version,
-                'module': module_name,
-            }, path=self._directory_path)
+            "-- %(module)s | git am -3 --keep"
+            % {
+                "remote": remote_name,
+                "init": init_version,
+                "target": target_version,
+                "module": module_name,
+            },
+            path=self._directory_path,
+        )
 
     def _load_migration_script(self, full_name):
         module = importlib.import_module(full_name)
-        result = [x[1]()
-                  for x in inspect.getmembers(module, inspect.isclass)
-                  if x[0] != 'BaseMigrationScript'
-                  and issubclass(x[1], BaseMigrationScript)]
+        result = [
+            x[1]()
+            for x in inspect.getmembers(module, inspect.isclass)
+            if x[0] != "BaseMigrationScript" and issubclass(x[1], BaseMigrationScript)
+        ]
         return result
 
     def _get_migration_scripts(self):
@@ -172,22 +192,20 @@ class Migration:
                     "migrate_remove_migration_folder"
                 )
             )
-        all_packages = importlib.\
-            import_module("odoo_module_migrate.migration_scripts")
+        all_packages = importlib.import_module("odoo_module_migrate.migration_scripts")
 
         migration_start = float(self._migration_steps[0]["init_version_code"])
         migration_end = float(self._migration_steps[-1]["target_version_code"])
 
-        for loader, name, is_pkg in pkgutil.walk_packages(
-                all_packages.__path__):
+        for loader, name, is_pkg in pkgutil.walk_packages(all_packages.__path__):
             # Ignore script that will be allways executed.
             # this script will be added at the end.
-            if name in ('migrate_allways', 'migrate_remove_migration_folder'):
+            if name in ("migrate_allways", "migrate_remove_migration_folder"):
                 continue
 
             # Filter migration scripts, depending of the configuration
-            full_name = all_packages.__name__ + '.' + name
-            if 'allways' in name:
+            full_name = all_packages.__name__ + "." + name
+            if "allways" in name:
                 # replace allways by the most recent version
                 real_name = name.replace("allways", _get_latest_version_code())
             else:
@@ -201,24 +219,27 @@ class Migration:
             if script_start >= migration_end or script_end <= migration_start:
                 continue
 
-            self._migration_scripts.extend(
-                self._load_migration_script(full_name)
-            )
+            self._migration_scripts.extend(self._load_migration_script(full_name))
 
         logger.debug(
             "The following migration script will be"
-            " executed:\n- %s" % '\n- '.join(
+            " executed:\n- %s"
+            % "\n- ".join(
                 [
-                    inspect.getfile(x.__class__).split('/')[-1]
-                    for x in self._migration_scripts]
+                    inspect.getfile(x.__class__).split("/")[-1]
+                    for x in self._migration_scripts
+                ]
             )
         )
 
     def run(self):
         logger.debug(
-            "Running migration from: %s to: %s in '%s'" % (
+            "Running migration from: %s to: %s in '%s'"
+            % (
                 self._migration_steps[0]["init_version_name"],
                 self._migration_steps[-1]["target_version_name"],
-                self._directory_path.resolve()))
+                self._directory_path.resolve(),
+            )
+        )
         for module_migration in self._module_migrations:
             module_migration.run()

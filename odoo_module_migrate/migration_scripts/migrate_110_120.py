@@ -18,8 +18,12 @@ _TEXT_REPLACES = {
 }
 
 _DEPRECATED_MODULES = [
-    ("account_asset", "oca_moved", "account_asset_management",
-        "Moved to OCA/account-financial-tools"),
+    (
+        "account_asset",
+        "oca_moved",
+        "account_asset_management",
+        "Moved to OCA/account-financial-tools",
+    ),
     ("account_budget", "removed"),
     ("account_cash_basis_base_account", "merged", "account"),
     ("account_invoicing", "merged", "account"),

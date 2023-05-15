@@ -21,10 +21,10 @@ class BaseMigrationScript(object):
     _REMOVED_FIELDS = []
     _RENAMED_FIELDS = []
     _GLOBAL_FUNCTIONS = []  # [function_object]
-    _module_path = ''
+    _module_path = ""
 
     def parse_rules(self):
-        script_parts = inspect.getfile(self.__class__).split('/')
+        script_parts = inspect.getfile(self.__class__).split("/")
         migrate_from_to = script_parts[-1].split(".")[0]
         migration_scripts_dir = "/".join(script_parts[:-1])
 
@@ -74,7 +74,7 @@ class BaseMigrationScript(object):
             file_pattern = "%s/%s/%s/*.yaml" % (
                 migration_scripts_dir,
                 rule_folder,
-                migrate_from_to
+                migrate_from_to,
             )
             for filename in glob.glob(file_pattern):
                 with open(filename) as f:
@@ -108,35 +108,38 @@ class BaseMigrationScript(object):
 
         file_pattern = "%s/python_scripts/%s/*.py" % (
             migration_scripts_dir,
-            migrate_from_to
+            migrate_from_to,
         )
         for path in glob.glob(file_pattern):
             module_name = path.split("/")[-1].split(".")[0]
-            module_name = ".".join([
-                "odoo_module_migrate.migration_scripts.python_scripts",
-                migrate_from_to,
-                module_name,
-            ])
+            module_name = ".".join(
+                [
+                    "odoo_module_migrate.migration_scripts.python_scripts",
+                    migrate_from_to,
+                    module_name,
+                ]
+            )
             module = importlib.import_module(module_name)
             for name, value in inspect.getmembers(module, inspect.isfunction):
                 if not name.startswith("_"):
                     self._GLOBAL_FUNCTIONS.append(value)
 
-    def run(self,
-            module_path,
-            manifest_path,
-            module_name,
-            migration_steps,
-            directory_path,
-            commit_enabled):
+    def run(
+        self,
+        module_path,
+        manifest_path,
+        module_name,
+        migration_steps,
+        directory_path,
+        commit_enabled,
+    ):
         logger.debug(
-            'Running %s script' %
-            inspect.getfile(self.__class__).split('/')[-1]
+            "Running %s script" % inspect.getfile(self.__class__).split("/")[-1]
         )
         self.parse_rules()
         manifest_path = self._get_correct_manifest_path(
-            manifest_path,
-            self._FILE_RENAMES)
+            manifest_path, self._FILE_RENAMES
+        )
         for root, directories, filenames in os.walk(module_path.resolve()):
             for filename in filenames:
                 extension = os.path.splitext(filename)[1]
@@ -148,7 +151,7 @@ class BaseMigrationScript(object):
                     extension,
                     self._FILE_RENAMES,
                     directory_path,
-                    commit_enabled
+                    commit_enabled,
                 )
 
         self.handle_deprecated_modules(manifest_path, self._DEPRECATED_MODULES)
@@ -164,14 +167,9 @@ class BaseMigrationScript(object):
                     tools=tools,
                 )
 
-    def process_file(self,
-                     root,
-                     filename,
-                     extension,
-                     file_renames,
-                     directory_path,
-                     commit_enabled
-                     ):
+    def process_file(
+        self, root, filename, extension, file_renames, directory_path, commit_enabled
+    ):
         # Skip useless file
         # TODO, skip files present in some folders. (for exemple 'lib')
         absolute_file_path = os.path.join(root, filename)
@@ -184,7 +182,7 @@ class BaseMigrationScript(object):
                 directory_path,
                 absolute_file_path,
                 os.path.join(root, new_name),
-                commit_enabled
+                commit_enabled,
             )
             absolute_file_path = os.path.join(root, new_name)
 
@@ -196,8 +194,8 @@ class BaseMigrationScript(object):
         replaces.update(self._TEXT_REPLACES.get(extension, {}))
 
         new_text = tools._replace_in_file(
-            absolute_file_path, replaces,
-            "Change file content of %s" % filename)
+            absolute_file_path, replaces, "Change file content of %s" % filename
+        )
 
         # Display errors if the new content contains some obsolete
         # pattern
@@ -209,51 +207,50 @@ class BaseMigrationScript(object):
 
         warnings = self._TEXT_WARNINGS.get("*", {})
         warnings.update(self._TEXT_WARNINGS.get(extension, {}))
-        warnings.update(removed_fields.get('warnings'))
-        warnings.update(renamed_fields.get('warnings'))
+        warnings.update(removed_fields.get("warnings"))
+        warnings.update(renamed_fields.get("warnings"))
         for pattern, warning_message in warnings.items():
             if re.findall(pattern, new_text):
-                logger.warning(
-                    warning_message +
-                    '. File ' + root + os.sep + filename
-                )
+                logger.warning(warning_message + ". File " + root + os.sep + filename)
 
     def handle_removed_fields(self, removed_fields):
-        """ Give warnings if field_name is found on the code. To minimize two
+        """Give warnings if field_name is found on the code. To minimize two
         many false positives we search for field name on this situations:
          * with simple/double quotes
          * prefixed with dot and with space, comma or equal after the string
         For now this handler is simple but the idea would be to improve it
         with deeper analysis and direct replaces if it is possible and secure.
         For that analysis model_name could be used
-         """
+        """
         res = {}
         for model_name, field_name, more_info in removed_fields:
-            msg = 'On the model %s, the field %s was deprecated.%s' % (
-                    model_name, field_name,
-                    ' %s' % more_info if more_info else ''
-                )
+            msg = "On the model %s, the field %s was deprecated.%s" % (
+                model_name,
+                field_name,
+                " %s" % more_info if more_info else "",
+            )
             res[r"""(['"]{0}['"]|\.{0}[\s,=])""".format(field_name)] = msg
-        return {'warnings': res}
+        return {"warnings": res}
 
     def handle_renamed_fields(self, removed_fields):
-        """ Give warnings if old_field_name is found on the code. To minimize
+        """Give warnings if old_field_name is found on the code. To minimize
          two many false positives we search for field name on this situations:
          * with simple/double quotes
          * prefixed with dot and with space, comma or equal after the string
         For now this handler is simple but the idea would be to improve it
         with deeper analysis and direct replaces if it is possible and secure.
         For that analysis model_name could be used
-         """
+        """
         res = {}
-        for model_name, old_field_name, new_field_name, more_info in \
-                removed_fields:
-            msg = 'On the model %s, the field %s was renamed to %s.%s' % (
-                    model_name, old_field_name, new_field_name,
-                    ' %s' % more_info if more_info else ''
-                )
+        for model_name, old_field_name, new_field_name, more_info in removed_fields:
+            msg = "On the model %s, the field %s was renamed to %s.%s" % (
+                model_name,
+                old_field_name,
+                new_field_name,
+                " %s" % more_info if more_info else "",
+            )
             res[r"""(['"]{0}['"]|\.{0}[\s,=])""".format(old_field_name)] = msg
-        return {'warnings': res}
+        return {"warnings": res}
 
     def handle_deprecated_modules(self, manifest_path, deprecated_modules):
         current_manifest_text = tools._read_content(manifest_path)
@@ -269,34 +266,38 @@ class BaseMigrationScript(object):
             if not re.findall(old_module_pattern, new_manifest_text):
                 continue
 
-            if action == 'removed':
+            if action == "removed":
                 # The module has been removed, just log an error.
-                logger.error(
-                    "Depends on removed module '%s'" % (old_module))
+                logger.error("Depends on removed module '%s'" % (old_module))
 
-            elif action == 'renamed':
+            elif action == "renamed":
                 new_manifest_text = re.sub(
-                    old_module_pattern, replace_pattern, new_manifest_text)
+                    old_module_pattern, replace_pattern, new_manifest_text
+                )
                 logger.info(
-                    "Replaced dependency of '%s' by '%s'." % (
-                        old_module, new_module))
+                    "Replaced dependency of '%s' by '%s'." % (old_module, new_module)
+                )
 
-            elif action == 'oca_moved':
+            elif action == "oca_moved":
                 new_manifest_text = re.sub(
-                    old_module_pattern, replace_pattern, new_manifest_text)
+                    old_module_pattern, replace_pattern, new_manifest_text
+                )
                 logger.warning(
                     "Replaced dependency of '%s' by '%s' (%s)\n"
-                    "Check that '%s' is available on your system." % (
-                        old_module, new_module, items[3], new_module))
+                    "Check that '%s' is available on your system."
+                    % (old_module, new_module, items[3], new_module)
+                )
 
             elif action == "merged":
                 if not re.findall(new_module_pattern, new_manifest_text):
                     # adding dependency of the merged module
                     new_manifest_text = re.sub(
-                        old_module_pattern, replace_pattern, new_manifest_text)
+                        old_module_pattern, replace_pattern, new_manifest_text
+                    )
                     logger.info(
-                        "'%s' merged in '%s'. Replacing dependency." % (
-                            old_module, new_module))
+                        "'%s' merged in '%s'. Replacing dependency."
+                        % (old_module, new_module)
+                    )
                 else:
                     # TODO, improve me. we should remove the dependency
                     # but it could generate coma trouble.
@@ -304,45 +305,42 @@ class BaseMigrationScript(object):
                     # the problem.
                     logger.error(
                         "'%s' merged in '%s'. You should remove the"
-                        " dependency to '%s' manually." % (
-                            old_module, new_module, old_module))
+                        " dependency to '%s' manually."
+                        % (old_module, new_module, old_module)
+                    )
         if current_manifest_text != new_manifest_text:
             tools._write_content(manifest_path, new_manifest_text)
 
     def _get_correct_manifest_path(self, manifest_path, file_renames):
-        current_manifest_file_name = manifest_path.as_posix().split('/')[-1]
+        current_manifest_file_name = manifest_path.as_posix().split("/")[-1]
         if current_manifest_file_name in file_renames:
             new_manifest_file_name = manifest_path.as_posix().replace(
-                current_manifest_file_name,
-                file_renames[current_manifest_file_name]
+                current_manifest_file_name, file_renames[current_manifest_file_name]
             )
             manifest_path = pathlib.Path(new_manifest_file_name)
         return manifest_path
 
-    def _rename_file(self,
-                     module_path,
-                     old_file_path,
-                     new_file_path,
-                     commit_enabled):
+    def _rename_file(self, module_path, old_file_path, new_file_path, commit_enabled):
         """
         Rename a file. try to execute 'git mv', to avoid huge diff.
 
         if 'git mv' fails, make a classical rename
         """
         logger.info(
-            "Renaming file: '%s' by '%s' " % (
+            "Renaming file: '%s' by '%s' "
+            % (
                 old_file_path.replace(str(module_path.resolve()), ""),
-                new_file_path.replace(str(module_path.resolve()), ""))
+                new_file_path.replace(str(module_path.resolve()), ""),
+            )
         )
         try:
             if commit_enabled:
                 _execute_shell(
-                    "git mv %s %s" % (old_file_path, new_file_path),
-                    path=module_path)
+                    "git mv %s %s" % (old_file_path, new_file_path), path=module_path
+                )
             else:
                 _execute_shell(
-                    "mv %s %s" % (old_file_path, new_file_path),
-                    path=module_path
+                    "mv %s %s" % (old_file_path, new_file_path), path=module_path
                 )
         except BaseException:
             logger.error(traceback.format_exc())
