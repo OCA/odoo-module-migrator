@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_stock_production_user,stock.production.lot,stock.model_stock_production_lot,quality.group_quality_user,1,0,0,0
