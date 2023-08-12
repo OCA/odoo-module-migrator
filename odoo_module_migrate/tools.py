@@ -27,7 +27,7 @@ def _get_latest_version_code():
 
 def _execute_shell(shell_command, path=False, raise_error=True):
     if path:
-        shell_command = "cd %s && %s" % (str(path.resolve()), shell_command)
+        shell_command = "cd '%s' && %s" % (str(path.resolve()), shell_command)
     logger.debug("Execute Shell:\n%s" % (shell_command))
     if raise_error:
         return subprocess.check_output(shell_command, shell=True)
