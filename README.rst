@@ -10,6 +10,8 @@
 odoo-module-migrator
 ====================
 
+TODO documentar uso con controlador
+
 ``odoo-module-migrator`` is a python3 library that allows you to automatically migrate
 module code to make it compatible with newer Odoo versions.
 For example:
