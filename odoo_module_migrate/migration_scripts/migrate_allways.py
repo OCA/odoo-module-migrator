@@ -7,6 +7,7 @@ from odoo_module_migrate.base_migration_script import BaseMigrationScript
 _TEXT_REPLACES = {
     ".xml": {
         r"<data +noupdate=\"0\" *>": "<data>",
+        r"<(tree.+)(string=\"[^\"]+\"\s)": r"<\1",
     }
 }
 
