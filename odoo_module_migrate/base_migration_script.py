@@ -399,7 +399,10 @@ class BaseMigrationScript(object):
             table_name = model_name.replace(".", "_")
             model_name_esc = re.escape(model_name)
 
-            msg = "The model %s has been .%s" % (model_name, (" %s" % more_info) or "")
+            msg = "The model %s has been deprecated.%s" % (
+                model_name,
+                (" %s" % more_info) or "",
+            )
 
             res["errors"].update(
                 {
