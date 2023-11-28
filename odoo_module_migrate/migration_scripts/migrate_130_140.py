@@ -7,6 +7,7 @@ import re
 from pathlib import Path
 import lxml.etree as et
 from odoo_module_migrate.base_migration_script import BaseMigrationScript
+from ..tools import get_files
 
 
 def src_model_new_value(field_elem, model_dot_name):
@@ -112,15 +113,6 @@ def _reformat_file(file_path: Path):
     return file_path
 
 
-def _get_files(module_path, reformat_file_ext):
-    """Get files to be reformatted."""
-    file_paths = list()
-    if not module_path.is_dir():
-        raise Exception(f"'{module_path}' is not a directory")
-    file_paths.extend(module_path.rglob("*" + reformat_file_ext))
-    return file_paths
-
-
 def reformat_deprecated_tags(
     logger, module_path, module_name, manifest_path, migration_steps, tools
 ):
@@ -130,8 +122,8 @@ def reformat_deprecated_tags(
     they have to be substituted by the `record` tag.
     """
 
-    reformat_file_ext = ".xml"
-    file_paths = _get_files(module_path, reformat_file_ext)
+    reformat_file_ext = (".xml")
+    file_paths = get_files(module_path, reformat_file_ext)
     logger.debug(f"{reformat_file_ext} files found:\n" f"{list(map(str, file_paths))}")
 
     reformatted_files = list()
