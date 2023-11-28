@@ -169,7 +169,6 @@ def replace_ustr(
             logger.error(f"Error processing file {file}: {str(e)}")
 
 
-<<<<<<< HEAD
 def replace_editable_attribute(
     logger, module_path, module_name, manifest_path, migration_steps, tools
 ):

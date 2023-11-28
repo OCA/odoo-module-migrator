@@ -335,7 +335,7 @@ class BaseMigrationScript(object):
 
         all_files = []
         for root, directories, filenames in os.walk(module_path.resolve()):
-            if 'migrations' in root.split(os.sep):
+            if "migrations" in root.split(os.sep):
                 continue
             for filename in filenames:
                 extension = os.path.splitext(filename)[1]

@@ -122,7 +122,7 @@ def reformat_deprecated_tags(
     they have to be substituted by the `record` tag.
     """
 
-    reformat_file_ext = (".xml")
+    reformat_file_ext = [".xml"]
     file_paths = get_files(module_path, reformat_file_ext)
     logger.debug(f"{reformat_file_ext} files found:\n" f"{list(map(str, file_paths))}")
 
