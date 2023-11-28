@@ -7,6 +7,7 @@ import sys
 import os
 import ast
 from typing import Any
+from ..tools import get_files
 
 empty_list = ast.parse("[]").body[0].value
 
@@ -236,13 +237,6 @@ def replace_read_group_signature(logger, filename):
             file.write(new_all)
 
 
-def _get_files(module_path, reformat_file_ext):
-    """Get files to be reformatted."""
-    file_paths = list()
-    if not module_path.is_dir():
-        raise Exception(f"'{module_path}' is not a directory")
-    file_paths.extend(module_path.rglob("*" + reformat_file_ext))
-    return file_paths
 
 
 def _check_open_form_view(logger, file_path: Path):
@@ -406,8 +400,8 @@ def _move_attrs_to_attributes_view(logger, file_path: Path):
 def _check_open_form(
     logger, module_path, module_name, manifest_path, migration_steps, tools
 ):
-    reformat_file_ext = ".xml"
-    file_paths = _get_files(module_path, reformat_file_ext)
+    reformat_file_ext = (".xml")
+    file_paths = get_files(module_path, reformat_file_ext)
     logger.debug(f"{reformat_file_ext} files found:\n" f"{list(map(str, file_paths))}")
 
     for file_path in file_paths:
@@ -430,8 +424,8 @@ def _reformat_read_group(
 ):
     """Reformat read_group method in py files."""
 
-    reformat_file_ext = ".py"
-    file_paths = _get_files(module_path, reformat_file_ext)
+    reformat_file_ext = (".py")
+    file_paths = get_files(module_path, reformat_file_ext)
     logger.debug(f"{reformat_file_ext} files found:\n" f"{list(map(str, file_paths))}")
 
     reformatted_files = list()
