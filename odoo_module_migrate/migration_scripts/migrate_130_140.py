@@ -7,6 +7,7 @@ import re
 from pathlib import Path
 import lxml.etree as et
 from odoo_module_migrate.base_migration_script import BaseMigrationScript
+from ..tools import _get_files
 
 
 def src_model_new_value(field_elem, model_dot_name):
@@ -110,15 +111,6 @@ def _reformat_file(file_path: Path):
     # Write the file out again
     file_path.write_text(xml_file)
     return file_path
-
-
-def _get_files(module_path, reformat_file_ext):
-    """Get files to be reformatted."""
-    file_paths = list()
-    if not module_path.is_dir():
-        raise Exception(f"'{module_path}' is not a directory")
-    file_paths.extend(module_path.rglob("*" + reformat_file_ext))
-    return file_paths
 
 
 def reformat_deprecated_tags(

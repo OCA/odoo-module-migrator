@@ -62,3 +62,12 @@ def _replace_in_file(file_path, replaces, log_message=False):
         logger.info(log_message)
         _write_content(file_path, new_text)
     return new_text
+
+
+def _get_files(module_path, reformat_file_ext):
+    """Get files to be reformatted."""
+    file_paths = list()
+    if not module_path.is_dir():
+        raise Exception(f"'{module_path}' is not a directory")
+    file_paths.extend(module_path.rglob("*" + reformat_file_ext))
+    return file_paths
