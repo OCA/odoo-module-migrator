@@ -2,6 +2,7 @@
 # @author: Sylvain LE GAL (https://twitter.com/legalsylvain)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+import ast
 import subprocess
 import re
 
@@ -62,3 +63,69 @@ def _replace_in_file(file_path, replaces, log_message=False):
         logger.info(log_message)
         _write_content(file_path, new_text)
     return new_text
+
+
+def _get_manifest_dict(manifest_path):
+    """
+    :param module: The name of the module (sale, purchase, ...)"""
+    if not manifest_path:
+        return {}
+    # default values for descriptor
+    info = {
+        "application": False,
+        "author": "Odoo S.A.",
+        "auto_install": False,
+        "category": "Uncategorized",
+        "depends": [],
+        "description": "",
+        "installable": True,
+        "license": "LGPL-3",
+        "post_load": None,
+        "version": "1.0",
+        "web": False,
+        "sequence": 100,
+        "summary": "",
+        "website": "",
+    }
+    info.update(
+        zip(
+            "depends data demo test init_xml update_xml demo_xml".split(),
+            iter(list, None),
+        )
+    )
+
+    f = open(manifest_file, mode="rb")
+    try:
+        info.update(ast.literal_eval(pycompat.to_text(f.read())))
+    finally:
+        f.close()
+
+    if not info.get("description"):
+        readme_path = [
+            opj(manifest_path, x)
+            for x in README
+            if os.path.isfile(opj(manifest_path, x))
+        ]
+        if readme_path:
+            with open(readme_path[0]) as fd:
+                info["description"] = fd.read()
+
+    # auto_install is set to `False` if disabled, and a set of
+    # auto_install dependencies otherwise. That way, we can set
+    # auto_install: [] to always auto_install a module regardless of its
+    # dependencies
+    auto_install = info.get("auto_install", info.get("active", False))
+    if isinstance(auto_install, collections.abc.Iterable):
+        info["auto_install"] = set(auto_install)
+        non_dependencies = info["auto_install"].difference(info["depends"])
+        assert not non_dependencies, (
+            "auto_install triggers must be dependencies, found "
+            "non-dependencies [%s] for module %s"
+            % (", ".join(non_dependencies), module)
+        )
+    elif auto_install:
+        info["auto_install"] = set(info["depends"])
+    else:
+        info["auto_install"] = False
+
+    return info
