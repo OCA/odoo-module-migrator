@@ -2,10 +2,11 @@
 # @author: Mihai Fekete (https://github.com/NextERP-Romania)
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-import re
-import lxml
+import ast
+import json
+import lxml.etree as et
+import os
 
-from pathlib import Path
 from odoo_module_migrate.base_migration_script import BaseMigrationScript
 
 
@@ -19,13 +20,23 @@ def add_asset_to_manifest(assets, manifest):
         manifest["assets"][asset_type].extend(asset_files)
 
 
-def remove_asset_file_from_manifest(cr, logger, file, manifest):
+def remove_asset_file_from_manifest(file, manifest):
     """Remove asset file from manifest views."""
     if "data" not in manifest:
         return
-    for file in manifest["data"]:
-        if file == file:
+    for file_path in manifest["data"]:
+        if file_path == file:
             manifest["data"].remove(file)
+
+
+def remove_node_from_xml(record_node, node):
+    """Remove a node from an XML tree."""
+    to_remove = True
+    if node.getchildren():
+        to_remove = False
+    if to_remove:
+        parent = node.getparent() or record_node
+        parent.remove(node)
 
 
 def reformat_assets_definition(
@@ -33,14 +44,8 @@ def reformat_assets_definition(
 ):
     """Reformat assets declaration in XML files."""
 
-    manifest = {}
-    import ipdb
-
-    ipdb.set_trace()
-    f = open(manifest_path, "r")
-    text = f.read()
-    manifest = lxml.etree.parse(text)
-    current_manifest_text = tools._read_content(manifest_path)
+    manifest = tools._get_manifest_dict(manifest_path)
+    parser = et.XMLParser(remove_blank_text=True)
     assets_views = [
         "web.assets_backend",
         "web.assets_common",
@@ -51,22 +56,41 @@ def reformat_assets_definition(
         "website.assets_editor",
         "website.assets_frontend_editor",
         "website.assets_wysiwyg",
+        "web_enterprise.assets_backend",
+        "web_enterprise.assets_common",
+        "web_enterprise._assets_backend_helpers",
     ]
-    for f in manifest.get("data", []):
-        if not f.endswith(".xml"):
+    for file_path in manifest.get("data", []):
+        if not file_path.endswith(".xml"):
             continue
-        f = open(os.path.join(module, f), "r")
-        text = f.read()
-        doc = lxml.etree.parse(fp)
-        for node in doc.xpath(xpath):
+        xml_file = open(os.path.join(module_path, file_path), "r")
+        tree = et.parse(xml_file, parser)
+        record_node = tree.getroot()
+        for node in record_node.getchildren():
             if node.get("inherit_id") in assets_views:
-                for line in node.xpath("xpath[@expr]"):
-                    if line.get("src"):
-                        add_asset_to_manifest(
-                            {node.get("inherit_id"): line.get("src")},
-                            manifest,
-                        )
-                        node.remove(line)
+                for xpath_elem in node.xpath("xpath[@expr]"):
+                    for file in xpath_elem.getchildren():
+                        elem_file_path = False
+                        if file.get("src"):
+                            elem_file_path = ["".join(file.get("src"))]
+                        elif file.get("href"):
+                            elem_file_path = ["".join(file.get("href"))]
+                        if elem_file_path:
+                            add_asset_to_manifest(
+                                {node.get("inherit_id"): elem_file_path},
+                                manifest,
+                            )
+                            remove_node_from_xml(record_node, file)
+                    remove_node_from_xml(record_node, xpath_elem)
+            remove_node_from_xml(record_node, node)
+        # write back the node to the XML file
+        with open(os.path.join(module_path, file_path), "wb") as f:
+            et.indent(tree)
+            tree.write(f, encoding="utf-8", xml_declaration=True)
+        if not record_node.getchildren():
+            remove_asset_file_from_manifest(file_path, manifest)
+            os.remove(os.path.join(module_path, file_path))
+    tools._write_content(manifest_path, json.dumps(manifest, indent=4, default=str))
 
 
 class MigrationScript(BaseMigrationScript):
