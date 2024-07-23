@@ -3,8 +3,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 import ast
-import copy
-import json
 import re
 import subprocess
 
@@ -65,14 +63,6 @@ def _replace_in_file(file_path, replaces, log_message=False):
         logger.info(log_message)
         _write_content(file_path, new_text)
     return new_text
-
-
-def _get_manifest_dict(manifest_path):
-    if not manifest_path:
-        return {}
-    text_file = _read_content(manifest_path)
-    json_data = json.loads(text_file)
-    return json_data
 
 
 def _get_manifest_dict(manifest_path):
