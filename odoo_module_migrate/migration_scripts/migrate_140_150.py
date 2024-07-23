@@ -35,7 +35,7 @@ def remove_node_from_xml(record_node, node):
     if node.getchildren():
         to_remove = False
     if to_remove:
-        parent = node.getparent() or record_node
+        parent = node.getparent() if node.getparent() is not None else record_node
         parent.remove(node)
 
 
