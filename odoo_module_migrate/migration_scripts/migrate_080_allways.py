@@ -6,6 +6,11 @@ from odoo_module_migrate.base_migration_script import BaseMigrationScript
 
 _FILE_RENAMES = {"__openerp__.py": "__manifest__.py"}
 
+_TEXT_ERRORS = {
+    ".xml": {
+        r'<xpath\s+expr="[^"]*\[@string=': "Error: The '@string=' xpath expression is deprecated.",
+    }
+}
 _TEXT_REPLACES = {
     ".py": {"from openerp": "from odoo", "import openerp": "import odoo"},
     ".xml": {
@@ -19,3 +24,4 @@ class MigrationScript(BaseMigrationScript):
 
     _FILE_RENAMES = _FILE_RENAMES
     _TEXT_REPLACES = _TEXT_REPLACES
+    _TEXT_ERRORS = _TEXT_ERRORS
