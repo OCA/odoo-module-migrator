@@ -4,6 +4,7 @@
 
 import subprocess
 import re
+import pathlib
 
 from .config import _AVAILABLE_MIGRATION_STEPS
 from .log import logger
@@ -62,3 +63,19 @@ def _replace_in_file(file_path, replaces, log_message=False):
         logger.info(log_message)
         _write_content(file_path, new_text)
     return new_text
+
+
+def get_files(module_path, extensions):
+    """
+    Returns a list of files with the specified extensions within the module_path.
+    """
+    file_paths = []
+    module_dir = pathlib.Path(module_path)
+
+    if not module_dir.is_dir():
+        raise Exception(f"'{module_path}' is not a valid directory.")
+
+    for ext in extensions:
+        file_paths.extend(module_dir.rglob(f"*{ext}"))
+
+    return file_paths

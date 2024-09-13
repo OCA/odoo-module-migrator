@@ -4,9 +4,42 @@
         <field name="name">res.partner.simplified.form</field>
         <field name="model">res.partner</field>
         <field name="arch" type="xml">
-            <field name="zip" position="after">
+            <!-- This is a list view for partners -->
+            <list position="inside">
                 <field name="test_field_1"/>
-            </field>
+            </list>
         </field>
+    </record>
+    
+    <record id="view_partner_form" model="ir.ui.view">
+        <field name="name">res.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <field name="view_mode">list,form</field>
+        </field>
+    </record>
+
+    <record id="view_partner_tree" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="create">false</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_partner_complex" model="ir.ui.view">
+        <field name="name">res.partner.complex.view</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <list>
+                    <field name="name"/>
+                </list>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_partner_ref" model="ir.ui.view">
+        <field name="view_ref">list_view_ref</field>
     </record>
 </odoo>
