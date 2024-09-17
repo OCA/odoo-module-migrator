@@ -2,8 +2,9 @@
 # @author: Sylvain LE GAL (https://twitter.com/legalsylvain)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-import subprocess
+import ast
 import re
+import subprocess
 
 from .config import _AVAILABLE_MIGRATION_STEPS
 from .log import logger
@@ -62,3 +63,13 @@ def _replace_in_file(file_path, replaces, log_message=False):
         logger.info(log_message)
         _write_content(file_path, new_text)
     return new_text
+
+
+def _get_manifest_dict(manifest_path):
+    """Load the module manifest from the file system."""
+    manifest = {}
+    if not manifest_path:
+        return {}
+    with open(manifest_path, mode="r") as f:
+        manifest.update(ast.literal_eval(f.read()))
+    return manifest
