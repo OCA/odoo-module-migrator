@@ -84,8 +84,25 @@ def replace_chatter_blocks(
             logger.error(f"Error processing file {file}: {str(e)}")
 
 
+def replace_user_has_groups(
+    logger, module_path, module_name, manifest_path, migration_steps, tools
+):
+    files_to_process = tools.get_files(module_path, (".py"))
+    replaces = {
+        r"self\.user_has_groups\(\s*(['\"])([\w\.]+)\1\s*\)": r"self.env.user.has_group(\1\2\1)",
+        r"self\.user_has_groups\(\s*(['\"])([^'\"]*[,!][^'\"]*?)\1\s*\)": r"self.env.user.has_groups(\1\2\1)",
+    }
+
+    for file in files_to_process:
+        try:
+            tools._replace_in_file(file, replaces)
+        except Exception as e:
+            logger.error(f"Error processing file {file}: {str(e)}")
+
+
 class MigrationScript(BaseMigrationScript):
     _GLOBAL_FUNCTIONS = [
         replace_tree_with_list_in_views,
         replace_chatter_blocks,
+        replace_user_has_groups,
     ]
