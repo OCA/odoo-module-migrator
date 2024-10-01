@@ -50,6 +50,7 @@ class BaseMigrationScript(object):
         uri = base_url + endpoint
         self._requests = requests.Session()
         response = self._requests.get(uri)
+
         if response and response.ok:
             data_version_changes = response.json()
             return data_version_changes
@@ -132,6 +133,7 @@ class BaseMigrationScript(object):
                         rules[rule]["doc"].extend(new_rules)
 
         # Read form controller
+
         data_version_changes = self._get_controller_data(migrate_from_to)
         if data_version_changes:
             for change in data_version_changes.values():
@@ -163,7 +165,12 @@ class BaseMigrationScript(object):
                 ):
                     # [(model_name, old_field_name, new_field_name, more_info), ...)]
                     new_rules = [
-                        [change["model"], change["old_name"], change["new_name"], change["notes"]]
+                        [
+                            change["model"],
+                            change["old_name"],
+                            change["new_name"],
+                            change["notes"],
+                        ]
                     ]
                     rules["_RENAMED_FIELDS"]["doc"].extend(new_rules)
 
@@ -182,6 +189,33 @@ class BaseMigrationScript(object):
                     # [(model_name, field_name, more_info), ...)]
                     new_rules = [[change["model"], change["old_name"], change["notes"]]]
                     rules["_REMOVED_FIELDS"]["doc"].extend(new_rules)
+
+                if (
+                    change["change_type"] == "rename"
+                    and change["model_type"] == "xmlid"
+                ):
+                    # [(model_name, old_field_name, new_field_name, more_info), ...)]
+                    new_rules = [
+                        [
+                            change["model"],
+                            change["old_name"],
+                            change["new_name"],
+                            change["notes"],
+                        ]
+                    ]
+                    warnings = rules["_TEXT_REPLACES"]["doc"].get("*", {})
+                    warnings[change["old_name"]] = change["new_name"]
+                    rules["_TEXT_REPLACES"]["doc"]["*"] = warnings
+
+                if (
+                    change["change_type"] == "remove"
+                    and change["model_type"] == "xmlid"
+                ):
+                    # [(model_name, field_name, more_info), ...)]
+                    warnings = rules["_TEXT_WARNINGS"]["doc"].get("*", {})
+                    warnings[change["old_name"]] = change["notes"]
+                    rules["_TEXT_WARNINGS"]["doc"]["*"] = warnings
+
         # extend
         for rule, data in rules.items():
             rtype = data["type"]
