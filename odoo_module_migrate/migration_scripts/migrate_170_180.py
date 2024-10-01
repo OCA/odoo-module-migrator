@@ -51,5 +51,41 @@ def replace_tree_with_list_in_views(
             logger.error(f"Error processing file {file}: {str(e)}")
 
 
+def replace_chatter_blocks(
+    logger, module_path, module_name, manifest_path, migration_steps, tools
+):
+    files_to_process = tools.get_files(module_path, (".xml",))
+
+    reg_chatter_block = r"""<div class=["']oe_chatter["'](?![^>]*position=["'][^"']+["'])[^>]*>[\s\S]*?</div>"""
+    reg_xpath_chatter = r"""//div\[hasclass\(['"]oe_chatter['"]\)\]"""
+    reg_chatter_with_position_self_closing = (
+        r"""<div class=["']oe_chatter["']\s*(position=["'][^"']+["'])\s*/>"""
+    )
+
+    replacement_div = "<chatter/>"
+    replacement_xpath = "//chatter"
+
+    def replace_chatter_self_closing(match):
+        position = match.group(1)
+        return f"<chatter {position}/>"
+
+    replaces = {
+        reg_chatter_block: replacement_div,
+        reg_xpath_chatter: replacement_xpath,
+        reg_chatter_with_position_self_closing: replace_chatter_self_closing,
+    }
+
+    for file in files_to_process:
+        try:
+            tools._replace_in_file(
+                file, replaces, log_message=f"Updated chatter blocks in file: {file}"
+            )
+        except Exception as e:
+            logger.error(f"Error processing file {file}: {str(e)}")
+
+
 class MigrationScript(BaseMigrationScript):
-    _GLOBAL_FUNCTIONS = [replace_tree_with_list_in_views]
+    _GLOBAL_FUNCTIONS = [
+        replace_tree_with_list_in_views,
+        replace_chatter_blocks,
+    ]

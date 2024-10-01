@@ -42,4 +42,24 @@
     <record id="view_partner_ref" model="ir.ui.view">
         <field name="view_ref">list_view_ref</field>
     </record>
+
+    <record id="chatter_form" model="ir.ui.view">
+        <field name="name">res.partner.chatter.form</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <chatter/>
+
+            <xpath expr="//chatter" position="replace"/>
+
+            <xpath expr="//chatter" position="after">
+                <div>
+                    <field name="test"/>
+                </div>
+            </xpath>
+
+            <chatter position="replace"/>
+
+            <chatter/>
+        </field>
+    </record>
 </odoo>
