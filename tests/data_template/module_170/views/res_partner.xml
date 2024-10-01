@@ -42,4 +42,31 @@
     <record id="view_partner_ref" model="ir.ui.view">
         <field name="view_ref">tree_view_ref</field>
     </record>
+
+    <record id="chatter_form" model="ir.ui.view">
+        <field name="name">res.partner.chatter.form</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <div class="oe_chatter">
+                <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                <field name="message_ids" widget="mail_thread"/>
+                <field name="activity_ids" widget="mail_activity"/>
+            </div>
+
+            <xpath expr="//div[hasclass('oe_chatter')]" position="replace"/>
+
+            <xpath expr="//div[hasclass('oe_chatter')]" position="after">
+                <div>
+                    <field name="test"/>
+                </div>
+            </xpath>
+
+            <div class="oe_chatter" position="replace"/>
+
+            <div class="oe_chatter">
+                <field name="message_follower_ids"/>
+                <field name="message_ids"/>
+            </div>
+        </field>
+    </record>
 </odoo>
