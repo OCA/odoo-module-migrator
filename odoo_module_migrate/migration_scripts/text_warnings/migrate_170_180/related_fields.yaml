@@ -1,0 +1,2 @@
+.py:
+  related=.*store=True: "[18] It is no longer necessary to set store=True on related fields to group, aggregate, or sort them. Remove store=True unless it is strictly required. More details: https://github.com/odoo/odoo/pull/127353"
