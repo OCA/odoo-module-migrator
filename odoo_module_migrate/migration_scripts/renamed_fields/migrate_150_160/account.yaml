@@ -1,1 +1,3 @@
 - ['account.account', 'user_type_id', 'account_type', 'Commit https://github.com/odoo/odoo/commit/26b2472f4977ccedbb0b5ed5f']
+- ['account.account', 'internal_type', 'account_type', 'Commit https://github.com/odoo/odoo/commit/26b2472f4977ccedbb0b5ed5f08be2c04313fd21']
+- ['account.move.line', 'analytic_account_id', 'analytic_distribution', 'Commit https://github.com/odoo/odoo/commit/7064c95aa04e5138bb12ae97acfee04ebb67cc0e']
