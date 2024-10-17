@@ -1,0 +1,3 @@
+.xml:
+  numbercall: "The 'numbercall' field has been removed. More details: https://github.com/odoo/odoo/commit/2700dd3fd4c45b5282d3803182dfffdfc4418ad8"
+  doall: "The 'doall' field has been removed. More details: https://github.com/odoo/odoo/commit/2700dd3fd4c45b5282d3803182dfffdfc4418ad8"
