@@ -40,3 +40,12 @@ class ResPartner(models.Model):
 
         if self.env.user.has_groups("base.group_user,!base.group_manager,!base.group"):
             pass
+    
+    def example_method_access(self):
+        self.env['account.move'].check_access('read')
+        self.env['account.move'].check_access('write')
+        self.env['account.move']._filter_access('read')
+        self.env['account.move']._filter_access('read')
+        
+        if not self.env['account.move'].has_access('read'):
+            pass
