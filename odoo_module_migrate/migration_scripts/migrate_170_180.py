@@ -100,9 +100,30 @@ def replace_user_has_groups(
             logger.error(f"Error processing file {file}: {str(e)}")
 
 
+def replace_access_methods(
+    logger, module_path, module_name, manifest_path, migration_steps, tools
+):
+    files_to_process = tools.get_files(module_path, (".py",))
+
+    replaces = {
+        r"\.check_access_rights\(['\"](\w+)['\"],\s*raise_exception=False\)": r".has_access('\1')",
+        r"\.check_access_rights\(['\"](\w+)['\"]\)": r".check_access('\1')",
+        r"\.check_access_rule\(['\"](\w+)['\"]\)": r".check_access('\1')",
+        r"_filter_access_rule\(['\"](\w+)['\"]\)": r"_filter_access('\1')",
+        r"_filter_access_rule_python\(['\"](\w+)['\"]\)": r"_filter_access('\1')",
+    }
+
+    for file in files_to_process:
+        try:
+            tools._replace_in_file(file, replaces)
+        except Exception as e:
+            logger.error(f"Error processing file {file}: {str(e)}")
+
+
 class MigrationScript(BaseMigrationScript):
     _GLOBAL_FUNCTIONS = [
         replace_tree_with_list_in_views,
         replace_chatter_blocks,
         replace_user_has_groups,
+        replace_access_methods,
     ]
