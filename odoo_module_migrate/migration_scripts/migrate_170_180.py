@@ -100,9 +100,42 @@ def replace_user_has_groups(
             logger.error(f"Error processing file {file}: {str(e)}")
 
 
+def replace_slugify(
+    logger, module_path, module_name, manifest_path, migration_steps, tools
+):
+    files_to_process = tools.get_files(module_path, (".py"))
+
+    for file in files_to_process:
+        try:
+            content = tools._read_content(file)
+            content = re.sub(
+                r"from\s+odoo\.addons\.http_routing\.models\.ir_http\s+import\s+slugify\b.*\n",
+                "",
+                content,
+            )
+            # process in controller (*.py) file are using request
+            has_request = "request" in content
+            if has_request:
+                content = re.sub(
+                    r"""(?<!request\.)\bslugify\(([^)]+)\)""",
+                    r"""request.env["ir.http"]._slugify(\1)""",
+                    content,
+                )
+            else:
+                content = re.sub(
+                    r"""\bslugify\(([^)]+)\)""",
+                    r"""self.env["ir.http"]._slugify(\1)""",
+                    content,
+                )
+            tools._write_content(file, content)
+        except Exception as e:
+            logger.error(f"Error processing file {file}: {str(e)}")
+
+
 class MigrationScript(BaseMigrationScript):
     _GLOBAL_FUNCTIONS = [
         replace_tree_with_list_in_views,
         replace_chatter_blocks,
         replace_user_has_groups,
+        replace_slugify,
     ]
