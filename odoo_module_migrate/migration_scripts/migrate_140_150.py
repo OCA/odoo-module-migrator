@@ -91,8 +91,8 @@ def reformat_assets_definition(
             remove_asset_file_from_manifest(file_path, manifest)
             os.remove(os.path.join(module_path, file_path))
     manifest_content = json.dumps(manifest, indent=4, default=str)
-    manifest_content = manifest_content.replace(": true,", ": True,").replace(
-        ": false,", ": False,"
+    manifest_content = manifest_content.replace(": true", ": True").replace(
+        ": false", ": False"
     )
     tools._write_content(manifest_path, manifest_content)
 
