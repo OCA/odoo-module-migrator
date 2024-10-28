@@ -87,7 +87,7 @@ def replace_chatter_blocks(
 def replace_user_has_groups(
     logger, module_path, module_name, manifest_path, migration_steps, tools
 ):
-    files_to_process = tools.get_files(module_path, (".py"))
+    files_to_process = tools.get_files(module_path, (".py",))
     replaces = {
         r"self\.user_has_groups\(\s*(['\"])([\w\.]+)\1\s*\)": r"self.env.user.has_group(\1\2\1)",
         r"self\.user_has_groups\(\s*(['\"])([^'\"]*[,!][^'\"]*?)\1\s*\)": r"self.env.user.has_groups(\1\2\1)",
