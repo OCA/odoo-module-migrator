@@ -8,6 +8,9 @@
             <list position="inside">
                 <field name="test_field_1"/>
             </list>
+            <list position="attribute">
+                <attribute name="editable">bottom</attribute>
+            </list>
         </field>
     </record>
     
