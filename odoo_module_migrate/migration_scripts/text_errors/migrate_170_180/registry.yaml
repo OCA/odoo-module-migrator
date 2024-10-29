@@ -1,0 +1,9 @@
+.py:
+  from\s+odoo\s+import\s+([^,\n]+,)*\s*registry\s*(,[^,\n]+)*:
+    "The import of 'registry' should now be done as 'from odoo.modules.registry import Registry'. More details: https://github.com/odoo/odoo/pull/178784"
+
+  \bodoo\.registry\(([^)]+)\):
+    "'odoo.registry' should now be imported as 'from odoo.modules.registry import Registry' and replaced with 'Registry'. More details: https://github.com/odoo/odoo/pull/178784"
+
+  \bregistry\(([^)]+)\):
+    "The usage of 'registry' should now be replaced with 'Registry'. Make sure 'from odoo.modules.registry import Registry' is included at the beginning of your file. More details: https://github.com/odoo/odoo/pull/178784"
