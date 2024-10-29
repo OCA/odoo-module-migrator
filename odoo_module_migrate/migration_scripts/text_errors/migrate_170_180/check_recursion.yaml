@@ -1,0 +1,6 @@
+.py:
+  \b\w+\._check_recursion\([^)]*\):
+    "[Error] The method '_check_recursion' is deprecated and replaced by '_has_cycle' for performance improvements. More details: https://github.com/odoo/odoo/pull/162656"
+
+  \b\w+\._check_m2m_recursion\([^)]*\):
+    "[Error] The method '_check_m2m_recursion' is deprecated and replaced by '_has_cycle' for performance improvements in checking cyclic dependencies. More details: https://github.com/odoo/odoo/pull/162656"
