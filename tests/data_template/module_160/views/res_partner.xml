@@ -7,7 +7,7 @@
             <field name="zip" position="after">
                 <field name="test_field_1"/>
                 <field name="task_ids" editable="bottom">
-                    <tree editable="bottom" delete="false">
+                    <tree editable="bottom" string="remove_string" delete="false">
                         <field name="id"/>
                         <field name="name"/>
                         <button name="get_formview_action" type="object" title="Open Task" icon="fa-pencil-square-o"/>
