@@ -10,6 +10,7 @@
                     <tree editable="bottom" delete="false">
                         <field name="id"/>
                         <field name="name"/>
+                        <field name="active" widget="boolean_toggle" string="Still Active"/>
                         <button name="get_formview_action" type="object" title="Open Task" icon="fa-pencil-square-o"/>
                     </tree>
                 </field>
