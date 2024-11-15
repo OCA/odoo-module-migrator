@@ -7,6 +7,7 @@
             <!-- This is a tree view for partners -->
             <tree position="inside">
                 <field name="test_field_1"/>
+                <field name="active" widget='toggle_button'/>
             </tree>
         </field>
     </record>
@@ -35,6 +36,17 @@
                 <tree>
                     <field name="name"/>
                 </tree>
+            </xpath>
+            <xpath expr="//field[@name='active']" position="attributes">
+                <attribute name="widget">toggle_button</attribute>
+            </xpath>
+            <xpath expr="//field[@name='active']" position="attributes">
+                <attribute name="widget"> toggle_button</attribute>
+            </xpath>
+            <xpath expr="//field[@name='active']" position="attributes">
+                <attribute name="widget">
+                    toggle_button
+                </attribute>
             </xpath>
         </field>
     </record>
