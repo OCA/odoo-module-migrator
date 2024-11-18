@@ -32,10 +32,41 @@ class ResPartner(models.Model):
             pass
     
     def example_method_access(self):
+        operation = 'read'
         self.env['account.move'].check_access('read')
+        self.env['account.move'].check_access('read')
+        self.env['account.move'].check_access(operation)
+        self.env['account.move'].check_access(operation)
+
         self.env['account.move'].check_access('write')
+        self.env['account.move'].check_access('write')
+        self.env['account.move'].check_access(operation)
+        self.env['account.move'].check_access(operation)
+
         self.env['account.move']._filter_access('read')
         self.env['account.move']._filter_access('read')
-        
+        self.env['account.move']._filter_access(operation)
+        self.env['account.move']._filter_access(operation)
+
+        self.env['account.move']._filter_access('read')
+        self.env['account.move']._filter_access('read')
+        self.env['account.move']._filter_access(operation)
+        self.env['account.move']._filter_access(operation)
+
         if not self.env['account.move'].has_access('read'):
             pass
+
+        if not self.env['account.move'].has_access('read'):
+            pass
+
+        if not self.env['account.move'].has_access(operation):
+            pass
+
+        if not self.env['account.move'].has_access(operation):
+            pass
+
+    def check_access(self, operation: str) -> None:
+        pass
+
+    def check_access(self, operation: str = 'read') -> None:
+        pass

@@ -106,11 +106,51 @@ def replace_access_methods(
     files_to_process = tools.get_files(module_path, (".py",))
 
     replaces = {
+        # Fixed string operations with raise_exception=False
         r"\.check_access_rights\(['\"](\w+)['\"],\s*raise_exception=False\)": r".has_access('\1')",
+        # Fixed string with operation= label
+        r"\.check_access_rights\(operation=['\"](\w+)['\"],\s*raise_exception=False\)": r".has_access('\1')",
+        # Variable operations with raise_exception=False
+        r"\.check_access_rights\((\w+),\s*raise_exception=False\)": r".has_access(\1)",
+        # Variable with operation= label
+        r"\.check_access_rights\(operation=(\w+),\s*raise_exception=False\)": r".has_access(\1)",
+        # Fixed string without label
         r"\.check_access_rights\(['\"](\w+)['\"]\)": r".check_access('\1')",
+        # Fixed string with operation= label
+        r"\.check_access_rights\(operation=['\"](\w+)['\"]\)": r".check_access('\1')",
+        # Variable without label
+        r"\.check_access_rights\((\w+)\)": r".check_access(\1)",
+        # Variable with operation= label
+        r"\.check_access_rights\(operation=(\w+)\)": r".check_access(\1)",
+        # Fixed string without label
         r"\.check_access_rule\(['\"](\w+)['\"]\)": r".check_access('\1')",
-        r"_filter_access_rule\(['\"](\w+)['\"]\)": r"_filter_access('\1')",
-        r"_filter_access_rule_python\(['\"](\w+)['\"]\)": r"_filter_access('\1')",
+        # Fixed string with operation= label
+        r"\.check_access_rule\(operation=['\"](\w+)['\"]\)": r".check_access('\1')",
+        # Variable without label
+        r"\.check_access_rule\((\w+)\)": r".check_access(\1)",
+        # Variable with operation= label
+        r"\.check_access_rule\(operation=(\w+)\)": r".check_access(\1)",
+        # _filter_access_rule patterns
+        r"\._filter_access_rule\(['\"](\w+)['\"]\)": r"._filter_access('\1')",
+        # Fixed string with operation= label
+        r"\._filter_access_rule\(operation=['\"](\w+)['\"]\)": r"._filter_access('\1')",
+        # Variable without label
+        r"\._filter_access_rule\((\w+)\)": r"._filter_access(\1)",
+        # Variable with operation= label
+        r"\._filter_access_rule\(operation=(\w+)\)": r"._filter_access(\1)",
+        # _filter_access_rule_python patterns
+        # Fixed string operations
+        r"\._filter_access_rule_python\(['\"](\w+)['\"]\)": r"._filter_access('\1')",
+        # Fixed string with operation= label
+        r"\._filter_access_rule_python\(operation=['\"](\w+)['\"]\)": r"._filter_access('\1')",
+        # Variable without label
+        r"\._filter_access_rule_python\((\w+)\)": r"._filter_access(\1)",
+        # Variable with operation= label
+        r"\._filter_access_rule_python\(operation=(\w+)\)": r"._filter_access(\1)",
+        # Match method definition with raise_exception=True
+        r"def\s+check_access_rights\s*\(\s*self\s*,\s*operation\s*,\s*raise_exception\s*=\s*True\s*\)": r"def check_access(self, operation: str) -> None",
+        # Match method definition with operation default value and raise_exception=True
+        r"def\s+check_access_rights\s*\(\s*self\s*,\s*operation\s*=\s*['\"](\w+)['\"]\s*,\s*raise_exception\s*=\s*True\s*\)": r"def check_access(self, operation: str = '\1') -> None",
     }
 
     for file in files_to_process:
