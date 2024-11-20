@@ -74,6 +74,7 @@
                             <div>
                                 <field name="partner_id" />
                             </div>
+                            <field name="color" widget="kanban_color_picker"/>
                         </div>
                     </t>
                 </templates>
@@ -92,6 +93,7 @@
                             <div>
                                 <field name="partner_id" />
                             </div>
+                            <field name="color" widget="kanban_color_picker"/>
                         </div>
                     </t>
                 </templates>

@@ -121,9 +121,37 @@ def remove_deprecated_kanban_click_classes(
             logger.error(f"Error processing file {file}: {str(e)}")
 
 
+def replace_kanban_color_picker_widget(
+    logger, module_path, module_name, manifest_path, migration_steps, tools
+):
+    files_to_process = tools.get_files(module_path, (".xml",))
+
+    replaces = {
+        # Case 1: Match any ul tag containing both oe_kanban_colorpicker class and data-field
+        # Example: <ul class="oe_kanban_colorpicker some-class" data-field="color" some-attr="value"/>
+        # Example: <ul data-field="color" t-if="condition" class="oe_kanban_colorpicker other-class"/>
+        r'<ul[^>]*?class="[^"]*?oe_kanban_colorpicker[^"]*?"[^>]*?data-field="([^"]+)"[^>]*?>(?:</ul>)?': r'<field name="\1" widget="kanban_color_picker"/>',
+        # Case 2: Same as Case 1 but with data-field appearing before class
+        # Example: <ul data-field="color" class="some-class oe_kanban_colorpicker" some-attr="value"/>
+        # Example: <ul some-attr="value" data-field="color" class="oe_kanban_colorpicker"/>
+        r'<ul[^>]*?data-field="([^"]+)"[^>]*?class="[^"]*?oe_kanban_colorpicker[^"]*?"[^>]*?>(?:</ul>)?': r'<field name="\1" widget="kanban_color_picker"/>',
+    }
+
+    for file in files_to_process:
+        try:
+            tools._replace_in_file(
+                file,
+                replaces,
+                log_message=f"Replace kanban colorpicker with field widget in file: {file}",
+            )
+        except Exception as e:
+            logger.error(f"Error processing file {file}: {str(e)}")
+
+
 class MigrationScript(BaseMigrationScript):
     _GLOBAL_FUNCTIONS = [
         remove_deprecated_kanban_click_classes,
+        replace_kanban_color_picker_widget,
         replace_tree_with_list_in_views,
         replace_chatter_blocks,
         replace_user_has_groups,
