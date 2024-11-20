@@ -100,8 +100,30 @@ def replace_user_has_groups(
             logger.error(f"Error processing file {file}: {str(e)}")
 
 
+def remove_deprecated_kanban_click_classes(
+    logger, module_path, module_name, manifest_path, migration_steps, tools
+):
+    files_to_process = tools.get_files(module_path, (".xml",))
+
+    replaces = {
+        "oe_kanban_global_click_edit": "",
+        "oe_kanban_global_click": "",
+    }
+
+    for file in files_to_process:
+        try:
+            tools._replace_in_file(
+                file,
+                replaces,
+                log_message=f"Remove deprecated kanban click classes in file: {file}",
+            )
+        except Exception as e:
+            logger.error(f"Error processing file {file}: {str(e)}")
+
+
 class MigrationScript(BaseMigrationScript):
     _GLOBAL_FUNCTIONS = [
+        remove_deprecated_kanban_click_classes,
         replace_tree_with_list_in_views,
         replace_chatter_blocks,
         replace_user_has_groups,
