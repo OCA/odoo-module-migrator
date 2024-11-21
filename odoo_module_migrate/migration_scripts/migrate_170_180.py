@@ -148,10 +148,36 @@ def replace_kanban_color_picker_widget(
             logger.error(f"Error processing file {file}: {str(e)}")
 
 
+def remove_kanban_tooltip(
+    logger, module_path, module_name, manifest_path, migration_steps, tools
+):
+    files_to_process = tools.get_files(module_path, (".xml",))
+    reg_tooltip_template = (
+        r"""<t\s+t-name=["']kanban-tooltip["'][^>]*>[\s\S]*?</t>\s*"""
+    )
+    reg_tooltip_attr = r"""\s+tooltip=["']kanban-tooltip["']"""
+
+    replaces = {
+        reg_tooltip_template: "",
+        reg_tooltip_attr: "",
+    }
+
+    for file in files_to_process:
+        try:
+            tools._replace_in_file(
+                file,
+                replaces,
+                log_message=f"Removed kanban tooltip feature in file: {file}",
+            )
+        except Exception as e:
+            logger.error(f"Error processing file {file}: {str(e)}")
+
+
 class MigrationScript(BaseMigrationScript):
     _GLOBAL_FUNCTIONS = [
         remove_deprecated_kanban_click_classes,
         replace_kanban_color_picker_widget,
+        remove_kanban_tooltip,
         replace_tree_with_list_in_views,
         replace_chatter_blocks,
         replace_user_has_groups,
