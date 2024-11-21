@@ -101,6 +101,13 @@
                                 <field name="partner_id"/>
                             </div>
                             <field name="color" widget="kanban_color_picker"/>
+                            <div role="menuitem" class="col-4">
+                                <a
+                                        class="dropdown-item"
+                                        type="open"
+                                        role="menuitem"
+                                >Configuration</a>
+                            </div>
                         </div>
                     </t>
                 </templates>

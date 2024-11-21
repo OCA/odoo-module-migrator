@@ -119,6 +119,13 @@
                                 data-field="color"
                                 modifiers="{}"
                             />
+                            <div role="menuitem" class="col-4">
+                                <a
+                                        class="dropdown-item"
+                                        type="edit"
+                                        role="menuitem"
+                                >Configuration</a>
+                            </div>
                         </div>
                     </t>
                 </templates>

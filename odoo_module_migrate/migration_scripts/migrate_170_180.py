@@ -173,11 +173,35 @@ def remove_kanban_tooltip(
             logger.error(f"Error processing file {file}: {str(e)}")
 
 
+def replace_type_edit(
+    logger, module_path, module_name, manifest_path, migration_steps, tools
+):
+    """Replace type='edit' with type='open' in elements."""
+    files_to_process = tools.get_files(module_path, (".xml",))
+
+    reg_type_edit = r"""type=["']edit["']"""
+
+    replaces = {
+        reg_type_edit: 'type="open"',
+    }
+
+    for file in files_to_process:
+        try:
+            tools._replace_in_file(
+                file,
+                replaces,
+                log_message=f"Replaced type='edit' with type='open' in file: {file}",
+            )
+        except Exception as e:
+            logger.error(f"Error processing file {file}: {str(e)}")
+
+
 class MigrationScript(BaseMigrationScript):
     _GLOBAL_FUNCTIONS = [
         remove_deprecated_kanban_click_classes,
         replace_kanban_color_picker_widget,
         remove_kanban_tooltip,
+        replace_type_edit,
         replace_tree_with_list_in_views,
         replace_chatter_blocks,
         replace_user_has_groups,
