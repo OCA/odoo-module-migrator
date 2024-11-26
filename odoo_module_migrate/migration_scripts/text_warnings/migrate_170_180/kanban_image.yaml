@@ -1,0 +1,2 @@
+.xml:
+  kanban_image\(['"][^'"]+["']\s*,\s*['"][^'"]+["']\s*,\s*[^)]+\): "[18.0] The kanban_image helper is deprecated in favor of <field widget=\"image\"/>. More details: https://github.com/odoo/odoo/pull/167751/commits/6c5896724abee4cee0a26d0b41de9781c8e51621"
