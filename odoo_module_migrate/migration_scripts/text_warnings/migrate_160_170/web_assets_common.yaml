@@ -1,0 +1,2 @@
+"*":
+  web.assets_common: "[17] Reference to 'web.assets_common'. This bundle has been removed from odoo, see https://github.com/odoo/odoo/pull/132190"
