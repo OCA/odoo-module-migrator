@@ -5,3 +5,4 @@
 - ['hr.expense', 'total_amount_company', 'total_amount', 'Commit https://github.com/odoo/odoo/commit/68fbdc964038ef6a1cf0d3df773db101ca81794a']
 - ['hr.expense', 'sheet_is_editable', 'is_editable', 'Commit https://github.com/odoo/odoo/commit/68fbdc964038ef6a1cf0d3df773db101ca81794a']
 - ['hr.expense', 'attachment_number', 'nb_attachment', 'Commit https://github.com/odoo/odoo/commit/68fbdc964038ef6a1cf0d3df773db101ca81794a']
+- ['hr.employee', 'address_home_id', 'work_contact_id', 'Commit https://github.com/odoo/odoo/commit/e8c48f824e078d643a3385fb910707d5525e927d']
