@@ -1,3 +1,4 @@
-- ['account.move', 'type', 'move_type', 'Commit https://github.com/odoo/odoo/commit/d675dbaa4c7174591e0e7c1a3caf3e76877312ce']
-- ['account.move', 'invoice_payment_state', 'payment_state', 'Commit https://github.com/odoo/odoo/commit/8e4158af810bcf475214946fa64d3b0ce4d3b26d']
-- ['account.move', 'invoice_sent', 'is_move_sent', 'Commit https://github.com/odoo/odoo/commit/caeb782841fc5a7ad71a196e2c9ee67644ef9074']
+- ["account.move", "type", "move_type", "Commit https://github.com/odoo/odoo/commit/d675dbaa4c7174591e0e7c1a3caf3e76877312ce"]
+- ["account.move", "invoice_payment_state", "payment_state", "Commit https://github.com/odoo/odoo/commit/8e4158af810bcf475214946fa64d3b0ce4d3b26d"]
+- ["account.move", "invoice_sent", "is_move_sent", "Commit https://github.com/odoo/odoo/commit/caeb782841fc5a7ad71a196e2c9ee67644ef9074"]
+- ["account.bank.statement.line", "name", "payment_ref", "Commit https://github.com/odoo/odoo/commit/f3fe2d50d99698eb0261c2309bd63f9f64b3d703"]
