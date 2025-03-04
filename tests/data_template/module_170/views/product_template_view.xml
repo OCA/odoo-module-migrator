@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_product_template_list_custom" model="ir.ui.view">
+        <field name="name">product.template.list.custom</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <list editable="1">
+                <field name="name"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+</odoo>
