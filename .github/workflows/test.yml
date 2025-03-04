@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - "master"
+      - "master-ocabot-*"
 
 jobs:
   test:
