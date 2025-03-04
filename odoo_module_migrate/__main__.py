@@ -31,7 +31,7 @@ def get_parser():
         "--modules",
         dest="modules",
         type=str,
-        help="Targer Modules to migrate."
+        help="Target Modules to migrate."
         " If not set, all the modules present in the directory will be"
         " migrated.",
     )
