@@ -69,4 +69,44 @@
             </div>
         </field>
     </record>
+
+    <record id="res_partner_view_kanban" model="ir.ui.view">
+        <field name="name">res.partner.view.kanban</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="id"/>
+                <field name="image_1920"/>
+                <templates>
+                    <t t-name='kanban-card'>
+                        <img t-att-src='kanban_image("res.partner","image_1920",record.id.raw_value)'
+                        alt='Image' class='o_image_64_max'/>
+                        <strong class='o_kanban_record_title ms-2'><field name='name'/></strong>
+                    </t>
+                    <t t-name="kanban-menu">
+                        <a t-if="widget.deletable" role="menuitem" type="delete" class="dropdown-item">Delete</a>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="res_partner_view_kanban2" model="ir.ui.view">
+        <field name="name">res.partner.view.kanban</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="id"/>
+                <field name="image_1920"/>
+                <templates>
+                    <t t-name='kanban-box'>
+                        <img t-att-src='kanban_image("res.partner","image_1920",record.id.raw_value)'
+                        alt='Image' class='o_image_64_max'/>
+                        <strong class='o_kanban_record_title ms-2'><field name='name'/></strong>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
 </odoo>
