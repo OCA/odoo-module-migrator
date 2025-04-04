@@ -8,6 +8,9 @@
             <tree position="inside">
                 <field name="test_field_1"/>
             </tree>
+            <tree position="attribute">
+                <attribute name="editable">1</attribute>
+            </tree>
         </field>
     </record>
     

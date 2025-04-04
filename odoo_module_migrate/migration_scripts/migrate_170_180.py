@@ -100,9 +100,30 @@ def replace_user_has_groups(
             logger.error(f"Error processing file {file}: {str(e)}")
 
 
+def replace_editable_attribute(
+    logger, module_path, module_name, manifest_path, migration_steps, tools
+):
+    files_to_process = tools.get_files(module_path, (".xml", ".js", ".py"))
+    replaces = {
+        'editable="1"': 'editable="bottom"',
+        "editable='1'": 'editable="bottom"',
+        r'<attribute\s+name=["\']editable["\']>1</attribute>': '<attribute name="editable">bottom</attribute>',
+    }
+    for file in files_to_process:
+        try:
+            tools._replace_in_file(
+                file,
+                replaces,
+                log_message=f"""Replace editable="1" by "bottom" in file: {file}""",
+            )
+        except Exception as e:
+            logger.error(f"Error processing file {file}: {str(e)}")
+
+
 class MigrationScript(BaseMigrationScript):
     _GLOBAL_FUNCTIONS = [
         replace_tree_with_list_in_views,
         replace_chatter_blocks,
         replace_user_has_groups,
+        replace_editable_attribute,
     ]
