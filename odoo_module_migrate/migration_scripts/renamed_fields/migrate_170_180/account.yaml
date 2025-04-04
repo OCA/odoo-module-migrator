@@ -1,0 +1,2 @@
+- ['res.company', 'period_lock_date', 'sale_lock_date and purchase_lock_date', 'Commit https://github.com/odoo/odoo/commit/c73d430080da602aa1528842b591040d0717987f']
+- ['account.move', 'reversal_move_id', 'reversal_move_ids', 'Commit https://github.com/odoo/odoo/commit/26d57934f7a656fe5267d7931e0601c43a18d270']
