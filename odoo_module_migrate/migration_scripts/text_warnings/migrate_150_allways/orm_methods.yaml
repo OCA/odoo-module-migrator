@@ -1,0 +1,2 @@
+.py:
+  (_invalidate_cache\(.*\)): "[16+] Please avoid using the private method _invalidate_cache(). Instead, use the appropriate public method such as invalidate_model(), invalidate_recordset(), or env.invalidate_all() to ensure better maintainability, compatibility, and adherence to Odoo's API standards."
