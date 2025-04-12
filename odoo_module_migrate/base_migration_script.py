@@ -10,6 +10,7 @@ import inspect
 import glob
 import yaml
 import importlib
+import requests
 
 
 class BaseMigrationScript(object):
@@ -24,6 +25,36 @@ class BaseMigrationScript(object):
     _REMOVED_MODELS = []
     _GLOBAL_FUNCTIONS = []  # [function_object]
     _module_path = ""
+
+    def _get_controller_data(self, version_from_to):
+        # data = request.get(url, version_from, version_to)
+        # version_from_to:
+        #     - migrate_100_allways.py
+        #     - migrate_160_170.py
+        #     - migrate_allways.py
+        # [0] - migrate
+        # [1] - version_from
+        # [2] - version_to
+        list_version_from_to = version_from_to.split("_")
+        if len(list_version_from_to) != 3 or "allways" in list_version_from_to:
+            return False
+        version_from = list_version_from_to[1]
+        version_to = list_version_from_to[2]
+        return self._get_changes_from_adhoc(version_from, version_to)
+
+    def _get_changes_from_adhoc(self, init_version_name, target_version_name):
+        base_url = "https://adhoc.com.ar"
+        endpoint = "/version_changes/{from_version}/{to_version}".format(
+            from_version=init_version_name, to_version=target_version_name
+        )
+        uri = base_url + endpoint
+        self._requests = requests.Session()
+        response = self._requests.get(uri)
+
+        if response and response.ok:
+            data_version_changes = response.json()
+            return data_version_changes
+        return False
 
     def parse_rules(self):
         script_parts = inspect.getfile(self.__class__).split("/")
@@ -100,6 +131,91 @@ class BaseMigrationScript(object):
                         rules[rule]["doc"].update(new_rules)
                     elif rules[rule]["type"] == TYPE_ARRAY:
                         rules[rule]["doc"].extend(new_rules)
+
+        # Read form controller
+
+        data_version_changes = self._get_controller_data(migrate_from_to)
+        if data_version_changes:
+            for change in data_version_changes.values():
+                # {'2': {
+                #     'change_type': 'rename',
+                #     'major_version_id': '17.0',
+                #     'model': False,
+                #     'field': False,
+                #     'model_type': 'model',
+                #     'old_name': 'mail.channel',
+                #     'new_name': 'discuss.channel',
+                #     'notes': '<p>Más información sobre este cambio <a href="https://github.com/odoo/odoo/pull/118354/" target="_blank">en PR 118354</a></p>'
+                #     }
+                # }
+
+                if (
+                    change["change_type"] == "rename"
+                    and change["model_type"] == "model"
+                ):
+                    # [(old.model.name, new.model.name, more_info)]
+                    new_rules = [
+                        [change["old_name"], change["new_name"], change["notes"]]
+                    ]
+                    rules["_RENAMED_MODELS"]["doc"].extend(new_rules)
+
+                if (
+                    change["change_type"] == "rename"
+                    and change["model_type"] == "field"
+                ):
+                    # [(model_name, old_field_name, new_field_name, more_info), ...)]
+                    new_rules = [
+                        [
+                            change["model"],
+                            change["old_name"],
+                            change["new_name"],
+                            change["notes"],
+                        ]
+                    ]
+                    rules["_RENAMED_FIELDS"]["doc"].extend(new_rules)
+
+                if (
+                    change["change_type"] == "remove"
+                    and change["model_type"] == "model"
+                ):
+                    # [(old.model.name, more_info)]
+                    new_rules = [[change["old_name"], change["notes"]]]
+                    rules["_REMOVED_MODELS"]["doc"].extend(new_rules)
+
+                if (
+                    change["change_type"] == "remove"
+                    and change["model_type"] == "field"
+                ):
+                    # [(model_name, field_name, more_info), ...)]
+                    new_rules = [[change["model"], change["old_name"], change["notes"]]]
+                    rules["_REMOVED_FIELDS"]["doc"].extend(new_rules)
+
+                if (
+                    change["change_type"] == "rename"
+                    and change["model_type"] == "xmlid"
+                ):
+                    # [(model_name, old_field_name, new_field_name, more_info), ...)]
+                    new_rules = [
+                        [
+                            change["model"],
+                            change["old_name"],
+                            change["new_name"],
+                            change["notes"],
+                        ]
+                    ]
+                    warnings = rules["_TEXT_REPLACES"]["doc"].get("*", {})
+                    warnings[change["old_name"]] = change["new_name"]
+                    rules["_TEXT_REPLACES"]["doc"]["*"] = warnings
+
+                if (
+                    change["change_type"] == "remove"
+                    and change["model_type"] == "xmlid"
+                ):
+                    # [(model_name, field_name, more_info), ...)]
+                    warnings = rules["_TEXT_WARNINGS"]["doc"].get("*", {})
+                    warnings[change["old_name"]] = change["notes"]
+                    rules["_TEXT_WARNINGS"]["doc"]["*"] = warnings
+
         # extend
         for rule, data in rules.items():
             rtype = data["type"]
