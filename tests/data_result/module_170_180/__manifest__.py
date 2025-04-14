@@ -11,4 +11,9 @@
     'data': [
         'views/res_partner.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'module_170/static/src/js/main.js',
+        ],
+    },
 }
