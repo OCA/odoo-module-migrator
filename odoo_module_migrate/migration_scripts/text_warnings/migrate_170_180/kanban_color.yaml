@@ -1,0 +1,2 @@
+.xml:
+  (?:t-attf-class|class)="[^"]*(?:kanban_getcolor|kanban_color|kanban_getcolorname)\([^"]*"|class="[^"]*oe_kanban_color_\d+[^"]*": "[18.0] Kanban color methods (kanban_getcolor, kanban_color, kanban_getcolorname) and static color classes (oe_kanban_color_X) have been deprecated in favor of the highlight_color attribute on kanban root node. This attribute will properly color the left border of the kanban cards. No need to set color classes or use color methods anymore. These methods will be removed in 18.0. More details: https://github.com/odoo/odoo/pull/167751"
