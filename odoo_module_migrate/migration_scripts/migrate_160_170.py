@@ -288,7 +288,183 @@ def _reformat_read_group(
             reformatted_files.append(reformatted_file)
     logger.debug("Reformatted files:\n" f"{list(reformatted_files)}")
 
+import ast
+import re
+import os
+import fnmatch
+
+def _migrate_states(logger, module_path, module_name, manifest_path, migration_steps, tools):
+    """
+    Global function for migrating Odoo 16.0 to 17.0.
+    Includes:
+    - Removal of `states` attributes from Python files.
+    - Conversion of `states` attributes to XML view attributes using simplified Python expressions.
+    """
+
+    def find_files(directory, pattern):
+        """
+        Find files matching a specific pattern in a directory and its subdirectories.
+        """
+        matches = []
+        for root, _, filenames in os.walk(directory):
+            for filename in filenames:
+                if fnmatch.fnmatch(filename, pattern):
+                    matches.append(os.path.join(root, filename))
+        return matches
+
+    def remove_states_from_python_files():
+        """
+        Remove `states` attributes from field definitions in Python files.
+        """
+        logger.info("Removing `states` attributes from Python files...")
+        for py_file in find_files(module_path, "*.py"):
+            with open(py_file, "r", encoding="utf-8") as f:
+                content = f.read()
+
+            try:
+                tree = ast.parse(content)
+            except SyntaxError:
+                logger.warning(f"Syntax error in file: {py_file}")
+                continue
+
+            # Modify the AST to remove `states` attributes
+            modified = False
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Assign) and len(node.targets) == 1:
+                    target = node.targets[0]
+                    if isinstance(target, ast.Name) and isinstance(node.value, ast.Call):
+                        keywords = getattr(node.value, "keywords", [])
+                        filtered_keywords = [
+                            keyword for keyword in keywords if keyword.arg != "states"
+                        ]
+                        if len(filtered_keywords) < len(keywords):
+                            node.value.keywords = filtered_keywords
+                            modified = True
+
+            if modified:
+                # Convert the modified AST back to source code
+                new_content = ast.unparse(tree)
+                logger.info(f"Updated Python file: {py_file}")
+                with open(py_file, "w", encoding="utf-8") as f:
+                    f.write(new_content)
+
+    # Initialize mapping for states -> XML attributes
+    attrs_mapping = {}
+
+    def parse_python_files():
+        """
+        Parse Python files to find fields with `states` attribute.
+        """
+        logger.info("Parsing Python files for fields with `states` attribute...")
+        for py_file in find_files(module_path, "*.py"):
+            with open(py_file, "r", encoding="utf-8") as f:
+                content = f.read()
+
+            try:
+                tree = ast.parse(content)
+            except SyntaxError:
+                logger.warning(f"Syntax error in file: {py_file}")
+                continue
+
+            # Extract variable definitions
+            variable_definitions = {}
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Assign) and len(node.targets) == 1:
+                    target = node.targets[0]
+                    if isinstance(target, ast.Name):
+                        variable_definitions[target.id] = node.value
+
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Assign) and len(node.targets) == 1:
+                    target = node.targets[0]
+                    if isinstance(target, ast.Name) and isinstance(node.value, ast.Call):
+                        field_name = target.id
+                        states_value = None
+                        for keyword in getattr(node.value, "keywords", []):
+                            if keyword.arg == "states":
+                                if isinstance(keyword.value, ast.Dict):
+                                    # Direct dictionary
+                                    states_value = ast.literal_eval(keyword.value)
+                                elif isinstance(keyword.value, ast.Name):
+                                    # Variable reference
+                                    var_name = keyword.value.id
+                                    if var_name in variable_definitions:
+                                        states_value = ast.literal_eval(variable_definitions[var_name])
+                                break
+
+                        if states_value:
+                            attrs = convert_states_to_xml_attrs(states_value)
+                            logger.info(f"Field: {field_name}, Generated XML attrs: {attrs}")
+                            attrs_mapping[field_name] = attrs
+
+    def convert_states_to_xml_attrs(states):
+        """
+        Convert `states` to XML attributes (readonly, required, invisible) using simplified Python expressions.
+        """
+        xml_attrs = {}
+        for attribute in ["readonly", "required", "invisible"]:
+            conditions = []
+            for state, rules in states.items():
+                for rule in rules:
+                    attr, value = rule
+                    if attr == attribute:
+                        if value is True:
+                            conditions.append(state)
+
+            # Generate simplified Python expression
+            if conditions:
+                if len(conditions) > 1:
+                    xml_attrs[attribute] = f"state in {conditions}"
+                else:
+                    xml_attrs[attribute] = f"state == '{conditions[0]}'"
+
+        return xml_attrs
+
+    def update_xml_views():
+        """
+        Update XML views with generated attributes (readonly, required, invisible).
+        """
+        logger.info("Updating XML views with generated attributes...")
+        for xml_file in find_files(module_path, "*.xml"):
+            with open(xml_file, "r", encoding="utf-8") as f:
+                content = f.read()
+
+            # Find fields and update their attributes
+            def replace_field(match):
+                field_name = match.group(1)
+                attrs = attrs_mapping.get(field_name)
+                if attrs:
+                    xml_attrs = " ".join(
+                        f'{key}="{value}"' for key, value in attrs.items()
+                    )
+                    return f'<field name="{field_name}" {xml_attrs} '
+                return match.group(0)
+
+            updated_content = re.sub(
+                r'<field\s+name="([^"]+)"', replace_field, content
+            )
+
+            # Write the updated content back to the file
+            if updated_content != content:
+                logger.info(f"Updated XML file: {xml_file}")
+                with open(xml_file, "w", encoding="utf-8") as f:
+                    f.write(updated_content)
+
+
+    # Main logic
+    logger.info(f"Starting migration for module: {module_name}")
+
+    # Step 1: Parse Python files to extract fields with `states`
+    parse_python_files()
+
+    # Step 2: Update XML views with generated attributes
+    update_xml_views()
+
+    # Step 3: Remove `states` attributes from Python files
+    remove_states_from_python_files()
+
+    logger.info(f"Migration completed for module: {module_name}")
 
 class MigrationScript(BaseMigrationScript):
 
-    _GLOBAL_FUNCTIONS = [_check_open_form, _reformat_read_group]
+    _GLOBAL_FUNCTIONS = [_check_open_form, _reformat_read_group, _migrate_states]
