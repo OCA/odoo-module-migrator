@@ -169,15 +169,19 @@ class VisitorAggregatesSpec(AbstractVisitor):
                         )
 
                     aggregates = [
-                        f"{field_spec.split('(')[1][:-1]}:{field_spec.split(':')[1].split('(')[0]}"
-                        if "(" in field_spec
-                        else field_spec
+                        (
+                            f"{field_spec.split('(')[1][:-1]}:{field_spec.split(':')[1].split('(')[0]}"
+                            if "(" in field_spec
+                            else field_spec
+                        )
                         for field_spec in aggregates
                     ]
                     aggregates = [
-                        "__count"
-                        if field_spec in ("id:count", "id:count_distinct")
-                        else field_spec
+                        (
+                            "__count"
+                            if field_spec in ("id:count", "id:count_distinct")
+                            else field_spec
+                        )
                         for field_spec in aggregates
                     ]
 
@@ -186,9 +190,11 @@ class VisitorAggregatesSpec(AbstractVisitor):
                         groupby = [groupby]
 
                     aggregates = [
-                        f"{field}:sum"
-                        if (":" not in field and field != "__count")
-                        else field
+                        (
+                            f"{field}:sum"
+                            if (":" not in field and field != "__count")
+                            else field
+                        )
                         for field in aggregates
                         if field not in groupby
                     ]
@@ -288,12 +294,16 @@ def _reformat_read_group(
             reformatted_files.append(reformatted_file)
     logger.debug("Reformatted files:\n" f"{list(reformatted_files)}")
 
+
 import ast
 import re
 import os
 import fnmatch
 
-def _migrate_states(logger, module_path, module_name, manifest_path, migration_steps, tools):
+
+def _migrate_states(
+    logger, module_path, module_name, manifest_path, migration_steps, tools
+):
     """
     Global function for migrating Odoo 16.0 to 17.0.
     Includes:
@@ -332,7 +342,9 @@ def _migrate_states(logger, module_path, module_name, manifest_path, migration_s
             for node in ast.walk(tree):
                 if isinstance(node, ast.Assign) and len(node.targets) == 1:
                     target = node.targets[0]
-                    if isinstance(target, ast.Name) and isinstance(node.value, ast.Call):
+                    if isinstance(target, ast.Name) and isinstance(
+                        node.value, ast.Call
+                    ):
                         keywords = getattr(node.value, "keywords", [])
                         filtered_keywords = [
                             keyword for keyword in keywords if keyword.arg != "states"
@@ -377,7 +389,9 @@ def _migrate_states(logger, module_path, module_name, manifest_path, migration_s
             for node in ast.walk(tree):
                 if isinstance(node, ast.Assign) and len(node.targets) == 1:
                     target = node.targets[0]
-                    if isinstance(target, ast.Name) and isinstance(node.value, ast.Call):
+                    if isinstance(target, ast.Name) and isinstance(
+                        node.value, ast.Call
+                    ):
                         field_name = target.id
                         states_value = None
                         for keyword in getattr(node.value, "keywords", []):
@@ -389,12 +403,16 @@ def _migrate_states(logger, module_path, module_name, manifest_path, migration_s
                                     # Variable reference
                                     var_name = keyword.value.id
                                     if var_name in variable_definitions:
-                                        states_value = ast.literal_eval(variable_definitions[var_name])
+                                        states_value = ast.literal_eval(
+                                            variable_definitions[var_name]
+                                        )
                                 break
 
                         if states_value:
                             attrs = convert_states_to_xml_attrs(states_value)
-                            logger.info(f"Field: {field_name}, Generated XML attrs: {attrs}")
+                            logger.info(
+                                f"Field: {field_name}, Generated XML attrs: {attrs}"
+                            )
                             attrs_mapping[field_name] = attrs
 
     def convert_states_to_xml_attrs(states):
@@ -440,16 +458,13 @@ def _migrate_states(logger, module_path, module_name, manifest_path, migration_s
                     return f'<field name="{field_name}" {xml_attrs} '
                 return match.group(0)
 
-            updated_content = re.sub(
-                r'<field\s+name="([^"]+)"', replace_field, content
-            )
+            updated_content = re.sub(r'<field\s+name="([^"]+)"', replace_field, content)
 
             # Write the updated content back to the file
             if updated_content != content:
                 logger.info(f"Updated XML file: {xml_file}")
                 with open(xml_file, "w", encoding="utf-8") as f:
                     f.write(updated_content)
-
 
     # Main logic
     logger.info(f"Starting migration for module: {module_name}")
@@ -464,6 +479,7 @@ def _migrate_states(logger, module_path, module_name, manifest_path, migration_s
     remove_states_from_python_files()
 
     logger.info(f"Migration completed for module: {module_name}")
+
 
 class MigrationScript(BaseMigrationScript):
 
