@@ -6,6 +6,8 @@ from pathlib import Path
 import sys
 import os
 import ast
+import re
+import fnmatch
 from typing import Any
 
 empty_list = ast.parse("[]").body[0].value
@@ -169,15 +171,19 @@ class VisitorAggregatesSpec(AbstractVisitor):
                         )
 
                     aggregates = [
-                        f"{field_spec.split('(')[1][:-1]}:{field_spec.split(':')[1].split('(')[0]}"
-                        if "(" in field_spec
-                        else field_spec
+                        (
+                            f"{field_spec.split('(')[1][:-1]}:{field_spec.split(':')[1].split('(')[0]}"
+                            if "(" in field_spec
+                            else field_spec
+                        )
                         for field_spec in aggregates
                     ]
                     aggregates = [
-                        "__count"
-                        if field_spec in ("id:count", "id:count_distinct")
-                        else field_spec
+                        (
+                            "__count"
+                            if field_spec in ("id:count", "id:count_distinct")
+                            else field_spec
+                        )
                         for field_spec in aggregates
                     ]
 
@@ -186,9 +192,11 @@ class VisitorAggregatesSpec(AbstractVisitor):
                         groupby = [groupby]
 
                     aggregates = [
-                        f"{field}:sum"
-                        if (":" not in field and field != "__count")
-                        else field
+                        (
+                            f"{field}:sum"
+                            if (":" not in field and field != "__count")
+                            else field
+                        )
                         for field in aggregates
                         if field not in groupby
                     ]
@@ -289,6 +297,315 @@ def _reformat_read_group(
     logger.debug("Reformatted files:\n" f"{list(reformatted_files)}")
 
 
+def _migrate_states(
+    logger, module_path, module_name, manifest_path, migration_steps, tools
+):
+    """
+    Global function for migrating Odoo 16.0 to 17.0.
+    Includes:
+    - Removal of `states` attributes from Python files.
+    - Conversion of `states` attributes to XML view attributes using simplified Python expressions.
+    """
+
+    def find_files(directory, pattern):
+        """
+        Find files matching a specific pattern in a directory and its subdirectories.
+        """
+        matches = []
+        for root, _, filenames in os.walk(directory):
+            for filename in filenames:
+                if fnmatch.fnmatch(filename, pattern):
+                    matches.append(os.path.join(root, filename))
+        return matches
+
+    def remove_states_from_python_files():
+        """
+        Remove all `states=...` and `states={...}` definitions from Python files.
+        Handles both inline and multi-line cases.
+        """
+        logger.info(
+            "Removing `states=...` and `states={...}` definitions from Python files..."
+        )
+
+        # Regular expression to match `states=...` patterns (simple and complex)
+        states_pattern = re.compile(r",?\s*states\s*=\s*(\{[^}]*\}|[^,)]+)", re.DOTALL)
+
+        for py_file in find_files(module_path, "*.py"):
+            try:
+                with open(py_file, "r", encoding="utf-8") as f:
+                    content = f.read()
+
+                new_content, count = states_pattern.subn("", content)
+                if count > 0:
+                    logger.info(f"Updated Python file: {py_file}")
+                    new_content = re.sub(
+                        r",\s*,", ",", new_content
+                    )  # Remove redundant commas
+                    new_content = re.sub(
+                        r",\s*([\]\)])", r"\1", new_content
+                    )  # Remove trailing commas
+                    new_content = new_content.strip() + "\n"
+
+                    with open(py_file, "w", encoding="utf-8") as f:
+                        f.write(new_content)
+
+            except Exception as e:
+                logger.warning(f"Error processing file {py_file}: {e}")
+
+    def parse_python_files():
+        """
+        Parse Python files to find fields with `states` attribute and their associated models.
+        If a class does not have `_name`, the model name is taken from `_inherit`.
+        Only process classes whose base class includes 'Model'.
+        """
+        logger.info("Parsing Python files for fields with `states` attribute...")
+        model_field_mapping = {}  # Mapping of model_name + field_name -> attrs
+
+        for py_file in find_files(module_path, "*.py"):
+            with open(py_file, "r", encoding="utf-8") as f:
+                content = f.read()
+
+            try:
+                tree = ast.parse(content)
+                logger.info(f"Successfully parsed file: {py_file}")
+            except SyntaxError as e:
+                logger.warning(f"Syntax error in file {py_file}: {e}")
+                continue
+
+            # Extract variable definitions
+            variable_definitions = {}
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Assign) and len(node.targets) == 1:
+                    target = node.targets[0]
+                    if isinstance(target, ast.Name):
+                        variable_definitions[target.id] = node.value
+
+            current_model = None
+            for node in ast.walk(tree):
+                # Detect model class definitions
+                if isinstance(node, ast.ClassDef):
+                    # Check if the class inherits from 'Model'
+                    if not any(
+                        isinstance(base, ast.Attribute) and base.attr == "Model"
+                        for base in node.bases
+                    ):
+                        logger.info(
+                            f"Skipping class {node.name} as it does not inherit from 'Model'"
+                        )
+                        continue
+
+                    model_name = None
+                    inherit_name = None
+
+                    for stmt in node.body:
+                        if isinstance(stmt, ast.Assign):
+                            for target in stmt.targets:
+                                # Check for `_name` attribute
+                                if (
+                                    isinstance(target, ast.Name)
+                                    and target.id == "_name"
+                                    and isinstance(stmt.value, ast.Constant)
+                                ):
+                                    model_name = stmt.value.value
+                                # Check for `_inherit` attribute
+                                elif (
+                                    isinstance(target, ast.Name)
+                                    and target.id == "_inherit"
+                                    and isinstance(stmt.value, ast.Constant)
+                                ):
+                                    inherit_name = stmt.value.value
+
+                    # Determine the model name
+                    current_model = model_name if model_name else inherit_name
+
+                    logger.info(f"Model: {current_model}")
+
+                    if current_model:
+                        model_field_mapping[current_model] = {}
+
+                # Detect fields with `states` attribute
+                if (
+                    current_model
+                    and isinstance(node, ast.Assign)
+                    and len(node.targets) == 1
+                ):
+                    target = node.targets[0]
+                    if isinstance(target, ast.Name) and isinstance(
+                        node.value, ast.Call
+                    ):
+                        field_name = target.id
+                        states_value = None
+                        for keyword in getattr(node.value, "keywords", []):
+                            if keyword.arg == "states":
+                                if isinstance(keyword.value, ast.Dict):
+                                    # Direct dictionary
+                                    states_value = ast.literal_eval(keyword.value)
+                                elif isinstance(keyword.value, ast.Name):
+                                    # Variable reference
+                                    var_name = keyword.value.id
+                                    if var_name in variable_definitions:
+                                        states_value = ast.literal_eval(
+                                            variable_definitions[var_name]
+                                        )
+
+                            if states_value:
+                                key = f"{current_model}.{field_name}"  # Combine model_name and field_name
+                                attrs = convert_states_to_xml_attrs(states_value)
+                                logger.info(
+                                    f"Model: {current_model}, Field: {field_name}, Key: {key}, States: {states_value}, Generated XML attrs: {attrs}"
+                                )
+                                model_field_mapping[key] = attrs
+
+        return model_field_mapping
+
+    def convert_states_to_xml_attrs(states):
+        """
+        Convert `states` to XML attributes (readonly, required, invisible).
+        """
+        logger.info(f"Parsing states: {states}")  # 添加日志，打印解析到的 states
+
+        xml_attrs = {}
+        for attribute in ["readonly", "required", "invisible"]:
+            conditions = []
+            for state, rules in states.items():
+                for rule in rules:
+                    if len(rule) != 2:
+                        logger.warning(
+                            f"Invalid rule format: {rule}. Skipping this rule."
+                        )
+                        continue
+
+                    attr, value = rule
+                    if attr == attribute and value is True:
+                        conditions.append(state)
+
+            if conditions:
+                if len(conditions) > 1:
+                    xml_attrs[attribute] = f"state in {conditions}"
+                else:
+                    xml_attrs[attribute] = f"state == '{conditions[0]}'"
+
+        if not xml_attrs:
+            logger.info(
+                f"No valid attributes generated from states: {states}"
+            )  # 添加日志，打印未生成有效属性的情况
+
+        return xml_attrs
+
+    def update_xml_views(model_field_mapping):
+        """
+        Update XML views with generated attributes (readonly, required, invisible) inside <field name="arch"> tags,
+        excluding content inside <search> tags.
+        """
+        logger.info("Updating XML views with generated attributes...")
+        for xml_file in find_files(module_path, "*.xml"):
+            with open(xml_file, "r", encoding="utf-8") as f:
+                content = f.read()
+
+            try:
+                tree = et.parse(xml_file)
+            except et.XMLSyntaxError:
+                logger.warning(f"Invalid XML syntax in file: {xml_file}")
+                continue
+
+            root = tree.getroot()
+
+            # Locate <record> tags
+            for record in root.findall(".//record"):
+                model_field = record.find("./field[@name='model']")
+                if model_field is None or not model_field.text:
+                    logger.warning(f"No model found in <record> in file: {xml_file}")
+                    continue
+
+                model_name = model_field.text
+                logger.info(f"Processing model: {model_name} in file: {xml_file}")
+
+                # Locate <field name="arch"> tags within the <record>
+                arch_field = record.find("./field[@name='arch']")
+                if arch_field is None:
+                    logger.warning(
+                        f"No <field name='arch'> found in <record> for model: {model_name}"
+                    )
+                    continue
+
+                # Parse the content of <arch> as XML
+                try:
+                    arch_tree = et.ElementTree(
+                        arch_field[0]
+                    )  # Parse the first child of <arch>
+                    arch_root = arch_tree.getroot()
+                except IndexError:
+                    logger.warning(
+                        f"<field name='arch'> is empty for model: {model_name} in file: {xml_file}"
+                    )
+                    continue
+                except et.XMLSyntaxError as e:
+                    logger.warning(
+                        f"Invalid XML syntax in <arch> content for model: {model_name} in file: {xml_file}. Error: {e}"
+                    )
+                    continue
+
+                # Create a copy of arch_root to modify independently
+                arch_root_copy = et.Element(arch_root.tag, arch_root.attrib)
+                for child in arch_root:
+                    arch_root_copy.append(child)
+
+                logger.debug(
+                    f"Updated arch_field content: {et.tostring(arch_root_copy, pretty_print=True, encoding='unicode')}"
+                )
+
+                # Skip processing if the direct child of <arch> is <search>
+                if arch_root_copy.tag == "search":
+                    logger.info(
+                        f"Skipping <search> content for model: {model_name} in file: {xml_file}"
+                    )
+                    for child in arch_root_copy:
+                        arch_field[0].append(child)
+
+                    continue
+
+                # Locate all <field> tags that meet the specified conditions
+                for field in arch_root_copy.xpath(
+                    "/form//field[not(ancestor::field)]"
+                ) + arch_root_copy.xpath("./field"):
+                    field_name = field.get("name")
+                    if not field_name:
+                        continue
+
+                    # Construct the key as model_name + field_name
+                    key = f"{model_name}.{field_name}"
+
+                    # Update attributes if the field exists in model_field_mapping
+                    attrs = model_field_mapping.get(key)
+                    if attrs:
+                        logger.info(
+                            f"Updating field: {field_name} in model: {model_name} with attrs: {attrs}"
+                        )
+                        for attr_key, attr_value in attrs.items():
+                            field.set(attr_key, attr_value)
+
+                for child in arch_root_copy:
+                    arch_field[0].append(child)
+
+            # Write the updated XML back to the file
+            with open(xml_file, "wb") as f:
+                tree.write(f, pretty_print=True, encoding="utf-8", xml_declaration=True)
+
+    # Main logic
+    logger.info(f"Starting migration for module: {module_name}")
+
+    # Step 1: Parse Python files to extract fields with `states`
+    model_field_mapping = parse_python_files()
+
+    # Step 2: Update XML views with generated attributes
+    update_xml_views(model_field_mapping)
+
+    # Step 3: Remove `states` attributes from Python files
+    remove_states_from_python_files()
+
+    logger.info(f"Migration completed for module: {module_name}")
+
+
 class MigrationScript(BaseMigrationScript):
 
-    _GLOBAL_FUNCTIONS = [_check_open_form, _reformat_read_group]
+    _GLOBAL_FUNCTIONS = [_check_open_form, _reformat_read_group, _migrate_states]
