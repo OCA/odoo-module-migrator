@@ -1,0 +1,2 @@
+.py:
+  \.message_post_with_view\(: "The method message_post_with_view has been replaced by message_post_with_source.\nMore details at https://github.com/odoo/odoo/commit/4775bd93a2bf9947236f4f7f06d6f8cb7734f7ef."
