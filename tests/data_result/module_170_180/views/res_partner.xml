@@ -10,7 +10,7 @@
             </list>
         </field>
     </record>
-    
+
     <record id="view_partner_form" model="ir.ui.view">
         <field name="name">res.partner.form</field>
         <field name="model">res.partner</field>
@@ -60,6 +60,58 @@
             <chatter position="replace"/>
 
             <chatter/>
+        </field>
+    </record>
+
+    <record id="res_partner_view_kanban" model="ir.ui.view">
+        <field name="name">res.partner.view.kanban</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <templates>
+                    <t t-name='card'>
+                        <div t-attf-class="oe_kanban_card " style="width:100%">
+                            <div>
+                                <field name="partner_id"/>
+                            </div>
+                            <field name="color" widget="kanban_color_picker"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="res_partner_view_kanban" model="ir.ui.view">
+        <field name="name">res.partner.view.kanban</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <templates>
+                    <t t-name='card'>
+                        <div t-attf-class="oe_kanban_card " style="width:100%">
+                            <div>
+                                <p>
+                                    <strong>
+                                        <h4 class="oe_goal_name">
+                                            <field name="definition_id"/>
+                                        </h4>
+                                    </strong>
+                                </p>
+                                <field name="partner_id"/>
+                            </div>
+                            <field name="color" widget="kanban_color_picker"/>
+                            <div role="menuitem" class="col-4">
+                                <a
+                                        class="dropdown-item"
+                                        type="open"
+                                        role="menuitem"
+                                >Configuration</a>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
         </field>
     </record>
 </odoo>
