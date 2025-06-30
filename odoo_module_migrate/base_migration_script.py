@@ -221,7 +221,7 @@ class BaseMigrationScript(object):
         errors.update(removed_models.get("errors"))
         for pattern, error_message in errors.items():
             if re.findall(pattern, new_text):
-                logger.error(error_message)
+                logger.error(error_message + "\nFile " + os.path.join(root, filename))
 
         warnings = self._TEXT_WARNINGS.get("*", {})
         warnings.update(self._TEXT_WARNINGS.get(extension, {}))
