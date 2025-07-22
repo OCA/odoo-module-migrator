@@ -1,0 +1,5 @@
+<template id="tests_template" name="Test Template">
+    <t t-call="web.layout">
+        <t t-call-assets="web.assets_common" t-js="false"/>
+    </t>
+</template>
