@@ -1,0 +1,2 @@
+.xml:
+  invisible=(["']1["']|["']True["']|["']true["'])|column_invisible=(["']1["']|["']True["']|["']true["']): "[18] Fields that are required by Python expressions (invisible, column_invisible, readonly, required, context, domain) are now added automatically as invisible and readonly. You can remove these fields from XML views unless they are necessary for specific logic. More details: https://github.com/odoo/odoo/pull/137031."
