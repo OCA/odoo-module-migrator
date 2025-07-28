@@ -100,9 +100,60 @@ def replace_user_has_groups(
             logger.error(f"Error processing file {file}: {str(e)}")
 
 
+def replace_unaccent_parameter(
+    logger, module_path, module_name, manifest_path, migration_steps, tools
+):
+    files_to_process = tools.get_files(module_path, (".py",))
+    replaces = {
+        # Handle multiline with unaccent=False or unaccent=True
+        r"(?s)fields\.(Char|Text|Html|Properties)\(\s*unaccent\s*=\s*(False|True)\s*,?\s*\)": r"fields.\1()",
+        # Handle when unaccent=False or unaccent=True is the first parameter
+        r"(?s)fields\.(Char|Text|Html|Properties)\(\s*unaccent\s*=\s*(False|True)\s*,\s*([^)]+?)\)": r"fields.\1(\3)",
+        # Handle when unaccent=False or unaccent=True is between other parameters
+        r"(?s)fields\.(Char|Text|Html|Properties)\(([^)]+?),\s*unaccent\s*=\s*(False|True)\s*,\s*([^)]+?)\)": r"fields.\1(\2, \4)",
+        # Handle when unaccent=False or unaccent=True is the last parameter
+        r"(?s)fields\.(Char|Text|Html|Properties)\(([^)]+?),\s*unaccent\s*=\s*(False|True)\s*\)": r"fields.\1(\2)",
+    }
+
+    for file in files_to_process:
+        try:
+            tools._replace_in_file(
+                file,
+                replaces,
+                log_message=f"[18.0] Removed deprecated unaccent=False parameter in file: {file}",
+            )
+        except Exception as e:
+            logger.error(f"Error processing file {file}: {str(e)}")
+
+
+def replace_ustr(
+    logger, module_path, module_name, manifest_path, migration_steps, tools
+):
+    files_to_process = tools.get_files(module_path, (".py",))
+    replaces = {
+        r"from\s+odoo\.tools\s+import\s+ustr\s*\n": "",
+        r"from\s+odoo\.tools\.misc\s+import\s+ustr\s*\n": "",
+        r"from\s+odoo\.tools\s+import\s+([^,\n]*,\s*)?ustr,\s*([^,\n]*)": r"from odoo.tools import \1\2",
+        r"from\s+odoo\.tools\.misc\s+import\s+([^,\n]*,\s*)?ustr,\s*([^,\n]*)": r"from odoo.tools.misc import \1\2",
+        r",\s*ustr(\s*,)?": r"\1",
+        r"tools\.ustr\(([^)]+)\)": r"\1",
+        r"misc\.ustr\(([^)]+)\)": r"\1",
+        r"=\s*ustr\(([^)]+)\)": r"= \1",
+    }
+    for file in files_to_process:
+        try:
+            tools._replace_in_file(
+                file, replaces, log_message=f"Deprecate ustr in: {file}"
+            )
+        except Exception as e:
+            logger.error(f"Error processing file {file}: {str(e)}")
+
+
 class MigrationScript(BaseMigrationScript):
     _GLOBAL_FUNCTIONS = [
+        replace_unaccent_parameter,
         replace_tree_with_list_in_views,
         replace_chatter_blocks,
         replace_user_has_groups,
+        replace_ustr,
     ]

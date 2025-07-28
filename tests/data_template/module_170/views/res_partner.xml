@@ -5,8 +5,9 @@
         <field name="model">res.partner</field>
         <field name="arch" type="xml">
             <!-- This is a tree view for partners -->
-            <tree position="inside">
+            <tree position="inside" string="remove_string">
                 <field name="test_field_1"/>
+                <field name="active" widget='toggle_button'/>
             </tree>
         </field>
     </record>
@@ -32,9 +33,20 @@
         <field name="model">res.partner</field>
         <field name="arch" type="xml">
             <xpath expr="//form" position="inside">
-                <tree>
+                <tree string="remove_string">
                     <field name="name"/>
                 </tree>
+            </xpath>
+            <xpath expr="//field[@name='active']" position="attributes">
+                <attribute name="widget">toggle_button</attribute>
+            </xpath>
+            <xpath expr="//field[@name='active']" position="attributes">
+                <attribute name="widget"> toggle_button</attribute>
+            </xpath>
+            <xpath expr="//field[@name='active']" position="attributes">
+                <attribute name="widget">
+                    toggle_button
+                </attribute>
             </xpath>
         </field>
     </record>

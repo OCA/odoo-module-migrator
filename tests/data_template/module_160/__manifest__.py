@@ -11,4 +11,7 @@
     'data': [
         'views/res_partner.xml',
     ],
+    "assets": {
+        "web.assets_common",
+    }
 }
