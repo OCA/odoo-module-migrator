@@ -31,9 +31,3 @@ jobs:
 
     - name: publish
       uses: pypa/gh-action-pypi-publish@release/v1
-
-    - name: sign
-      uses: sigstore/gh-action-sigstore-python@v1.2.3
-      with:
-        inputs: ./dist/*.tar.gz ./dist/*.whl
-        release-signing-artifacts: true
