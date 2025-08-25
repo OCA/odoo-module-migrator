@@ -1,0 +1,2 @@
+- ['stock.move', 'location_dest_id', 'location_final_id', '']
+- ['stock.warehouse.orderpoint', 'qty_to_order', 'qty_to_order_manual', '']

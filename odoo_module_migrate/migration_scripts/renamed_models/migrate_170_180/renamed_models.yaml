@@ -1,0 +1,7 @@
+- ["hr.applicant.skill", "hr.candidate.skill", None]
+- ["l10n_es_edi_facturae_adm_centers.ac_role_type", "l10n_es_edi_facturae.ac_role_type", None]
+- ["mail.notification.web.push", "mail.push", None]
+- ["mail.partner.device", "mail.push.device", None]
+- ["mail.shortcode", "mail.canned.response", None]
+- ["pos.combo", "product.combo", None]
+- ["pos.combo.line", "product.combo.item", None]
