@@ -1,0 +1,7 @@
+- ['barcode.rule', 'type', '']
+- ['gift.card', 'buy_pos_order_line_id', '']
+- ['gift.card', 'redeem_pos_order_line_ids', '']
+- ['pos.config', 'gift_card_product_id', '']
+- ['pos.config', 'use_gift_card', '']
+- ['pos.order.line', 'generated_gift_card_ids', '']
+- ['pos.order.line', 'gift_card_id', '']

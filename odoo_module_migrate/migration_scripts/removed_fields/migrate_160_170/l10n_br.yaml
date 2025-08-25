@@ -1,0 +1,5 @@
+- ['account.fiscal.position.template', 'l10n_br_fp_type', '']
+- ['account.tax.template', 'amount_mva', '']
+- ['account.tax.template', 'base_reduction', '']
+- ['account.tax.template', 'tax_discount', '']
+- ['res.partner', 'l10n_br_cpf_code', '']

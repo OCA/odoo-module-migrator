@@ -1,0 +1,2 @@
+- ['payment.provider', 'adyen_checkout_api_url', '']
+- ['payment.provider', 'adyen_recurring_api_url', '']

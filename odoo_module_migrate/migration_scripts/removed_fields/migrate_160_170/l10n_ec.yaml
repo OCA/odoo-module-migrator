@@ -1,0 +1,4 @@
+- ['account.journal', 'l10n_ec_emission_type', '']
+- ['account.tax.template', 'l10n_ec_code_applied', '']
+- ['account.tax.template', 'l10n_ec_code_ats', '']
+- ['account.tax.template', 'l10n_ec_code_base', '']

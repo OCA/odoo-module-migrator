@@ -1,0 +1,6 @@
+- ['account.move', 'l10n_it_send_state', '']
+- ['fetchmail.server', 'l10n_it_is_pec', '']
+- ['fetchmail.server', 'l10n_it_last_uid', '']
+- ['res.company', 'l10n_it_address_recipient_fatturapa', '']
+- ['res.company', 'l10n_it_address_send_fatturapa', '']
+- ['res.company', 'l10n_it_mail_pec_server_id', '']

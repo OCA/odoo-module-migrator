@@ -1,1 +1,3 @@
 - ['mail.template', 'user_signature', 'Commit https://github.com/odoo/odoo/commit/de1743ab']
+- ['res.users', 'alias_id', '']
+- ['res.users', 'out_of_office_message', '']

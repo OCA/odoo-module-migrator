@@ -1,0 +1,5 @@
+- ['product.template', 'detailed_type', '']
+- ['product.template', 'type', '']
+- ['stock.location', 'return_location', '']
+- ['stock.picking.type', 'default_location_return_id', '']
+- ['stock.picking.type', 'show_reserved', '']
