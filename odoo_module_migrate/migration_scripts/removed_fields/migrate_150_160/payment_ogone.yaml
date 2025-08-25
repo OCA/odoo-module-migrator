@@ -1,0 +1,6 @@
+- ['payment.acquirer', 'ogone_password', '']
+- ['payment.acquirer', 'ogone_pspid', '']
+- ['payment.acquirer', 'ogone_shakey_in', '']
+- ['payment.acquirer', 'ogone_shakey_out', '']
+- ['payment.acquirer', 'ogone_userid', '']
+- ['payment.acquirer', 'provider', '']

@@ -1,0 +1,6 @@
+- ['maintenance.equipment', 'maintenance_duration', '']
+- ['maintenance.equipment', 'message_main_attachment_id', '']
+- ['maintenance.equipment', 'next_action_date', '']
+- ['maintenance.equipment', 'period', '']
+- ['maintenance.equipment.category', 'message_main_attachment_id', '']
+- ['maintenance.request', 'message_main_attachment_id', '']

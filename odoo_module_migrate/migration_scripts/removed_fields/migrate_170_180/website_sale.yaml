@@ -1,0 +1,5 @@
+- ['product.product', 'ribbon_id', '']
+- ['product.ribbon', 'html', '']
+- ['product.ribbon', 'html_class', '']
+- ['sale.order', 'access_point_address', '']
+- ['sale.order.line', 'option_line_ids', '']

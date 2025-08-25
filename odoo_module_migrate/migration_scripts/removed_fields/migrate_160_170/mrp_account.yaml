@@ -1,0 +1,6 @@
+- ['mrp.bom', 'analytic_account_id', '']
+- ['mrp.production', 'analytic_account_id', '']
+- ['mrp.workcenter', 'costs_hour_account_id', '']
+- ['mrp.workcenter.productivity', 'cost_already_recorded', '']
+- ['mrp.workorder', 'mo_analytic_account_line_id', '']
+- ['mrp.workorder', 'wc_analytic_account_line_id', '']

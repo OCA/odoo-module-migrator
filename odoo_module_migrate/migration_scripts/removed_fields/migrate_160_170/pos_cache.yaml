@@ -1,0 +1,6 @@
+- ['pos.cache', 'cache', '']
+- ['pos.cache', 'compute_user_id', '']
+- ['pos.cache', 'config_id', '']
+- ['pos.cache', 'product_domain', '']
+- ['pos.cache', 'product_fields', '']
+- ['pos.config', 'cache_ids', '']

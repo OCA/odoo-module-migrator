@@ -1,0 +1,3 @@
+- ['product.template', 'purchase_requisition', '']
+- ['purchase.requisition.line', 'account_analytic_id', '']
+- ['purchase.requisition.line', 'analytic_tag_ids', '']

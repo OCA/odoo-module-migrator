@@ -1,0 +1,3 @@
+- ['account.tax.template', 'amount_type', '']
+- ['account.tax.template', 'python_applicable', '']
+- ['account.tax.template', 'python_compute', '']

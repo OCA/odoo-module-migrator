@@ -1,0 +1,4 @@
+- ['payment.acquirer', 'payulatam_account_id', '']
+- ['payment.acquirer', 'payulatam_api_key', '']
+- ['payment.acquirer', 'payulatam_merchant_id', '']
+- ['payment.acquirer', 'provider', '']

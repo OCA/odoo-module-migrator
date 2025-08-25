@@ -1,0 +1,4 @@
+- ['calendar.attendee', 'google_internal_event_id', '']
+- ['calendar.attendee', 'oe_synchro_date', '']
+- ['calendar.event', 'oe_update_date', '']
+- ['res.users', 'google_calendar_last_sync_date', '']
