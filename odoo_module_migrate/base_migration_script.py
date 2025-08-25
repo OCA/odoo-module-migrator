@@ -43,7 +43,10 @@ class BaseMigrationScript(object):
         return self._get_changes_from_adhoc(version_from, version_to)
 
     def _get_changes_from_adhoc(self, init_version_name, target_version_name):
-        base_url = "https://adhoc.com.ar"
+        base_url = os.getenv("ADHOC_URL", False)
+        if not base_url:
+            logger.warning("No ADHOC_URL env variable found. Version Changes skipped")
+            return False
         endpoint = "/version_changes/{from_version}/{to_version}".format(
             from_version=init_version_name, to_version=target_version_name
         )
