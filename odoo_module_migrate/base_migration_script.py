@@ -43,7 +43,7 @@ class BaseMigrationScript(object):
         return self._get_changes_from_adhoc(version_from, version_to)
 
     def _get_changes_from_adhoc(self, init_version_name, target_version_name):
-        base_url = "https://adhoc.com.ar"
+        base_url = "https://adhoc.inc"
         endpoint = "/version_changes/{from_version}/{to_version}".format(
             from_version=init_version_name, to_version=target_version_name
         )
