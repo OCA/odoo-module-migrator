@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_simple_form" model="ir.ui.view">
+        <field name="name">res.partner.simplified.form</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <field name="parent_id" position="after">
+                <field name="test_field_1"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>
