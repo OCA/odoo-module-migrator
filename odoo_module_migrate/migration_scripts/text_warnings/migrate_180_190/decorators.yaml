@@ -1,0 +1,3 @@
+.py:
+  ormcache_context\(:
+    "[19] 'ormcache_context' is deprecated. Use 'ormcache' directly, context values are available as 'self.env.context.get'. More information: https://github.com/odoo/odoo/commit/755e9c3f2bad#diff-3d5ccf8623cd4456c775fef15f0cc973b6f88f05c0ce3b04ab113324e589b851"
