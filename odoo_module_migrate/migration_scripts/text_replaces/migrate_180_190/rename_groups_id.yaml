@@ -1,0 +1,4 @@
+.xml:
+  (?<=name=[\"'])groups_id(?=[\"']): group_ids
+.py:
+  (?<=[\.\"'])groups_id(?=[\.\s,:)\]'\"]): group_ids

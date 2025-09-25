@@ -6,6 +6,7 @@
         <field name="arch" type="xml">
             <field name="parent_id" position="after">
                 <field name="test_field_1"/>
+                <field name="group_ids"/>
             </field>
         </field>
     </record>
