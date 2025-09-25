@@ -270,7 +270,10 @@ def analyze_field_changes(
             )
 
             for pattern, _ in base_patterns:
-                pattern_formatted = pattern.format(old_field=re.escape(field_name))
+                pattern_formatted = pattern.format(
+                    variable="self",
+                    old_field=re.escape(field_name)
+                )
                 if re.search(pattern_formatted, model_content, flags=re.DOTALL):
                     msg = f"Field '{field_name}' of model '{model_name}' was removed. {more_info or ''}"
                     warnings_by_message.setdefault(msg, set()).add(str(file_path))
