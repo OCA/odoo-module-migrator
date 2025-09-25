@@ -12,6 +12,7 @@ import yaml
 import importlib
 import requests
 from tqdm import tqdm
+from .ai_migration_helper import AIMigrationHelper
 
 
 class BaseMigrationScript(object):
@@ -25,12 +26,14 @@ class BaseMigrationScript(object):
     _RENAMED_MODELS = []
     _REMOVED_MODELS = []
     _GLOBAL_FUNCTIONS = []  # [function_object]
+    _AI_TRANSFORMS = []
     _module_path = ""
 
     def __init__(self):
         self._warnings_by_message = {}
         self._errors_by_message = {}
         self._repo_root = None
+        self._ai_helper = AIMigrationHelper()
 
     def _get_controller_data(self, version_from_to):
         # data = request.get(url, version_from, version_to)
@@ -119,6 +122,11 @@ class BaseMigrationScript(object):
                 "type": TYPE_ARRAY,
                 "doc": [],
             },
+            # [([regex_patterns], prompt), ...]
+            "_AI_TRANSFORMS": {
+                "type": TYPE_ARRAY,
+                "doc": [],
+            },
         }
         # read
         for rule in rules.keys():
@@ -139,7 +147,17 @@ class BaseMigrationScript(object):
                     elif rules[rule]["type"] == TYPE_DICT:
                         rules[rule]["doc"].update(new_rules)
                     elif rules[rule]["type"] == TYPE_ARRAY:
-                        rules[rule]["doc"].extend(new_rules)
+                        if rule == "_AI_TRANSFORMS":
+                            # Convert YAML format to expected tuple format
+                            for ai_transform_item in new_rules:
+                                extensions = ai_transform_item.get("extensions", [])
+                                patterns = ai_transform_item.get("patterns", [])
+                                prompt = ai_transform_item.get("prompt", "")
+                                rules[rule]["doc"].append(
+                                    (extensions, patterns, prompt)
+                                )
+                        else:
+                            rules[rule]["doc"].extend(new_rules)
 
         # Read from controller
         data_version_changes = self._get_controller_data(migrate_from_to)
@@ -253,9 +271,7 @@ class BaseMigrationScript(object):
                         else ""
                     )
                     field_info = (
-                        f"for field {change['old_name']} "
-                        if change.get("old_name")
-                        else ""
+                        f"for field {change['field']} " if change.get("field") else ""
                     )
                     warnings[change["old_name"]] = (
                         model_info + field_info + change["notes"]
@@ -358,6 +374,18 @@ class BaseMigrationScript(object):
             rel_files = [os.path.relpath(f, self._repo_root) for f in sorted(files)]
             logger.warning("%s\n  %s" % (warning_message, "\n  ".join(rel_files)))
 
+        for (
+            filename,
+            line_start,
+            line_end,
+        ), suggestion in self._ai_helper.suggestions.items():
+            logger.info(
+                "AI Suggestion for %s (lines %d-%d):\n\n%s"
+                % (filename, line_start, line_end, suggestion)
+            )
+
+        self._ai_helper.suggestions.clear()
+
     def process_file(
         self, root, filename, extension, file_renames, directory_path, commit_enabled
     ):
@@ -401,9 +429,7 @@ class BaseMigrationScript(object):
         for pattern, error_message in errors.items():
             if re.findall(pattern, new_text):
                 file_path = os.path.join(root, filename)
-                self._errors_by_message.setdefault(error_message, set()).add(
-                    file_path
-                )
+                self._errors_by_message.setdefault(error_message, set()).add(file_path)
 
         warnings = self._TEXT_WARNINGS.get("*", {})
         warnings.update(self._TEXT_WARNINGS.get(extension, {}))
@@ -425,6 +451,10 @@ class BaseMigrationScript(object):
                 self._REMOVED_FIELDS,
                 self._warnings_by_message,
             )
+
+        self._ai_helper.apply_ai_transforms(
+            filename, extension, content=new_text, ai_transforms=self._AI_TRANSFORMS
+        )
 
     def handle_removed_fields(self, removed_fields):
         """Give warnings if field_name is found on the code. To minimize two
