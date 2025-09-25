@@ -10,6 +10,7 @@ import inspect
 import glob
 import yaml
 import importlib
+from .ai_migration_helper import AIMigrationHelper
 
 
 class BaseMigrationScript(object):
@@ -23,7 +24,35 @@ class BaseMigrationScript(object):
     _RENAMED_MODELS = []
     _REMOVED_MODELS = []
     _GLOBAL_FUNCTIONS = []  # [function_object]
+    _AI_TRANSFORMS = [
+        (
+            [r"from odoo\.osv import expression", r"return expression\.AND"],
+            """
+# Prompt: Refactorización de Domains
+
+Analiza el siguiente código de Odoo y determina si corresponde aplicar una refactorización de **domains**:
+
+- Sustituir `expression.AND([...])` → `Domain.AND([...])` o el uso de `&`.
+- Sustituir `expression.OR([...])` → `Domain.OR([...])` o el uso de `|`.
+- Simplificar dominios anidados usando `&` y `|`.
+
+### Reglas
+- Si se detecta este patrón, devolver un objeto JSON con `show_change: true` y en `content` incluir los bloques **Antes** y **Después**.
+- Si no corresponde, devolver `show_change: false` y `content: ""`.
+
+### Ejemplo de salida esperada
+```json
+{
+  "show_change": true,
+  "content": "Antes:\n<codigo original>\n\nDespués:\n<codigo refactorizado>"
+}
+```""",
+        )
+    ]
     _module_path = ""
+
+    def __init__(self):
+        self._ai_helper = AIMigrationHelper()
 
     def parse_rules(self):
         script_parts = inspect.getfile(self.__class__).split("/")
@@ -212,6 +241,11 @@ class BaseMigrationScript(object):
         new_text = tools._replace_in_file(
             absolute_file_path, replaces, "Change file content of %s" % filename
         )
+
+        if self._AI_TRANSFORMS:
+            self._ai_helper.apply_ai_transforms(
+                content=new_text, ai_transforms=self._AI_TRANSFORMS
+            )
 
         # Display errors if the new content contains some obsolete
         # pattern
