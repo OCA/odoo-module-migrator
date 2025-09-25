@@ -1,4 +1,6 @@
 from odoo import models, fields, api
+from odoo.osv import expression
+from odoo.osv.expression import AND, OR
 
 
 class ResPartner(models.Model):
@@ -29,3 +31,9 @@ class ResPartner(models.Model):
         self.create(vals)
 
         return records
+
+    def search_with_expression(self, domain):
+        result = expression.AND([domain, [('active', '=', True)]])
+        result2 = AND([result, OR([[('is_company', '=', True)]])])
+        
+        return self.search(result2)
