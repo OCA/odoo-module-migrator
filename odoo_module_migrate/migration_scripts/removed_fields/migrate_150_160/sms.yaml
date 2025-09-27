@@ -1,0 +1,6 @@
+- ['ir.actions.server', 'sms_mass_keep_log', '']
+- ['sms.template', 'copyvalue', '']
+- ['sms.template', 'model_object_field', '']
+- ['sms.template', 'null_value', '']
+- ['sms.template', 'sub_model_object_field', '']
+- ['sms.template', 'sub_object', '']

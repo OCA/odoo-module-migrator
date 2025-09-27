@@ -1,0 +1,3 @@
+- ['payment.acquirer', 'payumoney_merchant_key', '']
+- ['payment.acquirer', 'payumoney_merchant_salt', '']
+- ['payment.acquirer', 'provider', '']

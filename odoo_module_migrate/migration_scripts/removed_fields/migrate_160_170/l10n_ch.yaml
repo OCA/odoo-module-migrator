@@ -1,0 +1,6 @@
+- ['account.move', 'l10n_ch_isr_number', '']
+- ['account.move', 'l10n_ch_isr_sent', '']
+- ['res.company', 'l10n_ch_isr_print_bank_location', '']
+- ['res.partner.bank', 'l10n_ch_isr_subscription_chf', '']
+- ['res.partner.bank', 'l10n_ch_isr_subscription_eur', '']
+- ['res.partner.bank', 'l10n_ch_postal', '']

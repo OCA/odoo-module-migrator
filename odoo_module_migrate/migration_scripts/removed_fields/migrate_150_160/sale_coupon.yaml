@@ -1,0 +1,4 @@
+- ['coupon.coupon', 'sales_order_id', '']
+- ['sale.order', 'code_promo_program_id', '']
+- ['sale.order', 'generated_coupon_ids', '']
+- ['sale.order', 'no_code_promo_program_ids', '']

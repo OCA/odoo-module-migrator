@@ -1,0 +1,5 @@
+- ['account.analytic.line', 'non_allow_billable', '']
+- ['project.project', 'bill_type', '']
+- ['project.sale.line.employee.map', 'timesheet_product_id', '']
+- ['project.task', 'non_allow_billable', '']
+- ['project.task', 'sale_order_id', '']

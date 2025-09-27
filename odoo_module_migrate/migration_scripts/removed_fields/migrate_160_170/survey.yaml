@@ -1,0 +1,5 @@
+- ['survey.question', 'is_conditional', '']
+- ['survey.question', 'triggering_answer_id', '']
+- ['survey.question', 'triggering_question_id', '']
+- ['survey.survey', 'message_main_attachment_id', '']
+- ['survey.user_input', 'message_main_attachment_id', '']
