@@ -224,6 +224,44 @@ class BaseMigrationScript(object):
                     warnings[change["old_name"]] = change["notes"]
                     rules["_TEXT_WARNINGS"]["doc"]["*"] = warnings
 
+                if (
+                    change["change_type"] == "change_type"
+                    and change["model_type"] == "field"
+                ):
+                    warnings = rules["_TEXT_WARNINGS"]["doc"].get(".py", {})
+                    model_info = (
+                        f"On the model {change['model']} "
+                        if change.get("model")
+                        else ""
+                    )
+                    field_info = (
+                        f"for field {change['field']} " if change.get("field") else ""
+                    )
+                    warnings[change["field"]] = (
+                        model_info + field_info + change["notes"]
+                    )
+                    rules["_TEXT_WARNINGS"]["doc"][".py"] = warnings
+
+                if (
+                    change["change_type"] == "remove"
+                    and change["model_type"] == "selection_value"
+                ):
+                    warnings = rules["_TEXT_WARNINGS"]["doc"].get("*", {})
+                    model_info = (
+                        f"On the model {change['model']} "
+                        if change.get("model")
+                        else ""
+                    )
+                    field_info = (
+                        f"for field {change['old_name']} "
+                        if change.get("old_name")
+                        else ""
+                    )
+                    warnings[change["old_name"]] = (
+                        model_info + field_info + change["notes"]
+                    )
+                    rules["_TEXT_WARNINGS"]["doc"]["*"] = warnings
+
         # extend
         for rule, data in rules.items():
             rtype = data["type"]
