@@ -11,6 +11,7 @@ import glob
 import yaml
 import importlib
 import requests
+from tqdm import tqdm
 
 
 class BaseMigrationScript(object):
@@ -25,6 +26,11 @@ class BaseMigrationScript(object):
     _REMOVED_MODELS = []
     _GLOBAL_FUNCTIONS = []  # [function_object]
     _module_path = ""
+
+    def __init__(self):
+        self._warnings_by_message = {}
+        self._errors_by_message = {}
+        self._repo_root = None
 
     def _get_controller_data(self, version_from_to):
         # data = request.get(url, version_from, version_to)
@@ -135,8 +141,7 @@ class BaseMigrationScript(object):
                     elif rules[rule]["type"] == TYPE_ARRAY:
                         rules[rule]["doc"].extend(new_rules)
 
-        # Read form controller
-
+        # Read from controller
         data_version_changes = self._get_controller_data(migrate_from_to)
         if data_version_changes:
             for change in data_version_changes.values():
@@ -271,19 +276,28 @@ class BaseMigrationScript(object):
         manifest_path = self._get_correct_manifest_path(
             manifest_path, self._FILE_RENAMES
         )
+        self._warnings_by_message = {}
+        self._repo_root = str(module_path.resolve())
+
+        all_files = []
         for root, directories, filenames in os.walk(module_path.resolve()):
             for filename in filenames:
                 extension = os.path.splitext(filename)[1]
-                if extension not in _ALLOWED_EXTENSIONS:
-                    continue
-                self.process_file(
-                    root,
-                    filename,
-                    extension,
-                    self._FILE_RENAMES,
-                    directory_path,
-                    commit_enabled,
-                )
+                if extension in _ALLOWED_EXTENSIONS:
+                    all_files.append((root, filename, extension))
+
+        if not (os.getenv("PROGRESS_DISABLE", "0") == "1"):
+            all_files = tqdm(all_files, desc="Processing files")
+
+        for root, filename, extension in all_files:
+            self.process_file(
+                root,
+                filename,
+                extension,
+                self._FILE_RENAMES,
+                directory_path,
+                commit_enabled,
+            )
 
         self.handle_deprecated_modules(manifest_path, self._DEPRECATED_MODULES)
 
@@ -297,6 +311,14 @@ class BaseMigrationScript(object):
                     migration_steps=migration_steps,
                     tools=tools,
                 )
+
+        for error_message, files in self._errors_by_message.items():
+            rel_files = [os.path.relpath(f, self._repo_root) for f in sorted(files)]
+            logger.error("%s\n  %s" % (error_message, "\n  ".join(rel_files)))
+
+        for warning_message, files in self._warnings_by_message.items():
+            rel_files = [os.path.relpath(f, self._repo_root) for f in sorted(files)]
+            logger.warning("%s\n  %s" % (warning_message, "\n  ".join(rel_files)))
 
     def process_file(
         self, root, filename, extension, file_renames, directory_path, commit_enabled
@@ -340,7 +362,10 @@ class BaseMigrationScript(object):
         errors.update(removed_models.get("errors"))
         for pattern, error_message in errors.items():
             if re.findall(pattern, new_text):
-                logger.error(error_message + "\nFile " + os.path.join(root, filename))
+                file_path = os.path.join(root, filename)
+                self._errors_by_message.setdefault(error_message, set()).add(
+                    file_path
+                )
 
         warnings = self._TEXT_WARNINGS.get("*", {})
         warnings.update(self._TEXT_WARNINGS.get(extension, {}))
@@ -350,7 +375,18 @@ class BaseMigrationScript(object):
         warnings.update(removed_models.get("warnings"))
         for pattern, warning_message in warnings.items():
             if re.findall(pattern, new_text):
-                logger.warning(warning_message + ". File " + root + os.sep + filename)
+                file_path = os.path.join(root, filename)
+                self._warnings_by_message.setdefault(warning_message, set()).add(
+                    file_path
+                )
+
+        if extension == ".py":
+            tools.analyze_field_changes(
+                absolute_file_path,
+                self._RENAMED_FIELDS,
+                self._REMOVED_FIELDS,
+                self._warnings_by_message,
+            )
 
     def handle_removed_fields(self, removed_fields):
         """Give warnings if field_name is found on the code. To minimize two
@@ -368,7 +404,11 @@ class BaseMigrationScript(object):
                 field_name,
                 " %s" % more_info if more_info else "",
             )
-            res[r"""(['"]{0}['"]|\.{0}[\s,=])""".format(field_name)] = msg
+            res[
+                r"""(?<!self\.)(?<!self\.write\(\{{)(?<!self\.create\(\{{)(['"]{0}['"]|\.{0}[\s,=])""".format(
+                    field_name
+                )
+            ] = msg
         return {"warnings": res}
 
     def handle_renamed_fields(self, removed_fields):
@@ -388,7 +428,11 @@ class BaseMigrationScript(object):
                 new_field_name,
                 " %s" % more_info if more_info else "",
             )
-            res[r"""(['"]{0}['"]|\.{0}[\s,=])""".format(old_field_name)] = msg
+            res[
+                r"""(?<!self\.)(?<!self\.write\(\{{)(?<!self\.create\(\{{)(['"]{0}['"]|\.{0}[\s,=])""".format(
+                    old_field_name
+                )
+            ] = msg
         return {"warnings": res}
 
     def handle_deprecated_modules(self, manifest_path, deprecated_modules):

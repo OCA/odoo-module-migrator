@@ -8,8 +8,13 @@
 
 from colorama import Fore, Style
 import time
+from tqdm import tqdm
 
 import logging
+import os
+
+if not (os.environ.get("PROGRESS_DISABLE", "0") == "1"):
+    logging.StreamHandler.emit = lambda self, record: tqdm.write(self.format(record))
 
 logger = logging.getLogger(__name__)
 
