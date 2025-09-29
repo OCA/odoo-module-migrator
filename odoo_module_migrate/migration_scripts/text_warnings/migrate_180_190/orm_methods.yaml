@@ -1,3 +1,0 @@
-"*":
-  \.toggle_active\(|\"toggle_active\":
-    "[19] 'toggle_active' is deprecated. Use action_archive or action_unarchive. More information: https://github.com/odoo/odoo/pull/183691"
