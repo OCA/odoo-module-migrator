@@ -1,0 +1,7 @@
+.py:
+  pytz\.timezone\(\s*self\.env\.(context\.get\(\s*['"']tz['"']|user\.tz):
+    "[19] Replace manual timezone handling with 'self.env.tz'. This new property provides automatic timezone resolution with proper fallbacks (context -> user -> UTC). More info: https://github.com/odoo/odoo/pull/221541"
+  timezone\(\s*self\.env\.(context\.get\(\s*['"']tz['"']|user\.tz):
+    "[19] Replace manual timezone handling with 'self.env.tz'. This new property provides automatic timezone resolution with proper fallbacks (context -> user -> UTC). More info: https://github.com/odoo/odoo/pull/221541"
+  (\w+)\.env\.context\.get\(\s*['"']tz['"']:
+    "[19] Replace manual timezone context access with 'env.tz'. This new property provides automatic timezone resolution with proper fallbacks (context -> user -> UTC). More info: https://github.com/odoo/odoo/pull/221541"
