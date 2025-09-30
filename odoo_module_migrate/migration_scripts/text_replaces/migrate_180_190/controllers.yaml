@@ -1,0 +1,2 @@
+.py:
+  type=(['\"])json\1: type=\1jsonrpc\1
