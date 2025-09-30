@@ -2,6 +2,8 @@
 # @author: Sylvain LE GAL (https://twitter.com/legalsylvain)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+import os
+
 from .log import logger
 
 from .config import _MANIFEST_NAMES
@@ -38,6 +40,14 @@ class ModuleMigration:
                 self._migration._migration_steps,
                 self._migration._directory_path,
                 self._migration._commit_enabled,
+            )
+
+        # Run pre-commit before final commit to format any changes made during migration scripts execution
+        if os.path.exists(".pre-commit-config.yaml") and self._migration._pre_commit:
+            _execute_shell(
+                "pre-commit run -a",
+                path=self._migration._directory_path,
+                raise_error=False,
             )
 
         self._commit_changes(
