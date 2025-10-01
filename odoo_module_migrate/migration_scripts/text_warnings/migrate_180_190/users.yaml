@@ -1,0 +1,3 @@
+.py:
+  "\\.users.":
+    "[19] 'users' field from model 'res.group' is deprecated. If you are calling this field from the model, try with: 'user_ids' directly, or evaluate 'all_user_ids' in each case. Otherwise, ignore this message. More information: https://github.com/odoo/odoo/pull/179354"
