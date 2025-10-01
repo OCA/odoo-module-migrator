@@ -2,6 +2,8 @@
 
 from odoo_module_migrate.base_migration_script import BaseMigrationScript
 import re
+import ast
+import json
 
 
 def migrate_expression_to_domain(
@@ -59,11 +61,6 @@ def migrate_expression_to_domain(
 
         except Exception as e:
             logger.error(f"Error processing file {file}: {str(e)}")
-
-
-import ast
-import json
-import re
 
 
 def upgrade_sql_constraints(
