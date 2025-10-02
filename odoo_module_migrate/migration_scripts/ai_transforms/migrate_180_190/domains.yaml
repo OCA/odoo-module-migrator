@@ -1,0 +1,41 @@
+- extensions:
+    - ".py"
+  patterns:
+    - "expression\\.AND\\s*\\("
+    - "expression\\.OR\\s*\\("
+    - "Domain\\.(AND|OR)\\s*\\(\\s*\\["
+  prompt: |
+    # Prompt: Refactorización de Domains
+
+    Analiza el siguiente código de Odoo y determina si corresponde aplicar una refactorización de **domains**:
+
+    - Sustituir `Domain.AND([...])` por el uso de `&` cuando aplique.
+    - Sustituir `Domain.OR([...])` por el uso de `|` cuando aplique.
+    - Simplificar dominios anidados usando `&` y `|`.
+    - Sustituir [("field", "operator", value), ...] por Domain("field", "operator", value) cuando aplique.
+
+    ### Reglas
+    - Si se detecta este patrón, devolver un objeto JSON con `show_change: true` y en `content` incluir únicamente el **código refactorizado**.
+    - Si no corresponde, devolver `show_change: false` y `content: ""`.
+
+    ### Ejemplo válido
+
+    #### Antes
+
+    ```python
+    def _get_read_domain(self):
+        res = super()._get_read_domain()
+        if self.env.user.share:
+            res = Domain.OR([res, [("id", "child_of", self.env.user.documentation_ids.ids)]])
+        return res
+    ```
+
+    #### Después
+
+    ```python
+    def _get_read_domain(self):
+        res = super()._get_read_domain()
+        if self.env.user.share:
+            res = res | Domain("id", "child_of", self.env.user.documentation_ids.ids)
+        return res
+    ```
