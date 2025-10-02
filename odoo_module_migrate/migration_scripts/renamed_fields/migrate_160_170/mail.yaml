@@ -1,0 +1,3 @@
+- ['mail.activity.plan', 'model', 'res_model', '']
+- ['mail.activity.plan', 'model_id', 'res_model_id', '']
+- ['mail.tracking.value', 'field', 'field_id', '']

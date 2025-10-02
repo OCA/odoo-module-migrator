@@ -1,0 +1,6 @@
+- ['account.move', 'tax_cash_basis_move_id', 'tax_cash_basis_origin_move_id', '']
+- ['account.reconcile.model', 'match_total_amount_param', 'payment_tolerance_param', '']
+- ['account.reconcile.model.template', 'match_total_amount_param', 'payment_tolerance_param', '']
+- ['account.reconcile.model', 'match_total_amount', 'allow_payment_tolerance', '']
+- ['account.reconcile.model.template', 'match_total_amount', 'allow_payment_tolerance', '']
+- ['res.company', 'account_tax_fiscal_country_id', 'account_fiscal_country_id', '']

@@ -1,0 +1,6 @@
+- ['mailing.mailing', 'contact_ab_pc', 'ab_testing_pc', '']
+- ['mailing.mailing', 'unique_ab_testing', 'ab_testing_enabled', '']
+- ['mailing.trace', 'sent', 'sent_datetime', '']
+- ['mailing.trace', 'opened', 'open_datetime', '']
+- ['mailing.trace', 'replied', 'reply_datetime', '']
+- ['mailing.trace', 'clicked', 'links_click_datetime', '']

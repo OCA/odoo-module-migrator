@@ -1,0 +1,2 @@
+- ['project.task', 'dependency_task_ids', 'depend_on_ids', '']
+- ['project.task', 'depending_task_ids', 'dependent_ids', '']

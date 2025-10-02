@@ -1,0 +1,2 @@
+- ['account.analytic.account', 'group_id', 'plan_id', '']
+- ['account.analytic.line', 'group_id', 'plan_id', '']
