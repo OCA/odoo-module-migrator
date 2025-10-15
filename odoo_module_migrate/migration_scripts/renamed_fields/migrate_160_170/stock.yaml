@@ -1,0 +1,3 @@
+- ['stock.move.line', 'reserved_uom_qty', 'quantity', 'Commit https://github.com/odoo/odoo/commit/7dda6bb92715ea25b2818a62fec5e646f3678b81']
+- ['stock.move.line', 'qty_done', 'quantity', 'Commit https://github.com/odoo/odoo/commit/7dda6bb92715ea25b2818a62fec5e646f3678b81']
+- ['stock.move.line', 'reserved_qty', 'quantity_product_uom', 'Commit https://github.com/odoo/odoo/commit/7dda6bb92715ea25b2818a62fec5e646f3678b81']
