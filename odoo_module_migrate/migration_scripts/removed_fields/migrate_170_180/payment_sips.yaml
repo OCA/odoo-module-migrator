@@ -1,0 +1,6 @@
+- ['payment.provider', 'sips_key_version', '']
+- ['payment.provider', 'sips_merchant_id', '']
+- ['payment.provider', 'sips_prod_url', '']
+- ['payment.provider', 'sips_secret', '']
+- ['payment.provider', 'sips_test_url', '']
+- ['payment.provider', 'sips_version', '']

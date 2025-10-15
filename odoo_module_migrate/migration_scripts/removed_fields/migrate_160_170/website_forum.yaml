@@ -1,0 +1,6 @@
+- ['forum.forum', 'allow_bump', '']
+- ['forum.forum', 'message_main_attachment_id', '']
+- ['forum.post', 'bump_date', '']
+- ['forum.post', 'message_main_attachment_id', '']
+- ['forum.tag', 'message_main_attachment_id', '']
+- ['website', 'forums_count', '']

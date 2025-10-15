@@ -1,0 +1,7 @@
+- ['l10n_es_edi_facturae.certificate', 'company_id', '']
+- ['l10n_es_edi_facturae.certificate', 'content', '']
+- ['l10n_es_edi_facturae.certificate', 'date_end', '']
+- ['l10n_es_edi_facturae.certificate', 'date_start', '']
+- ['l10n_es_edi_facturae.certificate', 'password', '']
+- ['l10n_es_edi_facturae.certificate', 'serial_number', '']
+- ['res.company', 'l10n_es_edi_facturae_certificate_id', '']

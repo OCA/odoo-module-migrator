@@ -1,0 +1,7 @@
+- ['pos.payment', 'razorpay_authcode', '']
+- ['pos.payment', 'razorpay_card_owner_name', '']
+- ['pos.payment', 'razorpay_card_scheme', '']
+- ['pos.payment', 'razorpay_issuer_bank', '']
+- ['pos.payment', 'razorpay_issuer_card_no', '']
+- ['pos.payment', 'razorpay_payment_method', '']
+- ['pos.payment', 'razorpay_reference_no', '']

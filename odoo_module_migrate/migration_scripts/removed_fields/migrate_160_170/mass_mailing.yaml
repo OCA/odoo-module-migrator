@@ -1,0 +1,5 @@
+- ['mailing.contact', 'message_main_attachment_id', '']
+- ['mailing.contact', 'subscription_list_ids', '']
+- ['mailing.contact.subscription', 'unsubscription_date', '']
+- ['mailing.mailing', 'message_main_attachment_id', '']
+- ['utm.campaign', 'ab_testing_total_pc', '']

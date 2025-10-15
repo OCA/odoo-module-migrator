@@ -1,0 +1,5 @@
+- ['payment.transaction', 'callback_hash', '']
+- ['payment.transaction', 'callback_is_done', '']
+- ['payment.transaction', 'callback_method', '']
+- ['payment.transaction', 'callback_model_id', '']
+- ['payment.transaction', 'callback_res_id', '']
