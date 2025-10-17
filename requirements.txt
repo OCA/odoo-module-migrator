@@ -2,3 +2,4 @@ argcomplete
 colorama
 lxml
 pyyaml
+requests
