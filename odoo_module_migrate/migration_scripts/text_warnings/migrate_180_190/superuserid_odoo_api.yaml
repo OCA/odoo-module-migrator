@@ -1,0 +1,2 @@
+.py:
+  SUPERUSER_ID: "[19] SUPERUSER_ID was moved to odoo.api. Use api.SUPERUSER_ID instead of odoo.SUPERUSER_ID and fix imports accordingly. Review documentation and examples: https://github.com/odoo/odoo/commit/d6a955f10483"
