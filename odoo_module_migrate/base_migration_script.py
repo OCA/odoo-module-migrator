@@ -10,6 +10,9 @@ import inspect
 import glob
 import yaml
 import importlib
+import requests
+from tqdm import tqdm
+from .ai_migration_helper import AIMigrationHelper
 
 
 class BaseMigrationScript(object):
@@ -23,7 +26,47 @@ class BaseMigrationScript(object):
     _RENAMED_MODELS = []
     _REMOVED_MODELS = []
     _GLOBAL_FUNCTIONS = []  # [function_object]
+    _AI_TRANSFORMS = []
     _module_path = ""
+
+    def __init__(self):
+        self._warnings_by_message = {}
+        self._errors_by_message = {}
+        self._repo_root = None
+        self._ai_helper = AIMigrationHelper()
+
+    def _get_controller_data(self, version_from_to):
+        # data = request.get(url, version_from, version_to)
+        # version_from_to:
+        #     - migrate_100_allways.py
+        #     - migrate_160_170.py
+        #     - migrate_allways.py
+        # [0] - migrate
+        # [1] - version_from
+        # [2] - version_to
+        list_version_from_to = version_from_to.split("_")
+        if len(list_version_from_to) != 3 or "allways" in list_version_from_to:
+            return False
+        version_from = list_version_from_to[1]
+        version_to = list_version_from_to[2]
+        return self._get_changes_from_adhoc(version_from, version_to)
+
+    def _get_changes_from_adhoc(self, init_version_name, target_version_name):
+        base_url = os.getenv("ADHOC_URL", False)
+        if not base_url:
+            logger.warning("No ADHOC_URL env variable found. Version Changes skipped")
+            return False
+        endpoint = "/version_changes/{from_version}/{to_version}".format(
+            from_version=init_version_name, to_version=target_version_name
+        )
+        uri = base_url + endpoint
+        self._requests = requests.Session()
+        response = self._requests.get(uri)
+
+        if response and response.ok:
+            data_version_changes = response.json()
+            return data_version_changes
+        return False
 
     def parse_rules(self):
         script_parts = inspect.getfile(self.__class__).split("/")
@@ -79,6 +122,11 @@ class BaseMigrationScript(object):
                 "type": TYPE_ARRAY,
                 "doc": [],
             },
+            # [([regex_patterns], prompt), ...]
+            "_AI_TRANSFORMS": {
+                "type": TYPE_ARRAY,
+                "doc": [],
+            },
         }
         # read
         for rule in rules.keys():
@@ -99,7 +147,137 @@ class BaseMigrationScript(object):
                     elif rules[rule]["type"] == TYPE_DICT:
                         rules[rule]["doc"].update(new_rules)
                     elif rules[rule]["type"] == TYPE_ARRAY:
-                        rules[rule]["doc"].extend(new_rules)
+                        if rule == "_AI_TRANSFORMS":
+                            # Convert YAML format to expected tuple format
+                            for ai_transform_item in new_rules:
+                                extensions = ai_transform_item.get("extensions", [])
+                                patterns = ai_transform_item.get("patterns", [])
+                                prompt = ai_transform_item.get("prompt", "")
+                                rules[rule]["doc"].append(
+                                    (extensions, patterns, prompt)
+                                )
+                        else:
+                            rules[rule]["doc"].extend(new_rules)
+
+        # Read from controller
+        data_version_changes = self._get_controller_data(migrate_from_to)
+        if data_version_changes:
+            for change in data_version_changes.values():
+                # {'2': {
+                #     'change_type': 'rename',
+                #     'major_version_id': '17.0',
+                #     'model': False,
+                #     'field': False,
+                #     'model_type': 'model',
+                #     'old_name': 'mail.channel',
+                #     'new_name': 'discuss.channel',
+                #     'notes': '<p>Más información sobre este cambio <a href="https://github.com/odoo/odoo/pull/118354/" target="_blank">en PR 118354</a></p>'
+                #     }
+                # }
+
+                if (
+                    change["change_type"] == "rename"
+                    and change["model_type"] == "model"
+                ):
+                    # [(old.model.name, new.model.name, more_info)]
+                    new_rules = [
+                        [change["old_name"], change["new_name"], change["notes"]]
+                    ]
+                    rules["_RENAMED_MODELS"]["doc"].extend(new_rules)
+
+                if (
+                    change["change_type"] == "rename"
+                    and change["model_type"] == "field"
+                ):
+                    # [(model_name, old_field_name, new_field_name, more_info), ...)]
+                    new_rules = [
+                        [
+                            change["model"],
+                            change["old_name"],
+                            change["new_name"],
+                            change["notes"],
+                        ]
+                    ]
+                    rules["_RENAMED_FIELDS"]["doc"].extend(new_rules)
+
+                if (
+                    change["change_type"] == "remove"
+                    and change["model_type"] == "model"
+                ):
+                    # [(old.model.name, more_info)]
+                    new_rules = [[change["old_name"], change["notes"]]]
+                    rules["_REMOVED_MODELS"]["doc"].extend(new_rules)
+
+                if (
+                    change["change_type"] == "remove"
+                    and change["model_type"] == "field"
+                ):
+                    # [(model_name, field_name, more_info), ...)]
+                    new_rules = [[change["model"], change["old_name"], change["notes"]]]
+                    rules["_REMOVED_FIELDS"]["doc"].extend(new_rules)
+
+                if (
+                    change["change_type"] == "rename"
+                    and change["model_type"] == "xmlid"
+                ):
+                    # [(model_name, old_field_name, new_field_name, more_info), ...)]
+                    new_rules = [
+                        [
+                            change["model"],
+                            change["old_name"],
+                            change["new_name"],
+                            change["notes"],
+                        ]
+                    ]
+                    warnings = rules["_TEXT_REPLACES"]["doc"].get("*", {})
+                    warnings[change["old_name"]] = change["new_name"]
+                    rules["_TEXT_REPLACES"]["doc"]["*"] = warnings
+
+                if (
+                    change["change_type"] == "remove"
+                    and change["model_type"] == "xmlid"
+                ):
+                    # [(model_name, field_name, more_info), ...)]
+                    warnings = rules["_TEXT_WARNINGS"]["doc"].get("*", {})
+                    warnings[change["old_name"]] = change["notes"]
+                    rules["_TEXT_WARNINGS"]["doc"]["*"] = warnings
+
+                if (
+                    change["change_type"] == "change_type"
+                    and change["model_type"] == "field"
+                ):
+                    warnings = rules["_TEXT_WARNINGS"]["doc"].get(".py", {})
+                    model_info = (
+                        f"On the model {change['model']} "
+                        if change.get("model")
+                        else ""
+                    )
+                    field_info = (
+                        f"for field {change['field']} " if change.get("field") else ""
+                    )
+                    warnings[change["field"]] = (
+                        model_info + field_info + change["notes"]
+                    )
+                    rules["_TEXT_WARNINGS"]["doc"][".py"] = warnings
+
+                if (
+                    change["change_type"] == "remove"
+                    and change["model_type"] == "selection_value"
+                ):
+                    warnings = rules["_TEXT_WARNINGS"]["doc"].get("*", {})
+                    model_info = (
+                        f"On the model {change['model']} "
+                        if change.get("model")
+                        else ""
+                    )
+                    field_info = (
+                        f"for field {change['field']} " if change.get("field") else ""
+                    )
+                    warnings[change["old_name"]] = (
+                        model_info + field_info + change["notes"]
+                    )
+                    rules["_TEXT_WARNINGS"]["doc"]["*"] = warnings
+
         # extend
         for rule, data in rules.items():
             rtype = data["type"]
@@ -152,19 +330,30 @@ class BaseMigrationScript(object):
         manifest_path = self._get_correct_manifest_path(
             manifest_path, self._FILE_RENAMES
         )
+        self._warnings_by_message = {}
+        self._repo_root = str(module_path.resolve())
+
+        all_files = []
         for root, directories, filenames in os.walk(module_path.resolve()):
+            if 'migrations' in root.split(os.sep):
+                continue
             for filename in filenames:
                 extension = os.path.splitext(filename)[1]
-                if extension not in _ALLOWED_EXTENSIONS:
-                    continue
-                self.process_file(
-                    root,
-                    filename,
-                    extension,
-                    self._FILE_RENAMES,
-                    directory_path,
-                    commit_enabled,
-                )
+                if extension in _ALLOWED_EXTENSIONS:
+                    all_files.append((root, filename, extension))
+
+        if not (os.getenv("PROGRESS_DISABLE", "0") == "1"):
+            all_files = tqdm(all_files, desc="Processing files")
+
+        for root, filename, extension in all_files:
+            self.process_file(
+                root,
+                filename,
+                extension,
+                self._FILE_RENAMES,
+                directory_path,
+                commit_enabled,
+            )
 
         self.handle_deprecated_modules(manifest_path, self._DEPRECATED_MODULES)
 
@@ -178,6 +367,26 @@ class BaseMigrationScript(object):
                     migration_steps=migration_steps,
                     tools=tools,
                 )
+
+        for error_message, files in self._errors_by_message.items():
+            rel_files = [os.path.relpath(f, self._repo_root) for f in sorted(files)]
+            logger.error("%s\n  %s" % (error_message, "\n  ".join(rel_files)))
+
+        for warning_message, files in self._warnings_by_message.items():
+            rel_files = [os.path.relpath(f, self._repo_root) for f in sorted(files)]
+            logger.warning("%s\n  %s" % (warning_message, "\n  ".join(rel_files)))
+
+        for (
+            filename,
+            line_start,
+            line_end,
+        ), suggestion in self._ai_helper.suggestions.items():
+            logger.info(
+                "AI Suggestion for %s (lines %d-%d):\n\n%s"
+                % (filename, line_start, line_end, suggestion)
+            )
+
+        self._ai_helper.suggestions.clear()
 
     def process_file(
         self, root, filename, extension, file_renames, directory_path, commit_enabled
@@ -221,7 +430,8 @@ class BaseMigrationScript(object):
         errors.update(removed_models.get("errors"))
         for pattern, error_message in errors.items():
             if re.findall(pattern, new_text):
-                logger.error(error_message + "\nFile " + os.path.join(root, filename))
+                file_path = os.path.join(root, filename)
+                self._errors_by_message.setdefault(error_message, set()).add(file_path)
 
         warnings = self._TEXT_WARNINGS.get("*", {})
         warnings.update(self._TEXT_WARNINGS.get(extension, {}))
@@ -231,7 +441,22 @@ class BaseMigrationScript(object):
         warnings.update(removed_models.get("warnings"))
         for pattern, warning_message in warnings.items():
             if re.findall(pattern, new_text):
-                logger.warning(warning_message + ". File " + root + os.sep + filename)
+                file_path = os.path.join(root, filename)
+                self._warnings_by_message.setdefault(warning_message, set()).add(
+                    file_path
+                )
+
+        if extension == ".py":
+            tools.analyze_field_changes(
+                absolute_file_path,
+                self._RENAMED_FIELDS,
+                self._REMOVED_FIELDS,
+                self._warnings_by_message,
+            )
+
+        self._ai_helper.apply_ai_transforms(
+            filename, extension, content=new_text, ai_transforms=self._AI_TRANSFORMS
+        )
 
     def handle_removed_fields(self, removed_fields):
         """Give warnings if field_name is found on the code. To minimize two
@@ -249,7 +474,11 @@ class BaseMigrationScript(object):
                 field_name,
                 " %s" % more_info if more_info else "",
             )
-            res[r"""(['"]{0}['"]|\.{0}[\s,=])""".format(field_name)] = msg
+            res[
+                r"""(?<!self\.)(?<!self\.write\(\{{)(?<!self\.create\(\{{)(['"]{0}['"]|\.{0}[\s,=])""".format(
+                    field_name
+                )
+            ] = msg
         return {"warnings": res}
 
     def handle_renamed_fields(self, removed_fields):
@@ -269,7 +498,11 @@ class BaseMigrationScript(object):
                 new_field_name,
                 " %s" % more_info if more_info else "",
             )
-            res[r"""(['"]{0}['"]|\.{0}[\s,=])""".format(old_field_name)] = msg
+            res[
+                r"""(?<!self\.)(?<!self\.write\(\{{)(?<!self\.create\(\{{)(['"]{0}['"]|\.{0}[\s,=])""".format(
+                    old_field_name
+                )
+            ] = msg
         return {"warnings": res}
 
     def handle_deprecated_modules(self, manifest_path, deprecated_modules):
