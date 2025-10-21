@@ -1,0 +1,3 @@
+.py:
+  env\.\w+\s*=(?!=):
+    "[19] Environment is read-only: avoid assigning attributes to 'env.<field_name>'. More info: https://github.com/odoo/odoo/pull/188584"
