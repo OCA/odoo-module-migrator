@@ -1,7 +1,13 @@
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).
 
-from odoo_module_migrate.base_migration_script import BaseMigrationScript
+import ast
+import json
 import re
+from io import BytesIO
+
+from lxml import etree
+
+from odoo_module_migrate.base_migration_script import BaseMigrationScript
 
 
 def migrate_expression_to_domain(
@@ -61,11 +67,6 @@ def migrate_expression_to_domain(
             logger.error(f"Error processing file {file}: {str(e)}")
 
 
-import ast
-import json
-import re
-
-
 def upgrade_sql_constraints(
     logger, module_path, module_name, manifest_path, migration_steps, tools
 ):
@@ -103,9 +104,61 @@ def upgrade_sql_constraints(
         tools._write_content(file, content)
 
 
-class MigrationScript(BaseMigrationScript):
+def _remove_group_attrs_in_search_views(
+    logger, module_path, module_name, manifest_path, migration_steps, tools
+):
+    """Remove `expand` and `string` attributes from <group> tags when they
+    are inside a <search> view.
+    """
 
+    files_to_process = tools.get_files(module_path, (".xml",))
+
+    for file_path in files_to_process:
+        try:
+            content = tools._read_content(file_path)
+            parser = etree.XMLParser(recover=True)
+            try:
+                # lxml does not accept unicode strings with XML declaration,
+                # so parse from bytes to be safe.
+                tree = etree.parse(BytesIO(content.encode("utf-8")), parser)
+                root = tree.getroot()
+            except Exception:
+                # If full-parse fails, skip this file
+                continue
+
+            changed = False
+
+            # Find all <search> elements and remove expand/string from <group> children
+            for search in root.findall(".//search"):
+                for group in search.findall(".//group"):
+                    for attr in ("expand", "string"):
+                        if attr in group.attrib:
+                            del group.attrib[attr]
+                            changed = True
+
+            if changed:
+                # Write back modified tree
+                new_content = etree.tostring(
+                    root, encoding="utf-8", xml_declaration=True
+                ).decode("utf-8")
+                new_content = new_content.replace(
+                    "<?xml version='1.0' encoding='utf-8'?>",
+                    '<?xml version="1.0" encoding="utf-8"?>',
+                )
+                if not new_content.endswith("\n"):
+                    new_content += "\n"
+                tools._write_content(file_path, new_content)
+                logger.info(
+                    f"Removed expand/string attrs from <group> in search views: {file_path}"
+                )
+
+        except Exception as e:
+            logger.error(f"Error processing XML file {file_path}: {e}")
+
+
+class MigrationScript(BaseMigrationScript):
     _GLOBAL_FUNCTIONS = [
         upgrade_sql_constraints,
         migrate_expression_to_domain,
+        _remove_group_attrs_in_search_views,
     ]
