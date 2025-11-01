@@ -11,4 +11,18 @@
         </field>
     </record>
 
+    <record id="view_partner_search" model="ir.ui.view">
+        <field name="name">res.partner.search</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <search>
+                <group string="My Group" expand="1">
+                    <field name="is_company"/>
+                </group>
+                <group>
+                    <field name="country_id"/>
+                </group>
+            </search>
+        </field>
+    </record>
 </odoo>
