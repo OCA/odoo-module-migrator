@@ -14,7 +14,10 @@
                         <button name="get_formview_action" type="object" title="Open Task" icon="fa-pencil-square-o"/>
                     </tree>
                 </field>
+                <field name="test_field_2" invisible="False # could not parse ['faulty domain']" required="not (((a or b == 42) and c == 43))" readonly="a == 1 and (b == 2 or c == 3) and d == 4"/>
             </field>
+            <field name="zip" position="attributes">
+                <attribute name="required">a == 1</attribute></field>
         </field>
     </record>
 </odoo>

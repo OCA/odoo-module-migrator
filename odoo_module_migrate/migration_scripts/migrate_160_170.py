@@ -261,6 +261,148 @@ def _check_open_form_view(logger, file_path: Path):
         )
 
 
+def _move_attrs_to_attributes_view(logger, file_path: Path):
+    """Transform <field attrs={'required': [('field', '=', value)]}> to <field required="field == value" /> in views"""
+    parser = et.XMLParser()
+    tree = et.parse(str(file_path.resolve()), parser)
+    field_selector = "record[@model='ir.ui.view']/field[@name='arch']"
+    modified = False
+
+    def leaf_to_python(leaf):
+        left, operator, right = leaf.elts
+        if operator.value in ("!=", "="):
+            if (
+                isinstance(right, ast.Constant)
+                and isinstance(right.value, bool)
+                and right.value in (False, True)
+            ):
+                falsy = (
+                    operator.value == "="
+                    and not right.value
+                    or operator.value == "!="
+                    and right.value
+                )
+                return "{}{}{}".format(
+                    falsy and "not" or "",
+                    falsy and " " or "",
+                    left.value,
+                )
+            if isinstance(right, ast.List) and not right.elts:
+                falsy = operator.value == "="
+                return "{}{}{}".format(
+                    falsy and "not" or "",
+                    falsy and " " or "",
+                    left.value,
+                )
+
+        return "{} {} {}".format(
+            left.value,
+            operator.value if operator.value != "=" else "==",
+            ast.unparse(right),
+        )
+
+    def get_operand(domain):
+        if not domain.elts:
+            return ast.List([])
+
+        current = domain.elts[0]
+
+        if isinstance(current, ast.Tuple | ast.List):
+            return ast.List([current])
+
+        if isinstance(current, ast.Constant):
+            left = get_operand(ast.List(domain.elts[1:]))
+
+            if current.value == "!":
+                return ast.List([current] + left.elts)
+
+            right = get_operand(ast.List(domain.elts[1 + len(left.elts) :]))
+            return ast.List([current] + left.elts + right.elts)
+
+    def domain_to_python(domain):
+        if not domain.elts:
+            return ""
+        if len(domain.elts) == 1:
+            return leaf_to_python(domain.elts[0])
+        first = domain.elts[0]
+        if isinstance(first, ast.Constant):
+            if first.value in ("&", "|"):
+                left = get_operand(ast.List(domain.elts[1:]))
+                right = get_operand(ast.List(domain.elts[len(left.elts) + 1 :]))
+                tail = domain_to_python(
+                    ast.List(domain.elts[len(left.elts) + len(right.elts) + 1 :])
+                )
+                return (
+                    "("
+                    + domain_to_python(left)
+                    + (" and " if first.value == "&" else " or ")
+                    + domain_to_python(right)
+                    + ")"
+                    + (tail and f" and {tail}" or "")
+                )
+            if first.value == "!":
+                left = get_operand(ast.List(domain.elts[1:]))
+                tail = domain_to_python(ast.List(domain.elts[len(left.elts) + 1 :]))
+                return "not ({})".format(domain_to_python(left)) + (
+                    tail and f" and {tail}" or ""
+                )
+
+            raise ValueError("unknown operator")
+        if isinstance(first, ast.List | ast.Tuple):
+            return (
+                domain_to_python(ast.List([domain.elts[0]]))
+                + " and "
+                + domain_to_python(ast.List(domain.elts[1:]))
+            )
+        raise ValueError("malformed domain")
+
+    def attrs_to_attributes(attrs_string):
+        try:
+            attrs_expression = ast.parse(attrs_string.strip(), mode="eval")
+        except:
+            return {}
+        if not isinstance(attrs_expression, ast.Expression):
+            return {}
+        if not isinstance(attrs_expression.body, ast.Dict):
+            return {}
+        attrs = attrs_expression.body
+        result = {}
+        for key, value in zip(attrs.keys, attrs.values):
+            try:
+                result[key.value] = domain_to_python(value)
+            except:
+                result[key.value] = f"False # could not parse {ast.unparse(value)}"
+        return result
+
+    for arch in tree.xpath(f"{field_selector} | data/{field_selector}"):
+        # <field attrs="{}" />
+        for node in arch.xpath("//*[@attrs]"):
+            attributes = attrs_to_attributes(node.attrib["attrs"])
+            if not attributes:
+                continue
+            node.attrib.update(attributes)
+            del node.attrib["attrs"]
+            modified = True
+        # inherited views
+        for node in arch.xpath("//attribute[@name='attrs']"):
+            attributes = attrs_to_attributes(node.text)
+            if not attributes:
+                continue
+            parent = node.getparent()
+            for key, value in attributes.items():
+                new_node = et.SubElement(parent, "attribute", name=key)
+                new_node.text = value
+            parent.remove(node)
+            modified = True
+
+    if modified:
+        tree.write(file_path, xml_declaration=True)
+        with open(file_path, "r+") as xml_file:
+            xml_file.write('<?xml version="1.0" encoding="utf-8"?>')
+            xml_file.seek(0, 2)
+            xml_file.write("\n")
+
+
 def _check_open_form(
     logger, module_path, module_name, manifest_path, migration_steps, tools
 ):
@@ -270,6 +412,17 @@ def _check_open_form(
 
     for file_path in file_paths:
         _check_open_form_view(logger, file_path)
+
+
+def _move_attrs_to_attributes(
+    logger, module_path, module_name, manifest_path, migration_steps, tools
+):
+    reformat_file_ext = ".xml"
+    file_paths = _get_files(module_path, reformat_file_ext)
+    logger.debug(f"{reformat_file_ext} files found:\n" f"{list(map(str, file_paths))}")
+
+    for file_path in file_paths:
+        _move_attrs_to_attributes_view(logger, file_path)
 
 
 def _reformat_read_group(
@@ -291,4 +444,8 @@ def _reformat_read_group(
 
 class MigrationScript(BaseMigrationScript):
 
-    _GLOBAL_FUNCTIONS = [_check_open_form, _reformat_read_group]
+    _GLOBAL_FUNCTIONS = [
+        _check_open_form,
+        _reformat_read_group,
+        _move_attrs_to_attributes,
+    ]
