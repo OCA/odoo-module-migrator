@@ -14,6 +14,13 @@
                         <button name="get_formview_action" type="object" title="Open Task" icon="fa-pencil-square-o"/>
                     </tree>
                 </field>
+                <field name="test_field_2" attrs="{'invisible': ['faulty domain'], 'required': ['!', '&amp;', '|', ('a', '!=', False), ('b', '=', 42), ('c', '=', 43)], 'readonly': [('a', '=', 1), '|', ('b', '=', 2), ('c', '=', 3), ('d', '=', 4)]}" />
+            </field>
+            <field name="zip" position="attributes">
+                <attribute name="attrs">{'required': [
+                    ('a', '=', 1)
+                ]}
+                </attribute>
             </field>
         </field>
     </record>
