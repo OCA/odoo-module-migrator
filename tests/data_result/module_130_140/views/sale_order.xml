@@ -4,6 +4,7 @@
         <field name="name">Example</field>
         <field name="res_model">account.move.line</field>
         <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="domain">[('id', '&gt;', 0)]</field>
         <field name="view_mode">tree</field>
     </record>
     <record id="report_example" model="ir.actions.report">
