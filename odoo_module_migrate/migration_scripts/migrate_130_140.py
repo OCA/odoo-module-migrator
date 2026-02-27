@@ -105,7 +105,7 @@ def _reformat_file(file_path: Path):
             et.indent(tag, space=indent, level=1)
             # Remove trailing newline
             tag_string = et.tostring(tag, pretty_print=True)[:-1]
-            xml_file = re.sub(tag_match, tag_string.decode(), xml_file)
+            xml_file = xml_file.replace(tag_match, tag_string.decode())
 
     # Write the file out again
     file_path.write_text(xml_file)
