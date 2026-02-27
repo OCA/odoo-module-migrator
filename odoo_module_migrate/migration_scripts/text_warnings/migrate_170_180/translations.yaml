@@ -1,0 +1,2 @@
+.py:
+  from odoo(\.tools(\.translate)?)? import .*_: "[18] When possible, it is better to rely on `Env._`: replace '_('text')' by 'self.env._('text')' and remove '_' from the imports. More details: https://github.com/odoo/odoo/pull/174844"
