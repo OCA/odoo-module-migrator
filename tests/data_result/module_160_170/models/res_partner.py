@@ -7,6 +7,7 @@ class ResPartner(models.Model):
     test_field_1 = fields.Boolean()
     task_ids = fields.One2many('project.task')
     task_count = fields.Integer(compute='_compute_task_count', string='# Tasks')
+    last_name = fields.Char()
 
     def _compute_task_count(self):
         # retrieve all children partners and prefetch 'parent_id' on them
@@ -21,3 +22,10 @@ class ResPartner(models.Model):
         group_dependent = self.env['project.task']._read_group([
             ('depend_on_ids', 'in', task_data.ids),
             ], ['depend_on_ids'], ['__count'])
+
+    def _compute_display_name(self):
+        if self.test_field_1:
+            return super()._compute_display_name()
+        for partner in self:
+            name = partner.name + ' ' + partner.last_name
+            partner.display_name = name
