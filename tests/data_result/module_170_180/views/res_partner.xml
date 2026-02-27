@@ -9,6 +9,9 @@
                 <field name="test_field_1"/>
                 <field name="active" widget="boolean_toggle"/>
             </list>
+            <list position="attribute">
+                <attribute name="editable">bottom</attribute>
+            </list>
         </field>
     </record>
     

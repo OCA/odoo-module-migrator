@@ -9,6 +9,9 @@
                 <field name="test_field_1"/>
                 <field name="active" widget='toggle_button'/>
             </tree>
+            <tree position="attribute">
+                <attribute name="editable">1</attribute>
+            </tree>
         </field>
     </record>
     

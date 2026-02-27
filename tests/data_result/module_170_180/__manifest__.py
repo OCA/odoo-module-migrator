@@ -10,5 +10,6 @@
     ],
     'data': [
         'views/res_partner.xml',
+        'views/product_template_view.xml',
     ],
 }
