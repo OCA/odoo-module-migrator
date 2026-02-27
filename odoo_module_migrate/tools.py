@@ -75,6 +75,9 @@ def get_files(module_path, extensions):
     if not module_dir.is_dir():
         raise Exception(f"'{module_path}' is not a valid directory.")
 
+    if isinstance(extensions, str):
+        extensions = (extensions,)
+
     for ext in extensions:
         file_paths.extend(module_dir.rglob(f"*{ext}"))
 
