@@ -72,12 +72,24 @@ def upgrade_sql_constraints(
 ):
     # Odoo method in which we migrate all occurrences of _sql_constraints
     files_to_process = tools.get_files(module_path, (".py",))
-    sql_expression_re = re.compile(r"\b_sql_constraints\s*=\s*\[([^\]]+)]")
+    # Regex pattern explanation:
+    # (?m) - Multiline mode, ^ matches start of each line
+    # ^(?![ \t]*#) - Negative lookahead: exclude lines starting with # (comments)
+    # ([ \t]*) - Capture group 1: leading spaces/tabs (NOT newlines to avoid extra blank lines)
+    # \b_sql_constraints\s*=\s*\[ - Match "_sql_constraints = ["
+    # ([^\]]+) - Capture group 2: constraint content (everything until the closing bracket)
+    # ] - Match closing bracket
+    # re.DOTALL - Allow . to match newlines for multi-line constraints
+    sql_expression_re = re.compile(
+        r"(?m)^(?![ \t]*#)([ \t]*)\b_sql_constraints\s*=\s*\[([^\]]+)]", re.DOTALL
+    )
     ind = " " * 4
 
     # Function to build the new SQL constraint definition
     def build_sql_object(match):
-        constraints = ast.literal_eval("[" + match.group(1) + "]")
+        # Preserve the original indentation level (e.g., 2 spaces, 4 spaces, 8 spaces for nested classes)
+        leading_indent = match.group(1)
+        constraints = ast.literal_eval("[" + match.group(2) + "]")
         result = []
         for name, definition, *messages in constraints:
             message = messages[0] if messages else ""
@@ -92,8 +104,8 @@ def upgrade_sql_constraints(
                 args = f"\n{ind * 2}{definition!r}"
             else:
                 args = repr(definition)
-            result.append(f"_{name} = models.{constructor}({args})")
-        return f"\n{ind}".join(result)
+            result.append(f"{leading_indent}_{name} = models.{constructor}({args})")
+        return "\n".join(result)
 
     # Process each file
     for file in files_to_process:

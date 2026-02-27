@@ -4,7 +4,11 @@ from odoo.osv import expression
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
-    
+
+    # _sql_constraints = [
+    #     ("name_uniq", "unique(name)", "The sale order name must be unique!")
+    # ]
+
     def simple_search(self, base_domain):
         extra_domain = [('state', '=', 'sale')]
         result1 = expression.AND([base_domain, extra_domain])
