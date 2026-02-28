@@ -1,0 +1,4 @@
+- ['pos.category', 'child_id', 'child_ids', '']
+- ['pos.order', 'note', 'floating_order_name', '']
+- ['pos.config', 'iface_customer_facing_display_background_image_1920', 'customer_display_bg_img_name', '']
+- ['product.template', 'description_self_order', 'public_description', '']
