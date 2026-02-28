@@ -1,0 +1,2 @@
+.py:
+  _\(\s*["\'].*?%s.*?["\']: "[Warning] In some languages the order of the placeholders may have to be modified, which is impossible if they are unnamed. We can use named placedholders to avoid this"
