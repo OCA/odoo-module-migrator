@@ -1,0 +1,4 @@
+- ['pos.config', 'is_table_management', '']
+- ['pos.order', 'multiprint_resume', '']
+- ['pos.order.line', 'mp_skip', '']
+- ['restaurant.floor', 'pos_config_id', '']

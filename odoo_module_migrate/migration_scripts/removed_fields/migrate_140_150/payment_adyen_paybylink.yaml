@@ -1,0 +1,2 @@
+- ['payment.acquirer', 'adyen_skin_code', '']
+- ['payment.acquirer', 'adyen_skin_hmac_key', '']

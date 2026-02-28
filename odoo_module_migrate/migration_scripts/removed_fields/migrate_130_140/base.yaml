@@ -1,0 +1,5 @@
+- ['ir.model.data', 'date_init', '']
+- ['ir.model.data', 'date_update', '']
+- ['ir.ui.view', 'model_ids', '']
+- ['res.company', 'account_no', '']
+- ['res.country', 'image', '']

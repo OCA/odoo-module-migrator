@@ -1,0 +1,5 @@
+- ['mailing.list', 'toast_content', '']
+- ['mailing.list', 'website_popup_ids', '']
+- ['website.mass_mailing.popup', 'mailing_list_id', '']
+- ['website.mass_mailing.popup', 'popup_content', '']
+- ['website.mass_mailing.popup', 'website_id', '']

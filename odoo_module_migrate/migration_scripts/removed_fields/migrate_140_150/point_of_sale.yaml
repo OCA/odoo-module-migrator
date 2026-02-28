@@ -1,0 +1,7 @@
+- ['account.bank.statement.cashbox', 'is_a_template', '']
+- ['account.bank.statement.cashbox', 'pos_config_ids', '']
+- ['account.bank.statement.line', 'pos_statement_id', '']
+- ['pos.config', 'default_cashbox_id', '']
+- ['pos.config', 'iface_vkeyboard', '']
+- ['pos.config', 'manage_orders', '']
+- ['pos.payment.method', 'cash_journal_id', '']

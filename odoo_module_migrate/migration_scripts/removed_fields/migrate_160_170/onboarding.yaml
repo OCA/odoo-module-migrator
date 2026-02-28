@@ -1,0 +1,4 @@
+- ['onboarding.onboarding', 'panel_background_color', '']
+- ['onboarding.onboarding', 'panel_background_image', '']
+- ['onboarding.onboarding.step', 'onboarding_id', '']
+- ['onboarding.progress.step', 'progress_id', '']

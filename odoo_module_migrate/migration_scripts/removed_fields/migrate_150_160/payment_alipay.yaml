@@ -1,0 +1,5 @@
+- ['payment.acquirer', 'alipay_md5_signature_key', '']
+- ['payment.acquirer', 'alipay_merchant_partner_id', '']
+- ['payment.acquirer', 'alipay_payment_method', '']
+- ['payment.acquirer', 'alipay_seller_email', '']
+- ['payment.acquirer', 'provider', '']

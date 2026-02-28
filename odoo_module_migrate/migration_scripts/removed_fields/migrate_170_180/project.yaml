@@ -1,0 +1,3 @@
+- ['project.project', 'analytic_account_id', '']
+- ['project.task', 'analytic_account_id', '']
+- ['project.task.type', 'description', '']

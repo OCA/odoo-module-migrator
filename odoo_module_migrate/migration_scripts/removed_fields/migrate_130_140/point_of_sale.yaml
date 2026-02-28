@@ -1,0 +1,4 @@
+- ['pos.config', 'iface_precompute_cash', '']
+- ['pos.config', 'module_pos_reprint', '']
+- ['pos.order', 'location_id', '']
+- ['pos.order', 'picking_id', '']

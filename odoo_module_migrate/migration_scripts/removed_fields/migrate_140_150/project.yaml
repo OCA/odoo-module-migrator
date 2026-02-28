@@ -1,0 +1,5 @@
+- ['project.project', 'allowed_internal_user_ids', '']
+- ['project.project', 'allowed_portal_user_ids', '']
+- ['project.project', 'subtask_project_id', '']
+- ['project.task', 'allowed_user_ids', '']
+- ['project.task', 'user_id', '']
