@@ -142,6 +142,36 @@ def reformat_deprecated_tags(
     logger.debug("Reformatted files:\n" f"{list(reformatted_files)}")
 
 
+def refactor_action_read(**kwargs):
+    """
+    replace action.read() by _for_xml_id to avoid access rights issue
+
+    ##### case 1: pattern for case action.read[0] right after self.env.ref
+    ## action = self.env.ref('sale.action_orders')
+    ## action = action.read()[0]
+
+    ##### case 2: pattern for case having new line between action.read[0] and self.env.ref
+    ## action = self.env.ref('sale.action_orders')
+    ## .........
+    ## .........
+    ## action = action.read()[0]
+    """
+    logger = kwargs["logger"]
+    tools = kwargs["tools"]
+    module_path = kwargs["module_path"]
+    file_paths = _get_files(module_path, ".py")
+
+    old_term = r"action.*= self.env.ref\((.*)\)((\n.+)+?)?(\n.+)(action\.read\(\)\[0\])"
+    new_term = r'\2\4self.env["ir.actions.act_window"]._for_xml_id(\1)'
+    for file_path in file_paths:
+        logger.debug(f"refactor file {file_path}")
+        tools._replace_in_file(
+            file_path,
+            {old_term: new_term},
+            log_message="refactor action.read[0] to _for_xml_id",
+        )
+
+
 _TEXT_REPLACES = {
     ".js": {
         r"tour\.STEPS\.SHOW_APPS_MENU_ITEM": "tour.stepUtils.showAppsMenuItem()",
@@ -155,5 +185,5 @@ _TEXT_REPLACES = {
 
 class MigrationScript(BaseMigrationScript):
 
-    _GLOBAL_FUNCTIONS = [reformat_deprecated_tags]
+    _GLOBAL_FUNCTIONS = [reformat_deprecated_tags, refactor_action_read]
     _TEXT_REPLACES = _TEXT_REPLACES
