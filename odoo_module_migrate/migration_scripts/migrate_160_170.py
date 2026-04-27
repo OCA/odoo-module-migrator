@@ -7,6 +7,158 @@ import sys
 import os
 import ast
 from typing import Any
+import re
+import ast as pyast
+
+# Operator map: old domain op → Python expression op
+_OP_MAP = {
+    "=": "==",
+    "!=": "!=",
+    "<": "<",
+    ">": ">",
+    "<=": "<=",
+    ">=": ">=",
+    "in": "in",
+    "not in": "not in",
+}
+
+def _domain_tuple_to_expr(field, op, value):
+    """Convert a single domain tuple to a Python expression string."""
+    py_op = _OP_MAP.get(op, op)
+    if isinstance(value, str):
+        val_repr = f"'{value}'"
+    elif isinstance(value, bool):
+        val_repr = str(value)
+    elif value is False:
+        val_repr = "False"
+    elif value is None:
+        val_repr = "False"  # Odoo treats None as False in domains
+    else:
+        val_repr = repr(value)
+    return f"{field} {py_op} {val_repr}"
+
+def _domain_to_python_expr(domain_str):
+    """
+    Convert an Odoo domain string like
+      [('state', '=', 'draft'), ('qty', '>', 0)]
+    to a Python expression like
+      state == 'draft' and qty > 0
+
+    Returns None if conversion is not possible (complex domain).
+    """
+    # Normalize HTML entities
+    domain_str = (domain_str
+        .replace("&", "&")
+        .replace("<", "<")
+        .replace(">", ">")
+        .replace(""", '"'))
+    try:
+        domain = pyast.literal_eval(domain_str)
+    except (ValueError, SyntaxError):
+        return None  # Cannot safely parse — leave for manual fix
+
+    if not isinstance(domain, list):
+        return None
+
+    # Handle logical operators ('|', '&', '!')
+    # For now, only handle simple AND-only domains (most common case)
+    parts = []
+    for item in domain:
+        if isinstance(item, str) and item in ('|', '&', '!'):
+            return None  # Complex — skip auto-conversion
+        if not (isinstance(item, (list, tuple)) and len(item) == 3):
+            return None
+        field, op, value = item
+        if not isinstance(field, str):
+            return None
+        expr = _domain_tuple_to_expr(field, op, value)
+        parts.append(expr)
+
+    return " and ".join(parts) if parts else None
+
+
+def migrate_attrs_domains(file_path, logger, **kwargs):
+    """
+    Scan XML view files and convert attrs= domain dicts to
+    inline invisible=/readonly=/required= Python expressions.
+    Complex domains are left in place with a WARNING log.
+    """
+    if not str(file_path).endswith(".xml"):
+        return
+
+    with open(file_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    # Match attrs="{'invisible': [...], 'readonly': [...], ...}"
+    # We use a simple regex to locate the attrs attribute value
+    attrs_pattern = re.compile(
+        r"""attrs=['"]\{([^'"]*)\}['"]"""
+    )
+
+    changed = False
+
+    def replace_attrs(m):
+        nonlocal changed
+        raw = "{" + m.group(1) + "}"
+        # Normalize and try to parse
+        normalized = (raw
+            .replace("&", "&")
+            .replace("<", "<")
+            .replace(">", ">")
+            .replace(""", '"')
+            .replace("True", "true_sentinel")  # temporary
+            .replace("False", "false_sentinel"))
+        try:
+            d = pyast.literal_eval(
+                normalized
+                    .replace("true_sentinel", "True")
+                    .replace("false_sentinel", "False")
+            )
+        except Exception:
+            logger.warning(
+                "Could not parse attrs in %s: %s — manual conversion required",
+                file_path, m.group(0)
+            )
+            return m.group(0)  # leave unchanged
+
+        # Try to convert each modifier key
+        result_attrs = {}
+        failed = False
+        for modifier in ("invisible", "readonly", "required", "column_invisible"):
+            if modifier not in d:
+                continue
+            domain = d[modifier]
+            if isinstance(domain, bool):
+                result_attrs[modifier] = "True" if domain else "False"
+                continue
+            if isinstance(domain, list):
+                expr = _domain_to_python_expr(repr(domain))
+                if expr is None:
+                    logger.warning(
+                        "Complex domain in %s, modifier '%s' — manual conversion needed: %s",
+                        file_path, modifier, domain
+                    )
+                    failed = True
+                    break
+                result_attrs[modifier] = expr
+            else:
+                failed = True
+                break
+
+        if failed or not result_attrs:
+            return m.group(0)  # leave unchanged
+
+        # Build replacement XML attributes
+        parts = " ".join(f'{k}="{v}"' for k, v in result_attrs.items())
+        changed = True
+        return parts
+
+    new_content = attrs_pattern.sub(replace_attrs, content)
+
+    if changed:
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(new_content)
+        logger.info("[IMP] Converted attrs= domains in %s", file_path)
 
 empty_list = ast.parse("[]").body[0].value
 
@@ -448,4 +600,5 @@ class MigrationScript(BaseMigrationScript):
         _check_open_form,
         _reformat_read_group,
         _move_attrs_to_attributes,
+        migrate_attrs_domains,
     ]
