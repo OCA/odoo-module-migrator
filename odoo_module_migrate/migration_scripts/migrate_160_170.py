@@ -9,7 +9,7 @@ import ast
 from typing import Any
 import re
 import ast as pyast
-
+ 
 _OP_MAP = {
     "=": "==",
     "!=": "!=",
@@ -20,8 +20,8 @@ _OP_MAP = {
     "in": "in",
     "not in": "not in",
 }
-
-
+ 
+ 
 def _domain_tuple_to_expr(field, op, value):
     py_op = _OP_MAP.get(op, op)
     if isinstance(value, str):
@@ -33,54 +33,60 @@ def _domain_tuple_to_expr(field, op, value):
     else:
         val_repr = repr(value)
     return field + " " + py_op + " " + val_repr
-
+ 
+ 
 def _domain_to_python_expr(domain_str):
+    """Convert a simple Odoo domain string to a Python boolean expression.
+ 
+    Returns None when conversion is not safe (complex domain with |, &, !).
+    """
     normalized = (
-        domain_str.replace("&", "&")
-        .replace("<", "<")
-        .replace(">", ">")
-        .replace(""", '"')
+        domain_str.replace("&amp;", "&")
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&quot;", '"')
     )
     try:
         domain = pyast.literal_eval(normalized)
     except (ValueError, SyntaxError):
         return None
-
+ 
     if not isinstance(domain, list):
         return None
-
+ 
     parts = []
     for item in domain:
         if isinstance(item, str) and item in ("|", "&", "!"):
-            return None  # complex — skip
+            return None  # complex operator — skip auto-conversion
         if not (isinstance(item, (list, tuple)) and len(item) == 3):
             return None
         field, op, value = item
         if not isinstance(field, str):
             return None
         parts.append(_domain_tuple_to_expr(field, op, value))
-
+ 
     return " and ".join(parts) if parts else None
-
+ 
+ 
 def migrate_attrs_domains(file_path, logger, **kwargs):
-    """Scan XML view files and convert attrs= domain dicts to inline expressions."""
+    """Convert attrs= domain dicts to inline invisible=/readonly=/required=."""
     if not str(file_path).endswith(".xml"):
         return
-
+ 
     with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
-
+ 
     attrs_pattern = re.compile(r"""attrs=['"]\{([^'"]*)\}['"]""")
     changed = False
-
+ 
     def replace_attrs(m):
         nonlocal changed
         raw = "{" + m.group(1) + "}"
         normalized = (
-            raw.replace("&", "&")
-            .replace("<", "<")
-            .replace(">", ">")
-            .replace(""", '"')
+            raw.replace("&amp;", "&")
+            .replace("&lt;", "<")
+            .replace("&gt;", ">")
+            .replace("&quot;", '"')
         )
         try:
             d = pyast.literal_eval(normalized)
@@ -91,7 +97,7 @@ def migrate_attrs_domains(file_path, logger, **kwargs):
                 m.group(0),
             )
             return m.group(0)
-
+ 
         result_attrs = {}
         for modifier in ("invisible", "readonly", "required", "column_invisible"):
             if modifier not in d:
@@ -104,8 +110,7 @@ def migrate_attrs_domains(file_path, logger, **kwargs):
                 expr = _domain_to_python_expr(repr(domain))
                 if expr is None:
                     logger.warning(
-                        "Complex domain in %s, modifier '%s' — manual conversion"
-                        " needed: %s",
+                        "Complex domain in %s, modifier '%s' — manual fix needed: %s",
                         file_path,
                         modifier,
                         domain,
@@ -114,32 +119,31 @@ def migrate_attrs_domains(file_path, logger, **kwargs):
                 result_attrs[modifier] = expr
             else:
                 return m.group(0)
-
+ 
         if not result_attrs:
             return m.group(0)
-
+ 
         changed = True
-        return " ".join(
-            k + '="' + v + '"' for k, v in result_attrs.items()
-        )
-
+        return " ".join(k + '="' + v + '"' for k, v in result_attrs.items())
+ 
     new_content = attrs_pattern.sub(replace_attrs, content)
-
+ 
     if changed:
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(new_content)
         logger.info("[IMP] Converted attrs= domains in %s", file_path)
-        
+ 
+ 
 def migrate_states_attr(file_path, logger, **kwargs):
-    """Warn about remaining states= attributes removed in v17."""
+    """Warn about states= attributes that were removed in Odoo v17."""
     if not str(file_path).endswith(".xml"):
         return
     with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
     if re.search(r'\bstates\s*=\s*["\']', content):
         logger.warning(
-            "[TODO] %s contains states= attributes removed in v17."
-            " Replace with invisible= expressions manually.",
+            "[TODO] %s has states= attributes removed in v17."
+            " Replace manually with invisible= expressions.",
             file_path,
         )
         
