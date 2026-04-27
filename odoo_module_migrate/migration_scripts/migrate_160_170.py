@@ -1,5 +1,6 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-
+from __future__ import annotations
+from typing import Union
 from odoo_module_migrate.base_migration_script import BaseMigrationScript
 import lxml.etree as et
 from pathlib import Path
@@ -32,7 +33,7 @@ class AbstractVisitor(ast.NodeVisitor):
                 )
         return "\n".join(all_lines)
 
-    def add_change(self, old_node: ast.AST, new_node: ast.AST | str):
+    def add_change(self, old_node: ast.AST, new_node: Union[ast.AST, str]):
         position = (
             old_node.lineno,
             old_node.end_lineno,
