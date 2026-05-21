@@ -3,3 +3,4 @@ colorama
 lxml
 pyyaml
 requests
+tqdm
