@@ -6,6 +6,7 @@
         <field name="arch" type="xml">
             <field name="parent_id" position="after">
                 <field name="test_field_1"/>
+                <field name="test_field_2">Changed users</field>
                 <field name="groups_id"/>
             </field>
         </field>
@@ -25,4 +26,15 @@
             </search>
         </field>
     </record>
+    <record id="view_users_form_inherit" model="ir.ui.view">
+        <field name="name">res.users.form.inherit</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//template_users_custom" position="inside">
+                <field name="users"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
