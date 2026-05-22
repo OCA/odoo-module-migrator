@@ -1,0 +1,3 @@
+- ['payment.provider', 'authorize_currency_id', '']
+- ['payment.provider', 'authorize_payment_method_type', '']
+- ['payment.token', 'authorize_payment_method_type', '']

@@ -1,0 +1,5 @@
+- ['payment.acquirer', 'fees_dom_fixed', '']
+- ['payment.acquirer', 'fees_dom_var', '']
+- ['payment.acquirer', 'fees_int_fixed', '']
+- ['payment.acquirer', 'fees_int_var', '']
+- ['payment.transaction', 'paypal_txn_type', '']

@@ -1,0 +1,4 @@
+- ['sale.order.template.line', 'discount', '']
+- ['sale.order.template.line', 'price_unit', '']
+- ['sale.order.template.option', 'discount', '']
+- ['sale.order.template.option', 'price_unit', '']

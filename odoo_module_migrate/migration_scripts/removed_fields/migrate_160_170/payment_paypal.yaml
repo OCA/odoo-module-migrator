@@ -1,0 +1,2 @@
+- ['payment.provider', 'paypal_seller_account', '']
+- ['payment.provider', 'paypal_use_ipn', '']

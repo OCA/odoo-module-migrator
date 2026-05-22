@@ -1,0 +1,4 @@
+- ['stock.move.line', 'product_qty', '']
+- ['stock.move.line', 'product_uom_qty', '']
+- ['stock.picking', 'move_lines', '']
+- ['stock.rule', 'location_id', '']

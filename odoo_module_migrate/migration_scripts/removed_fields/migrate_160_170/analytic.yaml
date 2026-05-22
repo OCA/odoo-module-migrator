@@ -1,0 +1,3 @@
+- ['account.analytic.account', 'message_main_attachment_id', '']
+- ['account.analytic.line', 'plan_id', '']
+- ['account.analytic.plan', 'company_id', '']
