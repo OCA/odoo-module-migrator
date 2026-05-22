@@ -1,0 +1,4 @@
+- ['hr.attendance', 'check_in_latitude', 'in_latitude', '']
+- ['hr.attendance', 'check_in_longitude', 'in_longitude', '']
+- ['hr.attendance', 'check_out_latitude', 'out_latitude', '']
+- ['hr.attendance', 'check_out_longitude', 'out_longitude', '']

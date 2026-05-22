@@ -1,0 +1,6 @@
+- ['event.type', 'default_registration_max', 'seats_max', '']
+- ['event.type', 'use_ticketing', 'use_ticket', '']
+- ['event.event.ticket', 'deadline', 'end_sale_date', '']
+- ['event.registration', 'campaign_id', 'utm_campaign_id', '']
+- ['event.registration', 'medium_id', 'utm_medium_id', '']
+- ['event.registration', 'source_id', 'utm_source_id', '']

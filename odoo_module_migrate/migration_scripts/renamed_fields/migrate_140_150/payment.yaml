@@ -1,0 +1,4 @@
+- ['payment.token', 'payment_ids', 'transaction_ids', '']
+- ['payment.transaction', 'is_processed', 'is_post_processed', '']
+- ['payment.transaction', 'payment_token_id', 'token_id', '']
+- ['payment.acquirer', 'registration_view_template_id', 'inline_form_view_id', '']

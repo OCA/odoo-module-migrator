@@ -1,0 +1,7 @@
+- ['calendar.recurrence', 'fr', 'fri', '']
+- ['calendar.recurrence', 'mo', 'mon', '']
+- ['calendar.recurrence', 'sa', 'sat', '']
+- ['calendar.recurrence', 'su', 'sun', '']
+- ['calendar.recurrence', 'th', 'thu', '']
+- ['calendar.recurrence', 'tu', 'tue', '']
+- ['calendar.recurrence', 'we', 'wed', '']
