@@ -180,3 +180,14 @@ class TestMigration(unittest.TestCase):
             "Differences found in the following files\n- %s"
             % ("\n- ".join(diff_files)),
         )
+
+    def test_migration_180_160(self):
+        self._migrate_module("module_180", "module_180_160", "18.0", "16.0")
+        comparison = self._get_comparison("module_180", "module_180_160")
+        diff_files = self._get_diff_files(comparison, "./")
+        self.assertEqual(
+            len(diff_files),
+            0,
+            "Differences found in the following files\n- %s"
+            % ("\n- ".join(diff_files)),
+        )
