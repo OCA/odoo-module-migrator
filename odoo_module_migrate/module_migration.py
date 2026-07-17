@@ -26,8 +26,8 @@ class ModuleMigration:
             "[%s] Running migration from %s to %s"
             % (
                 self._module_name,
-                self._migration._migration_steps[0]["init_version_name"],
-                self._migration._migration_steps[-1]["target_version_name"],
+                self._migration.migration_start,
+                self._migration.migration_end,
             )
         )
 
@@ -54,7 +54,7 @@ class ModuleMigration:
             "[MIG] %s: Migration to %s"
             % (
                 self._module_name,
-                self._migration._migration_steps[-1]["target_version_name"],
+                self._migration.migration_end,
             )
         )
 
