@@ -5,6 +5,7 @@ import lxml.etree as et
 from pathlib import Path
 import sys
 import os
+import re
 import ast
 from typing import Any
 
@@ -288,7 +289,50 @@ def _reformat_read_group(
             reformatted_files.append(reformatted_file)
     logger.debug("Reformatted files:\n" f"{list(reformatted_files)}")
 
+def replace_pattern_in_xml(xml_file: str, pattern_to_match: str, replacement_text: str):
+    with open(xml_file, "r", encoding="UTF-8") as file:
+        xml_content = file.read()
+
+    modified_content = re.sub(pattern_to_match, replacement_text, xml_content)
+
+    with open(xml_file, "w", encoding="UTF-8") as file:
+        file.write(modified_content)
+
+
+def search_directories(logger, module_path):
+    abs_path = os.path.abspath(module_path)
+    t_esc_match_found = []
+    t_esc = r"t-esc(?![-\w])"
+    t_out = "t-out"
+
+    for root, __, files in os.walk(abs_path):
+        for file_name in files:
+            if not file_name.endswith(".xml"):
+                continue
+            file_path = os.path.join(root, file_name)
+
+            with open(file_path, "r", encoding="UTF-8") as xml_file:
+                data = xml_file.read()
+
+            if data and re.search(t_esc, data):
+                t_esc_match_found.append(file_path)
+                replace_pattern_in_xml(file_path, t_esc, t_out)
+
+    logger.debug("t-esc match_found {0}".format(len(t_esc_match_found)))
+    return t_esc_match_found
+
+
+def replace_tesc_attribute_by_tout(
+    logger, module_path, module_name, manifest_path, migration_steps, tools
+):
+    logger.debug("Starting t-esc to t-out replacement for %s" % module_name)
+    t_esc_data = search_directories(logger, module_path)
+    for file_path in t_esc_data:
+        logger.info("Replaced t-esc by t-out in file %s" % file_path)
+    logger.debug(
+        "Result for {0}:\n{1}".format(module_name, {"Esc Expression Files": t_esc_data})
+    )
 
 class MigrationScript(BaseMigrationScript):
 
-    _GLOBAL_FUNCTIONS = [_check_open_form, _reformat_read_group]
+    _GLOBAL_FUNCTIONS = [_check_open_form, _reformat_read_group, replace_tesc_attribute_by_tout]
