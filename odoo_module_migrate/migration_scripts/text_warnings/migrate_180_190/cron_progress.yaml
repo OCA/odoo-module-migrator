@@ -1,0 +1,2 @@
+.py:
+  _notify_progress\(: "[19] _notify_progress is deprecated. Use _commit_progress instead. IMPORTANT: _commit_progress automatically commits the transaction, so remove any subsequent self.env.cr.commit() calls. Review documentation and examples: https://github.com/odoo/odoo/pull/207082/commits"
