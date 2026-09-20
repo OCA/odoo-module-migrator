@@ -5,6 +5,7 @@
         name="Example"
         res_model="account.move.line"
         src_model="account.move"
+        domain="[('id', '&gt;', 0)]"
         view_mode="tree"/>
     <report
         id="report_example"
