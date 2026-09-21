@@ -38,18 +38,27 @@ class Migration:
         self._migration_scripts = []
         self._module_migrations = []
         self._directory_path = False
+        self.migration_start = init_version_name
+        self.migration_end = target_version_name
 
         # Get migration steps that will be runned
-        found = False
+        mig_start_f = float(self.migration_start)
+        mig_end_f = float(self.migration_end)
         for item in _AVAILABLE_MIGRATION_STEPS:
-            if not found and item["init_version_name"] != init_version_name:
-                continue
-            else:
-                found = True
-            self._migration_steps.append(item)
-            if item["target_version_name"] == target_version_name:
-                # This is the last step, exiting
-                break
+            if (
+                float(item["init_version_name"]) >= mig_start_f
+                and float(item["target_version_name"]) <= mig_end_f
+            ):
+                self._migration_steps.append(item)
+        if mig_start_f > mig_end_f:
+            self._migration_steps.append(
+                {
+                    "init_version_name": self.migration_start,
+                    "target_version_name": self.migration_end,
+                    "init_version_code": str(int(mig_start_f * 10)),
+                    "target_version_code": str(int(mig_end_f * 10)),
+                }
+            )
 
         # Check consistency between format patch and module_names args
         if format_patch and len(module_names) != 1:
@@ -127,10 +136,8 @@ class Migration:
         return any([(module_path / x).exists() for x in _MANIFEST_NAMES])
 
     def _get_code_from_previous_branch(self, module_name, remote_name):
-        init_version = self._migration_steps[0]["init_version_name"]
-        target_version = self._migration_steps[-1]["target_version_name"]
         branch_name = "%(version)s-mig-%(module_name)s" % {
-            "version": target_version,
+            "version": self.migration_end,
             "module_name": module_name,
         }
 
@@ -140,7 +147,7 @@ class Migration:
             % {
                 "branch": branch_name,
                 "remote": remote_name,
-                "version": target_version,
+                "version": self.migration_end,
             },
             path=self._directory_path,
         )
@@ -151,7 +158,7 @@ class Migration:
             "git fetch --depth 9999999 %(remote)s %(init)s"
             % {
                 "remote": remote_name,
-                "init": init_version,
+                "init": self.migration_start,
             },
             path=self._directory_path,
         )
@@ -162,8 +169,8 @@ class Migration:
             "-- %(module)s | git am -3 --keep"
             % {
                 "remote": remote_name,
-                "init": init_version,
-                "target": target_version,
+                "init": self.migration_start,
+                "target": self.migration_end,
                 "module": module_name,
             },
             path=self._directory_path,
@@ -194,8 +201,8 @@ class Migration:
             )
         all_packages = importlib.import_module("odoo_module_migrate.migration_scripts")
 
-        migration_start = float(self._migration_steps[0]["init_version_code"])
-        migration_end = float(self._migration_steps[-1]["target_version_code"])
+        migration_start = float(self.migration_start) * 10
+        migration_end = float(self.migration_end) * 10
 
         for loader, name, is_pkg in pkgutil.walk_packages(all_packages.__path__):
             # Ignore script that will be allways executed.
@@ -236,8 +243,8 @@ class Migration:
         logger.debug(
             "Running migration from: %s to: %s in '%s'"
             % (
-                self._migration_steps[0]["init_version_name"],
-                self._migration_steps[-1]["target_version_name"],
+                self.migration_start,
+                self.migration_end,
                 self._directory_path.resolve(),
             )
         )
