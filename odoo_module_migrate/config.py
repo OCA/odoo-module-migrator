@@ -75,6 +75,12 @@ _AVAILABLE_MIGRATION_STEPS = [
         "init_version_code": "180",
         "target_version_code": "190",
     },
+    {
+        "init_version_name": "19.0",
+        "target_version_name": "20.0",
+        "init_version_code": "190",
+        "target_version_code": "200",
+    },
 ]
 
 _ALLOWED_EXTENSIONS = [".py", ".xml", ".js", ".csv"]

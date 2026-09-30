@@ -1,0 +1,5 @@
+.py:
+  \.get_param\(:
+    "[20] 'ir.config_parameter.get_param' was removed. Use 'get_str', 'get_int', 'get_float' or 'get_bool' depending on the type of the value (default is returned when the key is missing or the value is invalid). More information: https://github.com/odoo/odoo/commit/a4f2879697a7d5d016094e5f60e88e4bf0f10609"
+  \.set_param\(:
+    "[20] 'ir.config_parameter.set_param' was removed. Use 'set_str', 'set_int', 'set_float' or 'set_bool' depending on the type of the value. More information: https://github.com/odoo/odoo/commit/a4f2879697a7d5d016094e5f60e88e4bf0f10609"

@@ -1,0 +1,3 @@
+.xml:
+  t-inherit=:
+    "[20] Owl 3 compiles bare names in template expressions to 'ctx[name]', and the render context is only '{this, __owl__}': in inherited templates replace 'props.x', 'env.x', 'state.x' and component methods by 'this.props.x', 'this.env.x', 'this.state.x', 'this.method(...)'. Not covered by odoo/upgrade_code/owl3-migration.py. More information: https://github.com/odoo/odoo/tree/20.0/odoo/upgrade_code"

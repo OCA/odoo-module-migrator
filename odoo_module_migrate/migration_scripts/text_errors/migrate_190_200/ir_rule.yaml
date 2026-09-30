@@ -1,0 +1,3 @@
+.xml:
+  model=["']ir\.rule["']:
+    "[20] The model 'ir.rule' was removed: record rules become the 'domain' column of ir.access. Merge them by hand or run odoo/upgrade_code/19.4-00-ir-access.py against a database"
