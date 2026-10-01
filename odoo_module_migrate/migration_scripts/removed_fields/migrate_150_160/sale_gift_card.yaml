@@ -1,0 +1,4 @@
+- ['gift.card', 'buy_line_id', '']
+- ['gift.card', 'redeem_line_ids', '']
+- ['sale.order.line', 'generated_gift_card_ids', '']
+- ['sale.order.line', 'gift_card_id', '']

@@ -1,0 +1,7 @@
+- ['account.journal', 'l10n_latam_manual_checks', '']
+- ['account.payment', 'l10n_latam_check_bank_id', '']
+- ['account.payment', 'l10n_latam_check_current_journal_id', '']
+- ['account.payment', 'l10n_latam_check_id', '']
+- ['account.payment', 'l10n_latam_check_issuer_vat', '']
+- ['account.payment', 'l10n_latam_check_operation_ids', '']
+- ['account.payment', 'l10n_latam_check_payment_date', '']

@@ -1,0 +1,5 @@
+- ['event.event', 'auto_confirm', '']
+- ['event.event', 'message_main_attachment_id', '']
+- ['event.registration', 'message_main_attachment_id', '']
+- ['event.registration', 'mobile', '']
+- ['event.type', 'auto_confirm', '']

@@ -1,0 +1,6 @@
+- ['pos.payment', 'paytm_authcode', '']
+- ['pos.payment', 'paytm_card_scheme', '']
+- ['pos.payment', 'paytm_issuer_bank', '']
+- ['pos.payment', 'paytm_issuer_card_no', '']
+- ['pos.payment', 'paytm_payment_method', '']
+- ['pos.payment', 'paytm_reference_no', '']

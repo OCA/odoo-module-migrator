@@ -1,0 +1,5 @@
+- ['mrp.document', '_inherits', '']
+- ['mrp.document', 'active', '']
+- ['mrp.document', 'ir_attachment_id', '']
+- ['mrp.document', 'priority', '']
+- ['stock.picking.type', 'use_auto_consume_components_lots', '']

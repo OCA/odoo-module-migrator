@@ -1,0 +1,4 @@
+- ['product.document', 'attached_on', '']
+- ['res.company', 'sale_down_payment_product_id', '']
+- ['sale.order', 'analytic_account_id', '']
+- ['sale.order.line', 'analytic_distribution_search', '']

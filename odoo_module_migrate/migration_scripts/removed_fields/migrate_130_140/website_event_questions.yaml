@@ -1,0 +1,4 @@
+- ['event.question', 'is_individual', '']
+- ['event.registration', 'answer_ids', '']
+- ['event.registration.answer', 'event_answer_id', '']
+- ['event.registration.answer', 'event_registration_id', '']

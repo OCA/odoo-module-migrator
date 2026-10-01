@@ -1,0 +1,6 @@
+- ['product.packaging', 'height', '']
+- ['product.packaging', 'max_weight', '']
+- ['product.packaging', 'package_carrier_type', '']
+- ['product.packaging', 'packaging_length', '']
+- ['product.packaging', 'shipper_package_code', '']
+- ['product.packaging', 'width', '']

@@ -1,0 +1,3 @@
+- ['product.ribbon', 'product_tag_ids', '']
+- ['product.tag', 'ribbon_id', '']
+- ['res.company', 'website_sale_onboarding_payment_provider_state', '']

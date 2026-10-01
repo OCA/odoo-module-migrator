@@ -1,0 +1,7 @@
+- ['hr.leave', 'holiday_allocation_id', '']
+- ['hr.leave.accrual.level', 'is_based_on_worked_time', '']
+- ['hr.leave.accrual.level', 'parent_id', '']
+- ['hr.leave.allocation', 'message_main_attachment_id', '']
+- ['hr.leave.allocation', 'taken_leave_ids', '']
+- ['hr.leave.type', 'color_name', '']
+- ['hr.leave.type', 'responsible_id', '']
