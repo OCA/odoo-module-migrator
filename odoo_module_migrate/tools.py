@@ -2,6 +2,7 @@
 # @author: Sylvain LE GAL (https://twitter.com/legalsylvain)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+import json
 import subprocess
 import re
 import pathlib
@@ -79,3 +80,13 @@ def get_files(module_path, extensions):
         file_paths.extend(module_dir.rglob(f"*{ext}"))
 
     return file_paths
+
+
+def _get_manifest_dict(manifest_path):
+    """Load the module manifest from the file system."""
+    manifest = {}
+    if not manifest_path:
+        return {}
+    with open(manifest_path, mode="r") as f:
+        manifest.update(ast.literal_eval(f.read()))
+    return manifest
