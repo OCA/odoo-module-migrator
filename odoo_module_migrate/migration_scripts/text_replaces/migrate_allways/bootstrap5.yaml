@@ -1,0 +1,40 @@
+# Bootstrap 4 -> 5, the renames that have a single unambiguous replacement.
+# Odoo switched to Bootstrap 5 in 15.0, so classes left over from 4 silently
+# stop doing anything from that version on.
+#
+# Only direction-independent, one-to-one renames belong here. Classes that
+# Bootstrap 5 dropped without a drop-in replacement (form-group, form-row,
+# btn-block, media, jumbotron, card-deck, input-group-append/prepend,
+# custom-control) need the markup rethought and are reported as warnings
+# instead.
+.xml:
+  # Spacing: the utilities API defines margin-start/margin-end as ms/me and
+  # padding-start/padding-end as ps/pe. ml/mr/pl/pr no longer exist.
+  (?<![\w-])ml-((?:sm|md|lg|xl|xxl)-)?(0|1|2|3|4|5|auto)(?![\w-]): ms-\1\2
+  (?<![\w-])mr-((?:sm|md|lg|xl|xxl)-)?(0|1|2|3|4|5|auto)(?![\w-]): me-\1\2
+  (?<![\w-])pl-((?:sm|md|lg|xl|xxl)-)?(0|1|2|3|4|5)(?![\w-]): ps-\1\2
+  (?<![\w-])pr-((?:sm|md|lg|xl|xxl)-)?(0|1|2|3|4|5)(?![\w-]): pe-\1\2
+  # Text alignment: values are start/end/center.
+  (?<![\w-])text-((?:sm|md|lg|xl|xxl)-)?left(?![\w-]): text-\1start
+  (?<![\w-])text-((?:sm|md|lg|xl|xxl)-)?right(?![\w-]): text-\1end
+  # Float: values are start/end/none.
+  (?<![\w-])float-((?:sm|md|lg|xl|xxl)-)?left(?![\w-]): float-\1start
+  (?<![\w-])float-((?:sm|md|lg|xl|xxl)-)?right(?![\w-]): float-\1end
+  # Borders and rounded corners.
+  (?<![\w-])border-left(?![\w-]): border-start
+  (?<![\w-])border-right(?![\w-]): border-end
+  (?<![\w-])rounded-left(?![\w-]): rounded-start
+  (?<![\w-])rounded-right(?![\w-]): rounded-end
+  # Dropdown alignment.
+  (?<![\w-])dropdown-menu-left(?![\w-]): dropdown-menu-start
+  (?<![\w-])dropdown-menu-right(?![\w-]): dropdown-menu-end
+  # Typography: font-weight -> fw, font-style -> fst, font-family -> font.
+  (?<![\w-])font-weight-(lighter|light|normal|bold|bolder)(?![\w-]): fw-\1
+  (?<![\w-])font-italic(?![\w-]): fst-italic
+  (?<![\w-])text-monospace(?![\w-]): font-monospace
+  # Renamed helpers and components.
+  (?<![\w-])sr-only-focusable(?![\w-]): visually-hidden-focusable
+  (?<![\w-])sr-only(?![\w-]): visually-hidden
+  (?<![\w-])badge-pill(?![\w-]): rounded-pill
+  (?<![\w-])custom-select(?![\w-]): form-select
+  (?<![\w-])no-gutters(?![\w-]): g-0

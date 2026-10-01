@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_bootstrap" model="ir.ui.view">
+        <field name="name">res.partner.bootstrap</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <form>
+                <div class="ms-2 me-auto ps-3 pe-0">
+                    <span class="visually-hidden">Hidden label</span>
+                    <span class="badge rounded-pill">New</span>
+                </div>
+                <div class="row g-0 ms-sm-3 text-md-end float-lg-start">
+                    <div class="border-start rounded-end fw-bold fst-italic">
+                        <field name="comment" class="font-monospace"/>
+                    </div>
+                    <div class="dropdown-menu-end form-select text-start"/>
+                </div>
+                <!-- untouched: not Bootstrap direction classes -->
+                <div class="mt-2 mb-3 mx-auto o-text-right text-lefty ml-6"/>
+            </form>
+        </field>
+    </record>
+</odoo>
