@@ -1,0 +1,5 @@
+- ['pos.order.line', 'returned_line_id', 'refunded_orderline_id', '']
+- ['pos.order.line', 'refund_line_ids', 'refund_orderline_ids', '']
+- ['pos.order.line', 'note', 'customer_note', '']
+- ['pos.config', 'iface_customer_facing_display', 'iface_customer_facing_display_via_proxy', '']
+- ['pos.payment.method', 'cash_journal_id', 'journal_id', '']

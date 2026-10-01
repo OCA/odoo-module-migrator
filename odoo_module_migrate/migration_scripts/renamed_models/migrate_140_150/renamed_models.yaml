@@ -1,0 +1,4 @@
+- ["calendar.contacts", "calendar.filters", None]
+- ["mail.moderation", "mail.group.moderation", None]
+- ["stock.inventory", "stock.quant", None]
+- ["stock.inventory.line", "stock.move.line", None]

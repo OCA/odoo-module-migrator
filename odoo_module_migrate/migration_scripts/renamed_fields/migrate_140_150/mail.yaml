@@ -1,0 +1,6 @@
+- ['mail.activity.type', 'default_next_type_id', 'triggered_next_type_id', '']
+- ['mail.activity.type', 'next_type_ids', 'suggested_next_type_ids', '']
+- ['mail.activity.type', 'default_description', 'default_note', '']
+- ['mail.message', 'no_auto_thread', 'reply_to_force_new', '']
+- ['mail.notification', 'mail_id', 'mail_mail_id', '']
+- ['mail.mail', 'notification', 'is_notification', '']
