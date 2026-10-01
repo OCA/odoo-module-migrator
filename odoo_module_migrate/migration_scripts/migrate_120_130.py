@@ -69,6 +69,12 @@ _TEXT_REPLACES = {
             />
             """,
     },
+    ".js": {
+        # Agrega la sustitución para archivos .js
+        r"require\('web\.colorpicker'\);": "require('web.ColorpickerDialog');",
+        r"\.done\(": ".then(",
+    },
+
 }
 
 
