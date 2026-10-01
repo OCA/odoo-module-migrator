@@ -57,40 +57,68 @@ class VisitorToPrivateReadGroup(AbstractVisitor):
 class VisitorInverseGroupbyFields(AbstractVisitor):
     def visit_Call(self, node: ast.Call) -> Any:
         if isinstance(node.func, ast.Attribute) and node.func.attr == "_read_group":
-            # Should have the same number of args/keywords
-            # Inverse fields/groupby order
+            # Map keywords by their argument names
             keywords_by_key = {keyword.arg: keyword.value for keyword in node.keywords}
             key_i_by_key = {keyword.arg: i for i, keyword in enumerate(node.keywords)}
-            if len(node.args) >= 3:
-                self.add_change(node.args[2], node.args[1])
-                self.add_change(node.args[1], node.args[2])
-            elif len(node.args) == 2:
-                new_args_value = keywords_by_key.get("groupby", empty_list)
-                if "groupby" in keywords_by_key:
-                    fields_args = ast.keyword("fields", node.args[1])
-                    self.add_change(node.args[1], new_args_value)
-                    self.add_change(node.keywords[key_i_by_key["groupby"]], fields_args)
+
+            # Handle cases where node.args is empty
+            if not node.args:
+                # Ensure both 'groupby' and 'fields' exist in keywords
+                groupby_keyword = keywords_by_key.get("groupby", empty_list)
+                fields_keyword = keywords_by_key.get("fields", empty_list)
+
+                if "groupby" in key_i_by_key and "fields" in key_i_by_key:
+                    groupby_keyword_node = node.keywords[key_i_by_key["groupby"]]
+                    fields_keyword_node = node.keywords[key_i_by_key["fields"]]
+                    self.add_change(groupby_keyword_node, fields_keyword_node)
+                    self.add_change(fields_keyword_node, groupby_keyword_node)
                 else:
-                    self.add_change(
-                        node.args[1],
-                        f"{ast.unparse(new_args_value)}, {ast.unparse(node.args[1])}",
+                    # Log missing keywords and skip processing
+                    missing_keys = []
+                    if "groupby" not in keywords_by_key:
+                        missing_keys.append("groupby")
+                    if "fields" not in keywords_by_key:
+                        missing_keys.append("fields")
+                    # Skip processing if required keywords are missing
+                    print(
+                        f"Skipping _read_group call due to missing keywords: {missing_keys}"
                     )
-            else:  # len(node.args) <= 2
-                if (
-                    "groupby" in key_i_by_key
-                    and "fields" in key_i_by_key
-                    and key_i_by_key["groupby"] > key_i_by_key["fields"]
-                ):
-                    self.add_change(
-                        node.keywords[key_i_by_key["groupby"]],
-                        node.keywords[key_i_by_key["fields"]],
-                    )
-                    self.add_change(
-                        node.keywords[key_i_by_key["fields"]],
-                        node.keywords[key_i_by_key["groupby"]],
-                    )
-                else:
-                    raise ValueError(f"{key_i_by_key}, {keywords_by_key}, {node.args}")
+                    return
+            else:
+                # Handle cases with positional arguments
+                if len(node.args) >= 3:
+                    self.add_change(node.args[2], node.args[1])
+                    self.add_change(node.args[1], node.args[2])
+                elif len(node.args) == 2:
+                    new_args_value = keywords_by_key.get("groupby", empty_list)
+                    if "groupby" in keywords_by_key:
+                        fields_args = ast.keyword("fields", node.args[1])
+                        self.add_change(node.args[1], new_args_value)
+                        self.add_change(node.keywords[key_i_by_key["groupby"]], fields_args)
+                    else:
+                        self.add_change(
+                            node.args[1],
+                            f"{ast.unparse(new_args_value)}, {ast.unparse(node.args[1])}",
+                        )
+                else:  # len(node.args) <= 2
+                    if (
+                        "groupby" in key_i_by_key
+                        and "fields" in key_i_by_key
+                        and key_i_by_key["groupby"] > key_i_by_key["fields"]
+                    ):
+                        self.add_change(
+                            node.keywords[key_i_by_key["groupby"]],
+                            node.keywords[key_i_by_key["fields"]],
+                        )
+                        self.add_change(
+                            node.keywords[key_i_by_key["fields"]],
+                            node.keywords[key_i_by_key["groupby"]],
+                        )
+                    else:
+                        print(
+                            f"Skipping _read_group call due to insufficient arguments: {key_i_by_key}, {keywords_by_key}, {node.args}"
+                        )
+                        return
         self.generic_visit(node)
 
 
